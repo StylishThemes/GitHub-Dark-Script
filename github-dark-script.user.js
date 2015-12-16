@@ -9,6 +9,7 @@
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
@@ -400,12 +401,6 @@
 
       this.$style.prop( 'disabled', !this.data.stored.enable );
       $( '#ghd-options-inner .ghd-enable' )[0].checked = this.data.stored.enable;
-
-      // load color picker script
-      GM_xmlhttpRequest({
-        method : 'GET',
-        url : 'https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js'
-      });
 
       // only load package.json once a day
       if ( new Date().getTime() > this.data.stored.date + this.delay ) {
