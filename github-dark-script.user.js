@@ -59,10 +59,7 @@
       'fit'   : 'background-repeat: no-repeat !important; background-size: cover !important; background-position: center top !important;'
     },
 
-    getStoredValues : function() {
-      // get values from localstorage & save to this.data
-      this.data.stored = $.parseJSON( window.localStorage.GitHubDark || 'null' ) || { date : 0, version : 0 };
-
+    updatePanel : function() {
       var data = this.data.stored,
         $panel = $( '#ghd-options-inner' );
 
@@ -77,6 +74,12 @@
       $panel.find( '.ghd-type' ).val( data.type || 'tiled' );
       $panel.find( '.ghd-attach' ).val( data.attach || 'scroll' );
       $panel.find( '.ghd-tab' ).val( data.tab || 4 );
+    },
+
+    getStoredValues : function() {
+      // get values from localstorage & save to this.data
+      this.data.stored = $.parseJSON( window.localStorage.GitHubDark || 'null' ) || { date : 0, version : 0 };
+      this.updatePanel();
 
       if ( this.debug ) {
         console.log( 'Retrieved stored values', data );
@@ -255,7 +258,7 @@
       var $panel = $( '#ghd-options-inner' ),
       data = this.data.stored;
 
-      data.enable = $panel.find( '.ghd-enable' ).val();
+      data.enable = $panel.find( '.ghd-enable' ).is( ':checked' );
       data.theme  = $panel.find( '.ghd-theme' ).val();
       data.color  = $panel.find( '.ghd-color' ).val();
       data.font   = $panel.find( '.ghd-font' ).val();
@@ -267,6 +270,8 @@
       if ( this.debug ) {
         console.log( 'updating user settings', data );
       }
+
+      this.$style.prop( 'disabled', !data.enable );
 
       this.processStyle();
       this.getTheme();
@@ -313,7 +318,7 @@
             '<div class="boxed-group-inner">',
               '<form>',
                 '<p class="checkbox">',
-                 '<input class="ghd-enable" type="checkbox" checked><label>Enable GitHub-Dark</label>',
+                 '<input class="ghd-enable" type="checkbox"><label>Enable GitHub-Dark</label>',
                 '</p>',
                 '<p><label>Theme:</label> ' + themes + '</select></p>',
                 '<p>',
@@ -361,7 +366,6 @@
 
       $panel = $( '#ghd-options-inner' ).on( 'click', function( e ) {
         e.stopPropagation();
-        return false;
       });
 
       $panel.find( '.ghd-apply' ).on( 'click', function() {
@@ -372,16 +376,13 @@
         ghd.forceUpdate();
       });
 
-      $panel.find( '.ghd-enable' ).on( 'change', function() {
-        ghd.$style.prop( 'disabled', !this.checked );
-      });
-
       // Create our menu entry
       var menu = $( '<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>' );
       $( '.header .dropdown-item[href="/settings/profile"]' ).after( menu );
 
       $( '#ghd-menu' ).on( 'click', function() {
         $( '.modal-backdrop' ).click();
+        ghd.updatePanel();
         $( '#ghd-options' ).addClass( 'in' );
       });
 
@@ -397,6 +398,9 @@
 
       // load values from local storage
       this.getStoredValues();
+
+      this.$style.prop( 'disabled', !this.data.stored.enable );
+      $( '#ghd-options-inner .ghd-enable' )[0].checked = this.data.stored.enable;
 
       // load color picker script
       GM_xmlhttpRequest({
