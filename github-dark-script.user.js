@@ -82,9 +82,8 @@
       this.updatePanel();
 
       if ( this.debug ) {
-        console.log( 'Retrieved stored values', data );
+        console.log( 'Retrieved stored values', this.data );
       }
-
     },
 
     setStoredValues : function() {
