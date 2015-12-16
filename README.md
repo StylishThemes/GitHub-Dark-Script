@@ -1,4 +1,4 @@
-# GitHub Dark Script [![tags](https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Scrip.svg?style=flat)](https://github.com/StylishThemes/GitHub-Dark-Script/tags)
+# GitHub Dark Script [![tags](https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Script.svg?style=flat)](https://github.com/StylishThemes/GitHub-Dark-Script/tags)
 
 Userscript addition to [GitHub Dark](https://github.com/StylishThemes/GitHub-Dark) which adds an options panel to toggle style options.
 
