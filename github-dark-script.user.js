@@ -8,6 +8,7 @@
 // @include      /raw\.githubusercontent\.com/
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
+// @run-at       document-end
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
