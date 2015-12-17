@@ -14,9 +14,9 @@
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle */
+/* global jQuery, GM_addStyle, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
-(function($) {
+( function( $ ) {
   "use strict";
 
   // Skip script if no option dropdown exists
@@ -24,7 +24,7 @@
 
   var ghd = {
 
-    debug : window.location.search === '?debug',
+    debug : /\?debug/.test( window.location.href ),
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
@@ -62,25 +62,41 @@
     },
 
     updatePanel : function() {
-      var data = this.data.stored,
+      var color,
+        data = this.data.stored,
         $panel = $( '#ghd-options-inner' );
 
       // update this.themes so the saved theme isn't reloaded
-      this.themes[ data.theme ] = data.themeCss;
-
-      $panel.find( '.ghd-enable' ).prop( 'checked', data.enabled || true );
-      $panel.find( '.ghd-theme' ).val( data.theme || 'Twilight' );
-      $panel.find( '.ghd-color' ).val( data.color || '#4183C4' );
+      if ( data.theme ) {
+        this.themes[ data.theme ] = data.themeCss;
+      } else {
+        data.theme = 'Twilight';
+      }
+      $panel.find( '.ghd-enable' ).prop( 'checked', data.enable );
+      $panel.find( '.ghd-theme' ).val( data.theme );
       $panel.find( '.ghd-font' ).val( data.font || 'Menlo' );
       $panel.find( '.ghd-image' ).val( data.image || '' );
       $panel.find( '.ghd-type' ).val( data.type || 'tiled' );
       $panel.find( '.ghd-attach' ).val( data.attach || 'scroll' );
       $panel.find( '.ghd-tab' ).val( data.tab || 4 );
+
+      color = data.color || '#4183C4';
+      $panel.find( '.ghd-color' ).val( color );
+      // update swatch color & color picker value
+      $panel.find( '#ghd-swatch' ).css( 'background-color', color );
+
+      if ( this.picker ) {
+        this.picker.fromString( color );
+      }
+      this.$style.prop( 'disabled', !data.enable );
+
     },
 
     getStoredValues : function() {
       // get values from localstorage & save to this.data
-      this.data.stored = $.parseJSON( window.localStorage.GitHubDark || 'null' ) || { date : 0, version : 0 };
+      this.data.stored = $.parseJSON( window.localStorage.GitHubDark || 'null' ) ||
+        // defaults when no localStorage available
+        { date : 0, version : 0, enable : true };
       this.updatePanel();
 
       if ( this.debug ) {
@@ -153,11 +169,17 @@
 
     // load syntax highlighting theme, if necessary
     getTheme : function() {
-      var name = this.data.stored.theme;
+      if ( !this.data.stored.enable ) {
+        if ( this.debug ) {
+          console.log( 'Disabled: stop theme processing' );
+        }
+        return;
+      }
+      var name = this.data.stored.theme || 'Twilight';
       // test if this.themes contains the url (.min.css), or the actual css
       if ( /\.min\.css$/.test( this.themes[ name ] ) ) {
         if ( this.debug ) {
-          console.log( 'Loading "' + name + '" theme' );
+          console.log( 'Loading "' + name + '" theme', ghd.root + ghd.themes[ name ] );
         }
         GM_xmlhttpRequest({
           method : 'GET',
@@ -195,6 +217,12 @@
         css = data.rawCss || '',
         url = /^url/.test( data.image || '' ) ? data.image :
           ( data.image === 'none' ? 'none' : 'url("' + data.image + '")' );
+      if ( !data.enable ) {
+        if ( this.debug ) {
+          console.log( 'Disabled: stop processing' );
+        }
+        return;
+      }
       if ( this.debug ) {
         console.log( 'Processing set styles' );
       }
@@ -218,7 +246,7 @@
       this.applyStyle( css );
     },
 
-    // this.data.stored.themeCSS should be populated with user selected theme
+    // this.data.stored.themeCss should be populated with user selected theme
     // called asynchronously from processStyle()
     processTheme : function() {
       if ( this.debug ) {
@@ -234,11 +262,11 @@
         css = this.$style.html() || '';
       }
       // add syntax highlighting theme
-      css = css.replace( '/*[[syntax-theme]]*/', this.data.stored.themeCSS || '' );
+      css = css.replace( '/*[[syntax-theme]]*/', this.data.stored.themeCss || '' );
 
       if ( this.debug ) {
         console.log( 'Applying "' + this.data.stored.theme + '" theme', '"' +
-          ( this.data.stored.themeCSS || '' ).substring( 0, 30 ) + '"' );
+          ( this.data.stored.themeCss || '' ).substring( 0, 30 ) + '"' );
       }
 
       this.$style.html( css );
@@ -300,11 +328,11 @@
         '#ghd-options-close {height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer}',
         '#ghd-options-close:hover {fill: #ccc}',
         '#ghd-options .ghd-right { float: right; }',
-        '#ghd-options p { line-height: 30px; }'
+        '#ghd-options p { line-height: 30px; }',
+        '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }'
       ].join( '' ) );
 
-      var $panel,
-        themes = '<select class="ghd-theme ghd-right">';
+      var themes = '<select class="ghd-theme ghd-right">';
       $.each( this.themes, function( opt ) {
         themes += '<option value="' + opt + '">' + opt + '</option>';
       });
@@ -323,7 +351,8 @@
                 '</p>',
                 '<p><label>Theme:</label> ' + themes + '</select></p>',
                 '<p>',
-                  '<label>Color:</label> <input class="jscolor ghd-color ghd-right" type="text" value="#4183C4">',
+                  '<label>Color:</label> <input class="ghd-color ghd-right" type="text" value="#4183C4">',
+                  '<span id="ghd-swatch" class="ghd-right"></span>',
                 '</p>',
                 '<p>',
                   '<label>Background image:</label> <input class="ghd-image ghd-right" type="text">',
@@ -349,8 +378,8 @@
                   '<label>Code Font:</label> <input class="ghd-font ghd-right" type="text">',
                 '</p>',
                 '<p>',
-                  '<a href="#" class="ghd-apply btn btn-sm tooltipped tooltipped-n" aria-label="Click to apply the above options to the page">Apply Changes</a>',
-                  '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a> ',
+                  '<a href="#" class="ghd-apply btn btn-sm tooltipped tooltipped-n" aria-label="Click to apply the above options to the page">Apply Changes</a>&nbsp;',
+                  '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a>',
                 '</p>',
               '</form>',
             '</div>',
@@ -361,21 +390,46 @@
       // place for the stylesheet to be added
       this.$style = $( '<style class="ghd-style">' ).appendTo( 'body' );
 
-      $( '#ghd-options, #ghd-options-close' ).on( 'click', function() {
+    },
+
+    bindEvents : function() {
+
+      var $panel = $( '#ghd-options-inner' ),
+          $swatch = $panel.find( '#ghd-swatch' );
+
+      $( '#ghd-options, #ghd-options-close' ).on( 'click keyup', function( e ) {
+        // press escape to close options
+        if ( e.type === 'keyup' && e.which !== 27 ) {
+          return;
+        }
         $( '#ghd-options' ).removeClass( 'in' );
+        ghd.picker.hide();
       });
 
-      $panel = $( '#ghd-options-inner' ).on( 'click', function( e ) {
+      $panel.on( 'click', function( e ) {
         e.stopPropagation();
       });
 
       $panel.find( '.ghd-apply' ).on( 'click', function() {
         ghd.updateStyle();
+        return false;
       });
 
       $panel.find( '.ghd-update' ).on( 'click', function() {
         ghd.forceUpdate();
+        return false;
       });
+
+      this.picker = new jscolor( $panel.find( '.ghd-color' )[ 0 ] );
+      this.picker.zIndex = 65536;
+      this.picker.hash = true;
+      this.picker.backgroundColor = '#333';
+      this.picker.padding = 0;
+      this.picker.borderWidth = 0;
+      this.picker.borderColor = '#444';
+      this.picker.onFineChange = function() {
+        $swatch[0].style.backgroundColor = '#' + ghd.picker;
+      };
 
       // Create our menu entry
       var menu = $( '<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>' );
@@ -410,12 +464,19 @@
         this.checkVersion();
       } else {
         this.processStyle();
+        this.getTheme();
       }
 
     }
 
   };
 
+  // add style at document-start
   ghd.init();
 
-})(jQuery.noConflict(true));
+  $(function(){
+    // add event binding on document ready
+    ghd.bindEvents();
+  });
+
+})( jQuery.noConflict( true ) );
