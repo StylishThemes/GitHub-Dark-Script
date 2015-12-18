@@ -24,10 +24,14 @@
 
   var ghd = {
 
-    debug : /\?debug/.test( window.location.href ),
+    // use in localStorage
+    storageKey : 'GitHubDark',
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
+
+    // include a "?debug" anywhere in the browser URL to enable debugging
+    debug : /\?debug/.test( window.location.href ),
 
     // gh-pages url prefix for theme url
     root : 'https://stylishthemes.github.io/GitHub-Dark/',
@@ -61,6 +65,8 @@
       'fit'   : 'background-repeat: no-repeat !important; background-size: cover !important; background-position: center top !important;'
     },
 
+    wrapIcon : '<div class="ghd-wrap-toggle tooltipped tooltipped-n" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768"><path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/></svg></div>',
+
     updatePanel : function() {
       var color,
         data = this.data.stored,
@@ -73,6 +79,7 @@
         data.theme = 'Twilight';
       }
       $panel.find( '.ghd-enable' ).prop( 'checked', data.enable );
+      $panel.find( '.ghd-wrap' ).prop( 'checked', data.wrap );
       $panel.find( '.ghd-theme' ).val( data.theme );
       $panel.find( '.ghd-font' ).val( data.font || 'Menlo' );
       $panel.find( '.ghd-image' ).val( data.image || '' );
@@ -89,6 +96,9 @@
         this.picker.fromString( color );
       }
       this.$style.prop( 'disabled', !data.enable );
+      $( 'body' )
+        .toggleClass( 'ghd-disabled', !data.enable )
+        .toggleClass( 'nowrap', !data.wrap );
 
     },
 
@@ -96,7 +106,14 @@
       // get values from localstorage & save to this.data
       this.data.stored = $.parseJSON( window.localStorage.GitHubDark || 'null' ) ||
         // defaults when no localStorage available
-        { date : 0, version : 0, enable : true };
+        { date : 0, version : 0, enable : true, wrap : true };
+
+      var data = this.data.stored,
+        $panel = $( '#ghd-options-inner' );
+
+      $panel.find( '.ghd-enable' )[0].checked = data.enable;
+      $panel.find( '.ghd-wrap' )[0].checked = data.wrap;
+
       this.updatePanel();
 
       if ( this.debug ) {
@@ -106,7 +123,7 @@
 
     setStoredValues : function() {
       // save values to local storage - assume localstorage is available
-      window.localStorage.GitHubDark = JSON.stringify( this.data.stored || {} );
+      window.localStorage[ this.storageKey ] = JSON.stringify( this.data.stored || {} );
     },
 
     // convert version "1.2.3" into "001002003" for easier comparison
@@ -206,6 +223,7 @@
       rawCss  : '@-moz-document regexp("^...',  // github-dark.css (unprocessed)
       color   : '#4183C4',
       font    : 'Menlo',
+      wrap    : true, // code: wrap long lines
       image   : 'url()',
       type    : 'tiled',
       attach  : 'scroll',
@@ -291,6 +309,7 @@
       data.theme  = $panel.find( '.ghd-theme' ).val();
       data.color  = $panel.find( '.ghd-color' ).val();
       data.font   = $panel.find( '.ghd-font' ).val();
+      data.wrap   = $panel.find( '.ghd-wrap' ).is( ':checked' );
       data.image  = $panel.find( '.ghd-image' ).val();
       data.type   = $panel.find( '.ghd-type' ).val();
       data.attach = $panel.find( '.ghd-attach' ).val();
@@ -301,6 +320,9 @@
       }
 
       this.$style.prop( 'disabled', !data.enable );
+      $( 'body' )
+        .toggleClass( 'ghd-disabled', !data.enable )
+        .toggleClass( 'nowrap', !data.wrap );
 
       this.processStyle();
       this.getTheme();
@@ -320,16 +342,29 @@
       }
       // Script-specific CSS
       GM_addStyle([
-        '#ghd-menu:hover {cursor:pointer}',
-        '#ghd-options {position:fixed; z-index: 65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden;}',
-        '#ghd-options.in {opacity:1; visibility:visible; background:rgba(0,0,0,.5);}',
-        '#ghd-options-inner {position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow: 0 .5rem 1rem #111; color:#c0c0c0}',
-        '#ghd-options label {margin-left:.5rem; position:relative; top:-1px }',
-        '#ghd-options-close {height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer}',
-        '#ghd-options-close:hover {fill: #ccc}',
+        '#ghd-menu:hover { cursor:pointer }',
+        '#ghd-options { position:fixed; z-index: 65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden; }',
+        '#ghd-options.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5); }',
+        '#ghd-options-inner { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow: 0 .5rem 1rem #111; color:#c0c0c0 }',
+        '#ghd-options label { margin-left:.5rem; position:relative; top:-1px }',
+        '#ghd-options-close { height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer }',
+        '#ghd-options-close:hover { fill: #ccc }',
         '#ghd-options .ghd-right { float: right; }',
         '#ghd-options p { line-height: 30px; }',
-        '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }'
+        '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }',
+
+        // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
+        // icons next to a pre
+        '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:1000; }',
+        // icons inside a wrapper immediatly around a pre
+        '.highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }',
+        '.ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
+        '.ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(255,255,255,.4); }',
+        // 'body:not(.nowrap) .ghd-wrap-toggle svg { fill:rgba(255,255,255,.8) }',
+        'body:not(.nowrap) .ghd-wrap-toggle:hover svg { fill:#006400; }', // wrap enabled (green)
+        '.blob-wrapper, .markdown-body > pre, .markdown-body > .highlight { position:relative; }',
+        // hide wrap icon when style disabled
+        'body.ghd-disabled .ghd-wrap-toggle { display: none; }'
       ].join( '' ) );
 
       var themes = '<select class="ghd-theme ghd-right">';
@@ -356,6 +391,7 @@
                 '</p>',
                 '<p>',
                   '<label>Background image:</label> <input class="ghd-image ghd-right" type="text">',
+                  '<a href="https://github.com/StylishThemes/GitHub-Dark/wiki/Image" class="tooltipped tooltipped-n" aria-label="Click to learn about GitHub\'s Content Security&#10;Policy and how to add a custom image"><sup>?</sup></a>',
                 '</p>',
                 '<p>',
                   '<label>Background image type:</label>',
@@ -376,6 +412,10 @@
                 '</p>',
                 '<p>',
                   '<label>Code Font:</label> <input class="ghd-font ghd-right" type="text">',
+                  '<a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-n" aria-label="Add a system installed font name;&#10;this script will not load external fonts!"><sup>?</sup></a>',
+                '</p>',
+                '<p class="checkbox">',
+                 '<input class="ghd-wrap" type="checkbox"><label>Wrap Code</label>',
                 '</p>',
                 '<p>',
                   '<a href="#" class="ghd-apply btn btn-sm tooltipped tooltipped-n" aria-label="Click to apply the above options to the page">Apply Changes</a>&nbsp;',
@@ -389,6 +429,12 @@
 
       // place for the stylesheet to be added
       this.$style = $( '<style class="ghd-style">' ).appendTo( 'body' );
+
+      // add wrap code icons
+      $( '.blob-wrapper, .markdown-body > .highlight' ).prepend ( this.wrapIcon );
+      $( '.markdown-body > pre' )
+        .before( this.wrapIcon )
+        .parent().css( 'position', 'relative' );
 
     },
 
@@ -418,6 +464,12 @@
       $panel.find( '.ghd-update' ).on( 'click', function() {
         ghd.forceUpdate();
         return false;
+      });
+
+      $( '.ghd-wrap-toggle' ).on( 'click', function() {
+        ghd.data.stored.wrap = !ghd.data.stored.wrap;
+        $( 'body' ).toggleClass( 'nowrap', !ghd.data.stored.wrap );
+        ghd.setStoredValues();
       });
 
       this.picker = new jscolor( $panel.find( '.ghd-color' )[ 0 ] );
@@ -456,6 +508,9 @@
 
       this.$style.prop( 'disabled', !this.data.stored.enable );
       $( '#ghd-options-inner .ghd-enable' )[0].checked = this.data.stored.enable;
+      $( 'body' )
+        .toggleClass( 'ghd-disabled', !this.data.stored.enable )
+        .toggleClass( 'nowrap', this.data.stored.wrap );
 
       // only load package.json once a day
       if ( new Date().getTime() > this.data.stored.date + this.delay ) {
