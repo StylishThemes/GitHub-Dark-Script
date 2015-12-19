@@ -23,9 +23,6 @@
 (function($) {
   'use strict';
 
-  // apply style as soon as possible
-  GM_addStyle(GM_getResourceText("ghd"));
-
   var ghd = {
 
     // use in localStorage
@@ -521,8 +518,10 @@
 
       this.$style.prop('disabled', !this.data.stored.enable);
 
-      this.processStyle();
-      this.getTheme();
+      // apply style from cache
+      ghd.data.stored.rawCss = GM_getResourceText("ghd");
+      ghd.processStyle();
+      ghd.getTheme();
     }
 
   };
