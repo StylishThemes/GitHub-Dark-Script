@@ -16,10 +16,10 @@
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle, GM_xmlhttpRequest, jscolor */
+/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
-( function( $ ) {
-  "use strict";
+(function($) {
+  'use strict';
 
   var ghd = {
 
@@ -30,7 +30,7 @@
     delay : 8.64e7, // 24 hours in milliseconds
 
     // include a "?debug" anywhere in the browser URL to enable debugging
-    debug : /\?debug/.test( window.location.href ),
+    debug : /\?debug/.test(window.location.href),
 
     // gh-pages url prefix for theme url
     root : 'https://stylishthemes.github.io/GitHub-Dark/',
@@ -69,73 +69,72 @@
     updatePanel : function() {
       var color,
         data = this.data.stored,
-        $panel = $( '#ghd-options-inner' );
+        $panel = $('#ghd-options-inner');
 
       // update this.themes so the saved theme isn't reloaded
-      if ( data.theme ) {
-        this.themes[ data.theme ] = data.themeCss;
+      if (data.theme) {
+        this.themes[data.theme] = data.themeCss;
       } else {
         data.theme = 'Twilight';
       }
-      $panel.find( '.ghd-enable' ).prop( 'checked', data.enable );
-      $panel.find( '.ghd-wrap' ).prop( 'checked', data.wrap );
-      $panel.find( '.ghd-theme' ).val( data.theme );
-      $panel.find( '.ghd-font' ).val( data.font || 'Menlo' );
-      $panel.find( '.ghd-image' ).val( data.image || '' );
-      $panel.find( '.ghd-type' ).val( data.type || 'tiled' );
-      $panel.find( '.ghd-attach' ).val( data.attach || 'scroll' );
-      $panel.find( '.ghd-tab' ).val( data.tab || 4 );
+      $panel.find('.ghd-enable').prop('checked', data.enable);
+      $panel.find('.ghd-wrap').prop('checked', data.wrap);
+      $panel.find('.ghd-theme').val(data.theme);
+      $panel.find('.ghd-font').val(data.font || 'Menlo');
+      $panel.find('.ghd-image').val(data.image || '');
+      $panel.find('.ghd-type').val(data.type || 'tiled');
+      $panel.find('.ghd-attach').val(data.attach || 'scroll');
+      $panel.find('.ghd-tab').val(data.tab || 4);
 
       color = data.color || '#4183C4';
-      $panel.find( '.ghd-color' ).val( color );
+      $panel.find('.ghd-color').val(color);
       // update swatch color & color picker value
-      $panel.find( '#ghd-swatch' ).css( 'background-color', color );
+      $panel.find('#ghd-swatch').css('background-color', color);
 
-      if ( this.picker ) {
-        this.picker.fromString( color );
+      if (this.picker) {
+        this.picker.fromString(color);
       }
-      this.$style.prop( 'disabled', !data.enable );
-      $( 'body' )
-        .toggleClass( 'ghd-disabled', !data.enable )
-        .toggleClass( 'nowrap', !data.wrap );
-
+      this.$style.prop('disabled', !data.enable);
+      $('body')
+        .toggleClass('ghd-disabled', !data.enable)
+        .toggleClass('nowrap', !data.wrap);
     },
 
-    getStoredValues : function( reset ) {
+    getStoredValues : function(reset) {
       // get values from localstorage & save to this.data
-      var $panel = $( '#ghd-options-inner' ),
+      var $panel = $('#ghd-options-inner'),
 
       data = this.data.stored = {
-        attach   : ( reset ? '' : GM_getValue( 'attach', '' ) )   || 'scroll',
-        color    : ( reset ? '' : GM_getValue( 'color', '' ) )    || '#4183C4',
-        date     : ( reset ? '' : GM_getValue( 'date', '' ) )     || 0,
-        enable   : ( reset ? '' : GM_getValue( 'enable', '' ) )   || true,
-        font     : ( reset ? '' : GM_getValue( 'font', '' ) )     || 'Menlo',
-        image    : ( reset ? '' : GM_getValue( 'image', '' ) )    || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
-        tab      : ( reset ? '' : GM_getValue( 'tab', '' ) )      || 4,
-        theme    : ( reset ? '' : GM_getValue( 'theme', '' ) )    || 'Twilight',
-        type     : ( reset ? '' : GM_getValue( 'type', '' ) )     || 'tiled',
-        version  : ( reset ? '' : GM_getValue( 'version', '' ) )  || 0,
-        wrap     : ( reset ? '' : GM_getValue( 'wrap', '' ) )     || true,
+        attach   : (reset ? '' : GM_getValue('attach', ''))   || 'scroll',
+        color    : (reset ? '' : GM_getValue('color', ''))    || '#4183C4',
+        date     : (reset ? '' : GM_getValue('date', ''))     || 0,
+        enable   : (reset ? '' : GM_getValue('enable', ''))   || true,
+        font     : (reset ? '' : GM_getValue('font', ''))     || 'Menlo',
+        image    : (reset ? '' : GM_getValue('image', ''))    || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
+        tab      : (reset ? '' : GM_getValue('tab', ''))      || 4,
+        theme    : (reset ? '' : GM_getValue('theme', ''))    || 'Twilight',
+        type     : (reset ? '' : GM_getValue('type', ''))     || 'tiled',
+        version  : (reset ? '' : GM_getValue('version', ''))  || 0,
+        wrap     : (reset ? '' : GM_getValue('wrap', ''))     || true,
 
-        rawCss   : GM_getValue( 'rawCss', '' ),
-        themeCss : GM_getValue( 'themeCss', '' )
+        rawCss   : GM_getValue('rawCss', ''),
+        themeCss : GM_getValue('themeCss', '')
       };
 
       // no panel on init
-      if ( $panel.length ) {
-        $panel.find( '.ghd-enable' )[0].checked = data.enable;
-        $panel.find( '.ghd-wrap' )[0].checked = data.wrap;
+      if ($panel.length) {
+        $panel.find('.ghd-enable')[0].checked = data.enable;
+        $panel.find('.ghd-wrap')[0].checked = data.wrap;
 
         this.updatePanel();
       }
 
-      if ( reset ) {
+      if (reset) {
         this.setStoredValues();
       }
 
-      if ( this.debug ) {
-        console.log( ( reset ? 'Reset' : 'Retrieved' ) + ' stored values', this.data );
+      if (this.debug) {
+        console.log((reset ? 'Reset' : 'Retrieved') + ' stored values', this.data);
       }
     },
 
@@ -143,56 +142,56 @@
       // save values to local storage - assume localstorage is available
       var data = this.data.stored;
 
-      GM_setValue( 'attach', data.attach );
-      GM_setValue( 'color', data.color );
-      GM_setValue( 'date', data.date );
-      GM_setValue( 'enable', data.enable );
-      GM_setValue( 'font', data.font );
-      GM_setValue( 'image', data.image );
-      GM_setValue( 'rawCss', data.rawCss );
-      GM_setValue( 'tab', data.tab );
-      GM_setValue( 'theme', data.theme );
-      GM_setValue( 'themeCss', data.themeCss );
-      GM_setValue( 'type', data.type );
-      GM_setValue( 'version', data.version );
-      GM_setValue( 'wrap', data.wrap );
+      GM_setValue('attach', data.attach);
+      GM_setValue('color', data.color);
+      GM_setValue('date', data.date);
+      GM_setValue('enable', data.enable);
+      GM_setValue('font', data.font);
+      GM_setValue('image', data.image);
+      GM_setValue('rawCss', data.rawCss);
+      GM_setValue('tab', data.tab);
+      GM_setValue('theme', data.theme);
+      GM_setValue('themeCss', data.themeCss);
+      GM_setValue('type', data.type);
+      GM_setValue('version', data.version);
+      GM_setValue('wrap', data.wrap);
     },
 
     // convert version "1.2.3" into "001002003" for easier comparison
-    convertVersion : function( val ) {
+    convertVersion : function(val) {
       var index,
-      parts = val ? val.split( '.' ) : '',
+      parts = val ? val.split('.') : '',
       str = '',
       len = parts.length;
-      for ( index = 0; index < len; index++ ) {
-        str += ( '000' + parts[ index ] ).slice( -3 );
+      for (index = 0; index < len; index++) {
+        str += ('000' + parts[index]).slice(-3);
       }
-      if ( this.debug ) {
-        console.log( 'converted version "' + val + '" to "' + str + '" for easy comparison' );
+      if (this.debug) {
+        console.log('converted version "' + val + '" to "' + str + '" for easy comparison');
       }
       return val ? str : val;
     },
 
     checkVersion : function() {
-      if ( this.debug ) {
-        console.log( 'loading package.json' );
+      if (this.debug) {
+        console.log('loading package.json');
       }
       GM_xmlhttpRequest({
         method : 'GET',
         url : 'https://stylishthemes.github.io/GitHub-Dark/package.json',
-        onload : function( response ) {
+        onload : function(response) {
           // store package JSON
-          ghd.data.package = $.parseJSON ( response.responseText );
-          var version = ghd.convertVersion( ghd.data.package.version );
+          ghd.data.package = $.parseJSON(response.responseText);
+          var version = ghd.convertVersion(ghd.data.package.version);
           // if new available, load it & parse
-          if ( version > ghd.data.stored.version ) {
+          if (version > ghd.data.stored.version) {
             ghd.data.stored.version = version;
             // save last loaded date, so package.json is only loaded once a day
             ghd.data.stored.date = new Date().getTime();
             ghd.getGHDCss();
           } else {
-            if ( ghd.debug ) {
-              console.log( 'Using style saved to storage' );
+            if (ghd.debug) {
+              console.log('Using style saved to storage');
             }
             // use stored style
             ghd.processStyle();
@@ -202,13 +201,13 @@
     },
 
     getGHDCss : function() {
-      if ( this.debug ) {
-        console.log( 'Loading GitHub-Dark.css' );
+      if (this.debug) {
+        console.log('Loading GitHub-Dark.css');
       }
       GM_xmlhttpRequest({
         method : 'GET',
         url : 'https://stylishthemes.github.io/GitHub-Dark/github-dark.css',
-        onload : function ( response ) {
+        onload : function(response) {
           ghd.data.stored.rawCss = response.responseText;
           ghd.processStyle();
           ghd.getTheme();
@@ -218,29 +217,29 @@
 
     // load syntax highlighting theme, if necessary
     getTheme : function() {
-      if ( !this.data.stored.enable ) {
-        if ( this.debug ) {
-          console.log( 'Disabled: stop theme processing' );
+      if (!this.data.stored.enable) {
+        if (this.debug) {
+          console.log('Disabled: stop theme processing');
         }
         return;
       }
       var name = this.data.stored.theme || 'Twilight';
       // test if this.themes contains the url (.min.css), or the actual css
-      if ( /\.min\.css$/.test( this.themes[ name ] ) ) {
-        if ( this.debug ) {
-          console.log( 'Loading "' + name + '" theme', ghd.root + ghd.themes[ name ] );
+      if (/\.min\.css$/.test(this.themes[name])) {
+        if (this.debug) {
+          console.log('Loading "' + name + '" theme', ghd.root + ghd.themes[name]);
         }
         GM_xmlhttpRequest({
           method : 'GET',
-          url : ghd.root + ghd.themes[ name ],
-          onload : function ( response ) {
-            ghd.themes[ name ] = response.responseText;
+          url : ghd.root + ghd.themes[name],
+          onload : function(response) {
+            ghd.themes[name] = response.responseText;
             ghd.data.stored.themeCss = response.responseText;
             ghd.processTheme();
           }
         });
       } else {
-        ghd.data.stored.themeCss = ghd.themes[ name ];
+        ghd.data.stored.themeCss = ghd.themes[name];
         ghd.processTheme();
       }
     },
@@ -265,96 +264,95 @@
     processStyle : function() {
       var data = this.data.stored,
         css = data.rawCss || '',
-        url = /^url/.test( data.image || '' ) ? data.image :
-          ( data.image === 'none' ? 'none' : 'url("' + data.image + '")' );
-      if ( !data.enable ) {
-        if ( this.debug ) {
-          console.log( 'Disabled: stop processing' );
+        url = /^url/.test(data.image || '') ? data.image :
+          (data.image === 'none' ? 'none' : 'url("' + data.image + '")');
+      if (!data.enable) {
+        if (this.debug) {
+          console.log('Disabled: stop processing');
         }
         return;
       }
-      if ( this.debug ) {
-        console.log( 'Processing set styles' );
+      if (this.debug) {
+        console.log('Processing set styles');
       }
       css = css
         // remove moz-document wrapper
-        .replace( /@-moz-document regexp\((.*)\) \{(\n|\r)+/, '' )
+        .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
         // replace background image; if no 'url' at start, then use 'none'
-        .replace( /\/\*\[\[bg-choice\]\]\*\/ url\(.*\)/, url )
+        .replace(/\/\*\[\[bg-choice\]\]\*\/ url\(.*\)/, url)
         // Add tiled or fit window size css
-        .replace( '/*[[bg-options]]*/', this.type[ data.type || 'tiled' ] )
+        .replace('/*[[bg-options]]*/', this.type[data.type || 'tiled'])
         // set scroll or fixed background image
-        .replace( '/*[[bg-attachment]]*/ fixed', data.attach || 'scroll' )
+        .replace('/*[[bg-attachment]]*/ fixed', data.attach || 'scroll')
         // replace base-color
-        .replace( /\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || '#4183C4' )
+        .replace(/\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || '#4183C4')
         // add font choice
-        .replace( '/*[[font-choice]]*/', data.font || 'Menlo' )
+        .replace('/*[[font-choice]]*/', data.font || 'Menlo')
         // add tab size
-        .replace( /\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4 )
+        .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
         // remove default syntax
-        .replace( /\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '' );
-      this.applyStyle( css );
+        .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
+      this.applyStyle(css);
     },
 
     // this.data.stored.themeCss should be populated with user selected theme
     // called asynchronously from processStyle()
     processTheme : function() {
-      if ( this.debug ) {
-        console.log( 'Adding syntax theme to css' );
+      if (this.debug) {
+        console.log('Adding syntax theme to css');
       }
       var css = this.$style.html() || '';
       // look for /*[[syntax-theme]]*/ label, if it doesn't exist, reprocess raw css
-      if ( !/syntax-theme/.test( css ) ) {
-        if ( this.debug ) {
-          console.log( 'Need to process raw style before applying theme' );
+      if (!/syntax-theme/.test(css)) {
+        if (this.debug) {
+          console.log('Need to process raw style before applying theme');
         }
         this.processStyle();
         css = this.$style.html() || '';
       }
       // add syntax highlighting theme
-      css = css.replace( '/*[[syntax-theme]]*/', this.data.stored.themeCss || '' );
+      css = css.replace('/*[[syntax-theme]]*/', this.data.stored.themeCss || '');
 
-      if ( this.debug ) {
-        console.log( 'Applying "' + this.data.stored.theme + '" theme', '"' +
-          ( this.data.stored.themeCss || '' ).substring( 0, 30 ) + '"' );
+      if (this.debug) {
+        console.log('Applying "' + this.data.stored.theme + '" theme', '"' +
+          (this.data.stored.themeCss || '').substring(0, 30) + '"');
       }
 
-      this.$style.html( css );
+      this.$style.html(css);
     },
 
-
-    applyStyle : function( css ) {
-      if ( this.debug ) {
-        console.log( 'Applying style', '"' + ( css || '' ).substring( 0, 50 ) + '"' );
+    applyStyle : function(css) {
+      if (this.debug) {
+        console.log('Applying style', '"' + (css || '').substring(0, 50) + '"');
       }
       // add to style
-      this.$style.html( css || '' );
+      this.$style.html(css || '');
       // save style to localstorage from this.data.savedStyle
       this.setStoredValues();
     },
 
     updateStyle : function() {
-      var $panel = $( '#ghd-options-inner' ),
+      var $panel = $('#ghd-options-inner'),
       data = this.data.stored;
 
-      data.enable = $panel.find( '.ghd-enable' ).is( ':checked' );
-      data.theme  = $panel.find( '.ghd-theme' ).val();
-      data.color  = $panel.find( '.ghd-color' ).val();
-      data.font   = $panel.find( '.ghd-font' ).val();
-      data.wrap   = $panel.find( '.ghd-wrap' ).is( ':checked' );
-      data.image  = $panel.find( '.ghd-image' ).val();
-      data.type   = $panel.find( '.ghd-type' ).val();
-      data.attach = $panel.find( '.ghd-attach' ).val();
-      data.tab    = $panel.find( '.ghd-tab' ).val();
+      data.enable = $panel.find('.ghd-enable').is(':checked');
+      data.theme  = $panel.find('.ghd-theme').val();
+      data.color  = $panel.find('.ghd-color').val();
+      data.font   = $panel.find('.ghd-font').val();
+      data.wrap   = $panel.find('.ghd-wrap').is(':checked');
+      data.image  = $panel.find('.ghd-image').val();
+      data.type   = $panel.find('.ghd-type').val();
+      data.attach = $panel.find('.ghd-attach').val();
+      data.tab    = $panel.find('.ghd-tab').val();
 
-      if ( this.debug ) {
-        console.log( 'updating user settings', data );
+      if (this.debug) {
+        console.log('updating user settings', data);
       }
 
-      this.$style.prop( 'disabled', !data.enable );
-      $( 'body' )
-        .toggleClass( 'ghd-disabled', !data.enable )
-        .toggleClass( 'nowrap', !data.wrap );
+      this.$style.prop('disabled', !data.enable);
+      $('body')
+        .toggleClass('ghd-disabled', !data.enable)
+        .toggleClass('nowrap', !data.wrap);
 
       this.processStyle();
       this.getTheme();
@@ -369,8 +367,8 @@
     },
 
     buildOptions : function() {
-      if ( this.debug ) {
-        console.log( 'Adding options panel & GitHub Dark link to profile dropdown' );
+      if (this.debug) {
+        console.log('Adding options panel & GitHub Dark link to profile dropdown');
       }
       // Script-specific CSS
       GM_addStyle([
@@ -398,15 +396,15 @@
         '.blob-wrapper, .markdown-body > pre, .markdown-body > .highlight { position:relative; }',
         // hide wrap icon when style disabled
         'body.ghd-disabled .ghd-wrap-toggle { display: none; }'
-      ].join( '' ) );
+     ].join(''));
 
       var themes = '<select class="ghd-theme ghd-right">';
-      $.each( this.themes, function( opt ) {
+      $.each(this.themes, function(opt) {
         themes += '<option value="' + opt + '">' + opt + '</option>';
       });
 
       // Options overlay markup
-      $( 'body' ).append([
+      $('body').append([
         '<div id="ghd-options">',
           '<div id="ghd-options-inner" class="boxed-group">',
             '<h3>GitHub-Dark Options',
@@ -461,83 +459,81 @@
             '</div>',
           '</div>',
         '</div>',
-      ].join( '' ) );
+     ].join(''));
 
       // add wrap code icons
-      $( '.blob-wrapper, .markdown-body > .highlight' ).prepend ( this.wrapIcon );
-      $( '.markdown-body > pre' )
-        .before( this.wrapIcon )
-        .parent().css( 'position', 'relative' );
-
+      $('.blob-wrapper, .markdown-body > .highlight').prepend(this.wrapIcon);
+      $('.markdown-body > pre')
+        .before(this.wrapIcon)
+        .parent().css('position', 'relative');
     },
 
     bindEvents : function() {
-
-      var $panel = $( '#ghd-options-inner' ),
-          $swatch = $panel.find( '#ghd-swatch' );
+      var $panel = $('#ghd-options-inner'),
+          $swatch = $panel.find('#ghd-swatch');
 
       // finish initialization
-      $( '#ghd-options-inner .ghd-enable' )[0].checked = this.data.stored.enable;
-      $( 'body' )
-        .toggleClass( 'ghd-disabled', !this.data.stored.enable )
-        .toggleClass( 'nowrap', this.data.stored.wrap );
+      $('#ghd-options-inner .ghd-enable')[0].checked = this.data.stored.enable;
+      $('body')
+        .toggleClass('ghd-disabled', !this.data.stored.enable)
+        .toggleClass('nowrap', this.data.stored.wrap);
 
       // Create our menu entry
-      var menu = $( '<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>' );
-      $( '.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]' )
+      var menu = $('<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>');
+      $('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]')
         // gists only have the "go to profile" item; GitHub has both
-        .filter( ':last' )
-        .after( menu );
+        .filter(':last')
+        .after(menu);
 
-      $( '#ghd-menu' ).on( 'click', function() {
-        $( '.modal-backdrop' ).click();
+      $('#ghd-menu').on('click', function() {
+        $('.modal-backdrop').click();
         ghd.updatePanel();
-        $( '#ghd-options' ).addClass( 'in' );
+        $('#ghd-options').addClass('in');
       });
 
       // add bindings
-      $( '#ghd-options, #ghd-options-close' ).on( 'click keyup', function( e ) {
+      $('#ghd-options, #ghd-options-close').on('click keyup', function(e) {
         // press escape to close options
-        if ( e.type === 'keyup' && e.which !== 27 ) {
+        if (e.type === 'keyup' && e.which !== 27) {
           return;
         }
-        $( '#ghd-options' ).removeClass( 'in' );
+        $('#ghd-options').removeClass('in');
         ghd.picker.hide();
       });
 
-      $panel.on( 'click', function( e ) {
+      $panel.on('click', function(e) {
         e.stopPropagation();
       });
 
-      $panel.find( '.ghd-apply' ).on( 'click', function() {
+      $panel.find('.ghd-apply').on('click', function() {
         ghd.updateStyle();
         return false;
       });
 
-      $panel.find( '.ghd-reset' ).on( 'click', function() {
+      $panel.find('.ghd-reset').on('click', function() {
         // pass true to reset values
-        ghd.getStoredValues( true );
+        ghd.getStoredValues(true);
         ghd.updateStyle();
         return false;
       });
 
-      $panel.find( 'input[type="text"]' ).on( 'focus', function(){
+      $panel.find('input[type="text"]').on('focus', function() {
         // select all text when focused
         this.select();
       });
 
-      $panel.find( '.ghd-update' ).on( 'click', function() {
+      $panel.find('.ghd-update').on('click', function() {
         ghd.forceUpdate();
         return false;
       });
 
-      $( '.ghd-wrap-toggle' ).on( 'click', function() {
+      $('.ghd-wrap-toggle').on('click', function() {
         ghd.data.stored.wrap = !ghd.data.stored.wrap;
-        $( 'body' ).toggleClass( 'nowrap', !ghd.data.stored.wrap );
+        $('body').toggleClass('nowrap', !ghd.data.stored.wrap);
         ghd.setStoredValues();
       });
 
-      this.picker = new jscolor( $panel.find( '.ghd-color' )[ 0 ] );
+      this.picker = new jscolor($panel.find('.ghd-color')[0]);
       this.picker.zIndex = 65536;
       this.picker.hash = true;
       this.picker.backgroundColor = '#333';
@@ -550,25 +546,24 @@
 
       // update panel & options
       this.getStoredValues();
-
     },
 
     init : function() {
-      if ( this.debug ) {
-        console.log( 'GitHub-Dark script initializing!' );
+      if (this.debug) {
+        console.log('GitHub-Dark script initializing!');
       }
       this.data = {};
 
       // place for the stylesheet to be added
-      this.$style = $( '<style class="ghd-style">' ).appendTo( 'body' );
+      this.$style = $('<style class="ghd-style">').appendTo('body');
 
       // load values from local storage
       this.getStoredValues();
 
-      this.$style.prop( 'disabled', !this.data.stored.enable );
+      this.$style.prop('disabled', !this.data.stored.enable);
 
       // only load package.json once a day
-      if ( new Date().getTime() > this.data.stored.date + this.delay ) {
+      if (new Date().getTime() > this.data.stored.date + this.delay) {
         // get package.json from GitHub-Dark & compare versions
         // load new script if a newer one is available
         this.checkVersion();
@@ -576,7 +571,6 @@
         this.processStyle();
         this.getTheme();
       }
-
     }
 
   };
@@ -584,13 +578,12 @@
   // add style at document-start
   ghd.init();
 
-  $(function(){
+  $(function() {
     // apply script if option dropdown exists
-    if ( $( '.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]' ).length ) {
+    if ($('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]').length) {
       ghd.buildOptions();
       // add event binding on document ready
       ghd.bindEvents();
     }
   });
-
-})( jQuery.noConflict( true ) );
+})(jQuery.noConflict(true));
