@@ -248,7 +248,8 @@
         .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
         // remove default syntax
         .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
-      this.applyStyle(css);
+
+        return css;
     },
 
     // this.data.stored.themeCss should be populated with user selected theme
@@ -263,7 +264,7 @@
         if (this.debug) {
           console.log('Need to process raw style before applying theme');
         }
-        this.processStyle();
+        this.applyStyle(this.processStyle());
         css = this.$style.html() || '';
       }
       // add syntax highlighting theme
@@ -310,7 +311,7 @@
         .toggleClass('ghd-disabled', !data.enable)
         .toggleClass('nowrap', !data.wrap);
 
-      this.processStyle();
+      this.applyStyle(this.processStyle());
       this.getTheme();
     },
 
@@ -510,8 +511,8 @@
       }
       this.data = {};
 
-      // place for the stylesheet to be added
-      this.$style = $('<style class="ghd-style">').appendTo('body');
+      // add style tag to head
+      ghd.$style = $('<style class="ghd-style">').appendTo('head');
 
       // load values from local storage
       this.getStoredValues();
@@ -520,7 +521,8 @@
 
       // apply style from cache
       ghd.data.stored.rawCss = GM_getResourceText("ghd");
-      ghd.processStyle();
+      ghd.applyStyle(ghd.processStyle());
+
       ghd.getTheme();
     }
 
