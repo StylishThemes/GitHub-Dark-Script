@@ -10,6 +10,7 @@
 // @grant        GM_getResourceText
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
