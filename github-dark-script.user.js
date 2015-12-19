@@ -8,7 +8,9 @@
 // @include      /raw\.githubusercontent\.com/
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
-// @run-at       document-end
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @run-at       document-body
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
@@ -18,9 +20,6 @@
 /* eslint-disable indent, quotes */
 ( function( $ ) {
   "use strict";
-
-  // Skip script if no option dropdown exists
-  if ( !$( '.header .dropdown-item[href="/settings/profile"]' ).length ) { return; }
 
   var ghd = {
 
@@ -102,28 +101,61 @@
 
     },
 
-    getStoredValues : function() {
+    getStoredValues : function( reset ) {
       // get values from localstorage & save to this.data
-      this.data.stored = $.parseJSON( window.localStorage.GitHubDark || 'null' ) ||
-        // defaults when no localStorage available
-        { date : 0, version : 0, enable : true, wrap : true };
+      var $panel = $( '#ghd-options-inner' ),
 
-      var data = this.data.stored,
-        $panel = $( '#ghd-options-inner' );
+      data = this.data.stored = {
+        attach   : ( reset ? '' : GM_getValue( 'attach', '' ) )   || 'scroll',
+        color    : ( reset ? '' : GM_getValue( 'color', '' ) )    || '#4183C4',
+        date     : ( reset ? '' : GM_getValue( 'date', '' ) )     || 0,
+        enable   : ( reset ? '' : GM_getValue( 'enable', '' ) )   || true,
+        font     : ( reset ? '' : GM_getValue( 'font', '' ) )     || 'Menlo',
+        image    : ( reset ? '' : GM_getValue( 'image', '' ) )    || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
+        tab      : ( reset ? '' : GM_getValue( 'tab', '' ) )      || 4,
+        theme    : ( reset ? '' : GM_getValue( 'theme', '' ) )    || 'Twilight',
+        type     : ( reset ? '' : GM_getValue( 'type', '' ) )     || 'tiled',
+        version  : ( reset ? '' : GM_getValue( 'version', '' ) )  || 0,
+        wrap     : ( reset ? '' : GM_getValue( 'wrap', '' ) )     || true,
 
-      $panel.find( '.ghd-enable' )[0].checked = data.enable;
-      $panel.find( '.ghd-wrap' )[0].checked = data.wrap;
+        rawCss   : GM_getValue( 'rawCss', '' ),
+        themeCss : GM_getValue( 'themeCss', '' )
+      };
 
-      this.updatePanel();
+      // no panel on init
+      if ( $panel.length ) {
+        $panel.find( '.ghd-enable' )[0].checked = data.enable;
+        $panel.find( '.ghd-wrap' )[0].checked = data.wrap;
+
+        this.updatePanel();
+      }
+
+      if ( reset ) {
+        this.setStoredValues();
+      }
 
       if ( this.debug ) {
-        console.log( 'Retrieved stored values', this.data );
+        console.log( ( reset ? 'Reset' : 'Retrieved' ) + ' stored values', this.data );
       }
     },
 
     setStoredValues : function() {
       // save values to local storage - assume localstorage is available
-      window.localStorage[ this.storageKey ] = JSON.stringify( this.data.stored || {} );
+      var data = this.data.stored;
+
+      GM_setValue( 'attach', data.attach );
+      GM_setValue( 'color', data.color );
+      GM_setValue( 'date', data.date );
+      GM_setValue( 'enable', data.enable );
+      GM_setValue( 'font', data.font );
+      GM_setValue( 'image', data.image );
+      GM_setValue( 'rawCss', data.rawCss );
+      GM_setValue( 'tab', data.tab );
+      GM_setValue( 'theme', data.theme );
+      GM_setValue( 'themeCss', data.themeCss );
+      GM_setValue( 'type', data.type );
+      GM_setValue( 'version', data.version );
+      GM_setValue( 'wrap', data.wrap );
     },
 
     // convert version "1.2.3" into "001002003" for easier comparison
@@ -421,17 +453,15 @@
                  '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
                 '</p>',
                 '<p>',
-                  '<a href="#" class="ghd-apply btn btn-sm tooltipped tooltipped-n" aria-label="Click to apply the above options to the page">Apply Changes</a>&nbsp;',
-                  '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a>',
+                  '<a href="#" class="ghd-apply btn btn-sm tooltipped tooltipped-n" aria-label="Click to apply these options to the page">Apply Changes</a>&nbsp;',
+                  '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset</a>&nbsp;&nbsp;',
+                  '<a href="#" class="ghd-update ghd-right btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a>',
                 '</p>',
               '</form>',
             '</div>',
           '</div>',
         '</div>',
       ].join( '' ) );
-
-      // place for the stylesheet to be added
-      this.$style = $( '<style class="ghd-style">' ).appendTo( 'body' );
 
       // add wrap code icons
       $( '.blob-wrapper, .markdown-body > .highlight' ).prepend ( this.wrapIcon );
@@ -446,6 +476,26 @@
       var $panel = $( '#ghd-options-inner' ),
           $swatch = $panel.find( '#ghd-swatch' );
 
+      // finish initialization
+      $( '#ghd-options-inner .ghd-enable' )[0].checked = this.data.stored.enable;
+      $( 'body' )
+        .toggleClass( 'ghd-disabled', !this.data.stored.enable )
+        .toggleClass( 'nowrap', this.data.stored.wrap );
+
+      // Create our menu entry
+      var menu = $( '<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>' );
+      $( '.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]' )
+        // gists only have the "go to profile" item; GitHub has both
+        .filter( ':last' )
+        .after( menu );
+
+      $( '#ghd-menu' ).on( 'click', function() {
+        $( '.modal-backdrop' ).click();
+        ghd.updatePanel();
+        $( '#ghd-options' ).addClass( 'in' );
+      });
+
+      // add bindings
       $( '#ghd-options, #ghd-options-close' ).on( 'click keyup', function( e ) {
         // press escape to close options
         if ( e.type === 'keyup' && e.which !== 27 ) {
@@ -462,6 +512,18 @@
       $panel.find( '.ghd-apply' ).on( 'click', function() {
         ghd.updateStyle();
         return false;
+      });
+
+      $panel.find( '.ghd-reset' ).on( 'click', function() {
+        // pass true to reset values
+        ghd.getStoredValues( true );
+        ghd.updateStyle();
+        return false;
+      });
+
+      $panel.find( 'input[type="text"]' ).on( 'focus', function(){
+        // select all text when focused
+        this.select();
       });
 
       $panel.find( '.ghd-update' ).on( 'click', function() {
@@ -486,15 +548,8 @@
         $swatch[0].style.backgroundColor = '#' + ghd.picker;
       };
 
-      // Create our menu entry
-      var menu = $( '<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>' );
-      $( '.header .dropdown-item[href="/settings/profile"]' ).after( menu );
-
-      $( '#ghd-menu' ).on( 'click', function() {
-        $( '.modal-backdrop' ).click();
-        ghd.updatePanel();
-        $( '#ghd-options' ).addClass( 'in' );
-      });
+      // update panel & options
+      this.getStoredValues();
 
     },
 
@@ -504,16 +559,13 @@
       }
       this.data = {};
 
-      this.buildOptions();
+      // place for the stylesheet to be added
+      this.$style = $( '<style class="ghd-style">' ).appendTo( 'body' );
 
       // load values from local storage
       this.getStoredValues();
 
       this.$style.prop( 'disabled', !this.data.stored.enable );
-      $( '#ghd-options-inner .ghd-enable' )[0].checked = this.data.stored.enable;
-      $( 'body' )
-        .toggleClass( 'ghd-disabled', !this.data.stored.enable )
-        .toggleClass( 'nowrap', this.data.stored.wrap );
 
       // only load package.json once a day
       if ( new Date().getTime() > this.data.stored.date + this.delay ) {
@@ -533,8 +585,12 @@
   ghd.init();
 
   $(function(){
-    // add event binding on document ready
-    ghd.bindEvents();
+    // apply script if option dropdown exists
+    if ( $( '.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]' ).length ) {
+      ghd.buildOptions();
+      // add event binding on document ready
+      ghd.bindEvents();
+    }
   });
 
 })( jQuery.noConflict( true ) );
