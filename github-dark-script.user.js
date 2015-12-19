@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Dark Script
-// @version      0.4.0
+// @version      0.4.1
 // @description  Adds an options panel for the GitHub Dark userstyle
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
@@ -105,17 +105,17 @@
       var $panel = $('#ghd-options-inner'),
 
       data = this.data.stored = {
-        attach   : (reset ? '' : GM_getValue('attach', ''))   || 'scroll',
-        color    : (reset ? '' : GM_getValue('color', ''))    || '#4183C4',
-        date     : (reset ? '' : GM_getValue('date', ''))     || 0,
-        enable   : (reset ? '' : GM_getValue('enable', ''))   || true,
-        font     : (reset ? '' : GM_getValue('font', ''))     || 'Menlo',
-        image    : (reset ? '' : GM_getValue('image', ''))    || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
-        tab      : (reset ? '' : GM_getValue('tab', ''))      || 4,
-        theme    : (reset ? '' : GM_getValue('theme', ''))    || 'Twilight',
-        type     : (reset ? '' : GM_getValue('type', ''))     || 'tiled',
-        version  : (reset ? '' : GM_getValue('version', ''))  || 0,
-        wrap     : (reset ? '' : GM_getValue('wrap', ''))     || true,
+        attach   : (reset ? '' : GM_getValue('attach', ''))  || 'scroll',
+        color    : (reset ? '' : GM_getValue('color', ''))   || '#4183C4',
+        date     : (reset ? '' : GM_getValue('date', ''))    || 0,
+        enable   : (reset ? '' : GM_getValue('enable', ''))  || true,
+        font     : (reset ? '' : GM_getValue('font', ''))    || 'Menlo',
+        image    : (reset ? '' : GM_getValue('image', ''))   || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
+        tab      : (reset ? '' : GM_getValue('tab', ''))     || 4,
+        theme    : (reset ? '' : GM_getValue('theme', ''))   || 'Twilight',
+        type     : (reset ? '' : GM_getValue('type', ''))    || 'tiled',
+        version  : (reset ? '' : GM_getValue('version', '')) || 0,
+        wrap     : (reset ? '' : GM_getValue('wrap', ''))    || true,
 
         rawCss   : GM_getValue('rawCss', ''),
         themeCss : GM_getValue('themeCss', '')
