@@ -1,7 +1,7 @@
 {
   "name": "github-dark-script",
   "version": "0.4.1",
-  "description": "Adds an options panel for the GitHub Dark userstyle",
+  "description": "GitHub Dark in userscript form, with an options panel",
   "license": "CC-BY-SA-4.0",
   "repository": "StylishThemes/GitHub-Dark-Script"
 }
