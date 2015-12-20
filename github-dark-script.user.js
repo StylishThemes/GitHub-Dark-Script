@@ -453,7 +453,7 @@
                   '<a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-n" aria-label="Add a system installed font name;&#10;this script will not load external fonts!"><sup>?</sup></a>',
                 '</p>',
                 '<p>',
-                  '<label>Tab Size:</label> <input class="ghd-tab ghd-right" type="number" min="1" max="10">',
+                  '<label>Tab Size:</label> <input class="ghd-tab ghd-right" type="text">',
                 '</p>',
                 '<p class="checkbox">',
                  '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
