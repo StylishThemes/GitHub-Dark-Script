@@ -396,6 +396,7 @@
         '#ghd-settings p { line-height: 25px; }',
         '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }',
         '#ghd-settings .checkbox input { margin-top: .35em }',
+        '#ghd-settings input[type="checkbox"] { width: 16px !important; height: 16px !important; border-radius: 3px !important; }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
