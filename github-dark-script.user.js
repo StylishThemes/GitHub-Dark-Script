@@ -459,7 +459,6 @@
                  '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
                 '</p>',
                 '<p>',
-                  '<a href="#" class="ghd-apply btn btn-sm tooltipped tooltipped-n" aria-label="Click to apply these options to the page">Apply Changes</a>&nbsp;',
                   '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset</a>&nbsp;&nbsp;',
                   '<a href="#" class="ghd-update ghd-right btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a>',
                 '</p>',
@@ -507,15 +506,13 @@
         }
         $('#ghd-options').removeClass('in');
         ghd.picker.hide();
+
+        // apply changes when the panel is closed
+        ghd.updateStyle();
       });
 
       $panel.on('click', function(e) {
         e.stopPropagation();
-      });
-
-      $panel.find('.ghd-apply').on('click', function() {
-        ghd.updateStyle();
-        return false;
       });
 
       $panel.find('.ghd-reset').on('click', function() {
