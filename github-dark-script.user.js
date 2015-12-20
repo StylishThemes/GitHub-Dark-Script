@@ -7,23 +7,25 @@
 // @include      /render\.githubusercontent\.com/
 // @include      /raw\.githubusercontent\.com/
 // @grant        GM_addStyle
-// @grant        GM_getResourceText
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
-// @resource     ghd https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/github-dark.css
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, GM_getResourceText, jscolor */
+/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
 (function($) {
   'use strict';
 
   var ghd = {
+
+    // delay until package.json allowed to load
+    delay : 8.64e7, // 24 hours in milliseconds
+
     // include a "?debug" anywhere in the browser URL to enable debugging
     debug : /\?debug/.test(window.location.href),
 
@@ -61,6 +63,7 @@
 
     wrapIcon : '<div class="ghd-wrap-toggle tooltipped tooltipped-n" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768"><path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/></svg></div>',
 
+    // extract style & theme name
     regex: /\/\*! [^\*]+ \*\//,
 
     updatePanel : function() {
@@ -103,12 +106,14 @@
       data = this.data = {
         attach  : (reset ? '' : GM_getValue('attach', ''))  || 'scroll',
         color   : (reset ? '' : GM_getValue('color', ''))   || '#4183C4',
+        date    : (reset ? '' : GM_getValue('date', ''))    || 0,
         enable  : (reset ? '' : GM_getValue('enable', ''))  || true,
         font    : (reset ? '' : GM_getValue('font', ''))    || 'Menlo',
         image   : (reset ? '' : GM_getValue('image', ''))   || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
         tab     : (reset ? '' : GM_getValue('tab', ''))     || 4,
         theme   : (reset ? '' : GM_getValue('theme', ''))   || 'Twilight',
         type    : (reset ? '' : GM_getValue('type', ''))    || 'tiled',
+        version : (reset ? '' : GM_getValue('version', '')) || 0,
         wrap    : (reset ? '' : GM_getValue('wrap', ''))    || true,
 
         rawCss       : GM_getValue('rawCss', ''),
@@ -134,21 +139,86 @@
     },
 
     setStoredValues : function() {
-      // save values to local storage - assume localstorage is available
       var data = this.data;
 
       GM_setValue('attach', data.attach);
       GM_setValue('color', data.color);
+      GM_setValue('date', data.date);
       GM_setValue('enable', data.enable);
       GM_setValue('font', data.font);
       GM_setValue('image', data.image);
-      GM_setValue('processedCss', ghd.$style.text());
-      GM_setValue('rawCss', data.rawCss);
       GM_setValue('tab', data.tab);
       GM_setValue('theme', data.theme);
-      GM_setValue('themeCss', data.themeCss);
       GM_setValue('type', data.type);
+      GM_setValue('version', data.version);
       GM_setValue('wrap', data.wrap);
+
+      GM_setValue('rawCss', data.rawCss);
+      GM_setValue('themeCss', data.themeCss);
+      GM_setValue('processedCss', ghd.$style.text());
+
+      if (this.debug) {
+        console.log('Saving current values', data);
+      }
+    },
+
+    // convert version "1.2.3" into "001002003" for easier comparison
+    convertVersion : function(val) {
+      var index,
+      parts = val ? val.split('.') : '',
+      str = '',
+      len = parts.length;
+      for (index = 0; index < len; index++) {
+        str += ('000' + parts[index]).slice(-3);
+      }
+      if (this.debug) {
+        console.log('Converted version "' + val + '" to "' + str + '" for easy comparison');
+      }
+      return val ? str : val;
+    },
+
+    checkVersion : function() {
+      if (this.debug) {
+        console.log('Loading package.json');
+      }
+      GM_xmlhttpRequest({
+        method : 'GET',
+        url : 'https://stylishthemes.github.io/GitHub-Dark/package.json',
+        onload : function(response) {
+          // store package JSON
+          ghd.data.package = $.parseJSON(response.responseText);
+          var version = ghd.convertVersion(ghd.data.package.version);
+          // if new available, load it & parse
+          if (version > ghd.data.version) {
+            ghd.data.version = version;
+            // save last loaded date, so package.json is only loaded once a day
+            ghd.data.date = new Date().getTime();
+            if (ghd.debug) {
+              console.log('Loading github-dark.css');
+            }
+            // apply style
+            GM_xmlhttpRequest({
+              method : 'GET',
+              url : ghd.root + 'github-dark.css',
+              onload : function(response) {
+                ghd.data.rawCss = response.responseText;
+                ghd.applyStyle(ghd.processStyle());
+                ghd.getTheme();
+              }
+            });
+          } else {
+            ghd.addSavedStyle();
+          }
+        }
+      });
+    },
+
+    addSavedStyle : function() {
+      if (this.debug) {
+        console.log('Adding previously saved style');
+      }
+      // apply already processed css to prevent FOUC
+      this.$style.text(this.data.processedCss);
     },
 
     // load syntax highlighting theme, if necessary
@@ -182,17 +252,21 @@
 
     /*
     this.data = {
-      enable  : true,
-      theme   : 'Tomorrow Night',
-      themeCss: '/*! Tomorrow Night * /.ace_editor,.highlight{...', // theme/{name}.min.css
-      rawCss  : '@-moz-document regexp("^...',  // github-dark.css (unprocessed)
-      color   : '#4183C4',
-      font    : 'Menlo',
-      wrap    : true, // code: wrap long lines
-      image   : 'url()',
-      type    : 'tiled',
       attach  : 'scroll',
-      tab     : 4
+      color   : '#4183C4',
+      date    : 1450159200000, // last loaded package.json
+      enable  : true,
+      font    : 'Menlo',
+      image   : 'url()',
+      tab     : 4,
+      theme   : 'Tomorrow Night',
+      type    : 'tiled',
+      version : '001014032', // v1.14.32 = last stored GitHub-Dark version
+      wrap    : true, // code: wrap long lines
+
+      rawCss       : '@-moz-document regexp("^...', // github-dark.css (unprocessed)
+      themeCss     : '/*! Tomorrow Night * /.ace_editor,.highlight{...', // theme/{name}.min.css
+      processedCss : '' // css saved directly from this.$style
     }
     */
     processStyle : function() {
@@ -263,7 +337,6 @@
       }
       // add to style
       this.$style.text(css || '');
-      // save style to localstorage from this.data.savedStyle
       this.setStoredValues();
     },
 
@@ -271,15 +344,15 @@
       var $panel = $('#ghd-options-inner'),
       data = this.data;
 
-      data.enable = $panel.find('.ghd-enable').is(':checked');
-      data.theme  = $panel.find('.ghd-theme').val();
-      data.color  = $panel.find('.ghd-color').val();
-      data.font   = $panel.find('.ghd-font').val();
-      data.wrap   = $panel.find('.ghd-wrap').is(':checked');
-      data.image  = $panel.find('.ghd-image').val();
-      data.type   = $panel.find('.ghd-type').val();
       data.attach = $panel.find('.ghd-attach').val();
+      data.color  = $panel.find('.ghd-color').val();
+      data.enable = $panel.find('.ghd-enable').is(':checked');
+      data.font   = $panel.find('.ghd-font').val();
+      data.image  = $panel.find('.ghd-image').val();
       data.tab    = $panel.find('.ghd-tab').val();
+      data.theme  = $panel.find('.ghd-theme').val();
+      data.type   = $panel.find('.ghd-type').val();
+      data.wrap   = $panel.find('.ghd-wrap').is(':checked');
 
       if (this.debug) {
         console.log('updating user settings', data);
@@ -296,8 +369,8 @@
 
     // user can force GitHub-dark update
     forceUpdate : function() {
-      // clear saved processed css
-      GM_setValue('processedCss', '');
+      // clear saved date
+      GM_setValue('version', 0);
       document.location.reload();
     },
 
@@ -405,7 +478,7 @@
 
     bindEvents : function() {
       var $panel = $('#ghd-options-inner'),
-          $swatch = $panel.find('#ghd-swatch');
+        $swatch = $panel.find('#ghd-swatch');
 
       // finish initialization
       $('#ghd-options-inner .ghd-enable')[0].checked = this.data.enable;
@@ -491,31 +564,17 @@
       // add style tag to head
       ghd.$style = $('<style class="ghd-style">').appendTo('head');
 
-      // load values from local storage
       this.getStoredValues();
 
       this.$style.prop('disabled', !this.data.enable);
-      if (this.data.processedCss) {
 
-        if (this.debug) {
-          console.log('Adding previously saved style');
-        }
-        // apply already processed css to prevent FOUC
-        this.$style.text(this.data.processedCss);
+      // only load package.json once a day
+      if (new Date().getTime() > this.data.date + this.delay) {
+        // get package.json from GitHub-Dark & compare versions
+        // load new script if a newer one is available
+        this.checkVersion();
       } else {
-        if (this.debug) {
-          console.log('No saved processed data, loading github-dark.css');
-        }
-        // apply style
-        GM_xmlhttpRequest({
-          method : 'GET',
-          url : ghd.root + 'github-dark.css',
-          onload : function(response) {
-            ghd.data.rawCss = response.responseText;
-            ghd.applyStyle(ghd.processStyle());
-            ghd.getTheme();
-          }
-        });
+        this.addSavedStyle();
       }
     }
 
