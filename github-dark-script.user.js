@@ -537,6 +537,10 @@
         this.select();
       });
 
+      $panel.find('select, input').on('change', function(){
+        ghd.updateStyle();
+      });
+
       $panel.find('.ghd-update').on('click', function() {
         ghd.forceUpdate();
         return false;
