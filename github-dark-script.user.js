@@ -61,6 +61,8 @@
 
     wrapIcon : '<div class="ghd-wrap-toggle tooltipped tooltipped-n" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768"><path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/></svg></div>',
 
+    regex: /\/\*! [^\*]+ \*\//,
+
     updatePanel : function() {
       var color,
         data = this.data,
@@ -248,7 +250,7 @@
 
       if (this.debug) {
         console.log('Applying "' + this.data.theme + '" theme', '"' +
-          (this.data.themeCss || '').substring(0, 30) + '"');
+          (this.data.themeCss || '').match(this.regex) + '"');
       }
 
       this.$style.html(css);
@@ -257,7 +259,7 @@
 
     applyStyle : function(css) {
       if (this.debug) {
-        console.log('Applying style', '"' + (css || '').substring(0, 50) + '"');
+        console.log('Applying style', '"' + (css || '').match(this.regex) + '"');
       }
       // add to style
       this.$style.html(css || '');
@@ -295,8 +297,7 @@
     // user can force GitHub-dark update
     forceUpdate : function() {
       // clear saved processed css
-      this.data.processedCss = '';
-      this.setStoredValues();
+      GM_setValue('processedCss', '');
       document.location.reload();
     },
 
@@ -506,9 +507,15 @@
           console.log('No saved processed data, loading github-dark.css');
         }
         // apply style
-        ghd.data.rawCss = GM_getResourceText('ghd');
-        ghd.applyStyle(ghd.processStyle());
-        ghd.getTheme();
+        GM_xmlhttpRequest({
+          method : 'GET',
+          url : ghd.root + 'github-dark.css',
+          onload : function(response) {
+            ghd.data.rawCss = response.responseText;
+            ghd.applyStyle(ghd.processStyle());
+            ghd.getTheme();
+          }
+        });
       }
     }
 
