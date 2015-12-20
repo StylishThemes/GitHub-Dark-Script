@@ -252,6 +252,7 @@
       }
 
       this.$style.html(css);
+      this.setStoredValues();
     },
 
     applyStyle : function(css) {
