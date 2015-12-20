@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GitHub Dark Script
 // @version      0.6.0
-// @description  Adds an options panel for the GitHub Dark userstyle
+// @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
 // @include      /render\.githubusercontent\.com/
@@ -69,7 +69,7 @@
     updatePanel : function() {
       var color,
         data = this.data,
-        $panel = $('#ghd-options-inner');
+        $panel = $('#ghd-settings-inner');
 
       // update this.themes so the saved theme isn't reloaded
       if (data.theme) {
@@ -101,7 +101,7 @@
     },
 
     getStoredValues : function(reset) {
-      var $panel = $('#ghd-options-inner'),
+      var $panel = $('#ghd-settings-inner'),
 
       data = this.data = {
         attach  : (reset ? '' : GM_getValue('attach', ''))  || 'scroll',
@@ -341,7 +341,7 @@
     },
 
     updateStyle : function() {
-      var $panel = $('#ghd-options-inner'),
+      var $panel = $('#ghd-settings-inner'),
       data = this.data;
 
       data.attach = $panel.find('.ghd-attach').val();
@@ -374,23 +374,23 @@
       document.location.reload();
     },
 
-    buildOptions : function() {
+    buildSettings : function() {
       if (this.debug) {
-        console.log('Adding options panel & GitHub Dark link to profile dropdown');
+        console.log('Adding settings panel & GitHub Dark link to profile dropdown');
       }
       // Script-specific CSS
       GM_addStyle([
         '#ghd-menu:hover { cursor:pointer }',
-        '#ghd-options { position:fixed; z-index: 65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden; }',
-        '#ghd-options.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5); }',
-        '#ghd-options-inner { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow: 0 .5rem 1rem #111; color:#c0c0c0 }',
-        '#ghd-options label { margin-left:.5rem; position:relative; top:-1px }',
-        '#ghd-options-close { height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer }',
-        '#ghd-options-close:hover { fill: #ccc }',
-        '#ghd-options .ghd-right { float: right; }',
-        '#ghd-options p { line-height: 25px; }',
+        '#ghd-settings { position:fixed; z-index: 65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden; }',
+        '#ghd-settings.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5); }',
+        '#ghd-settings-inner { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow: 0 .5rem 1rem #111; color:#c0c0c0 }',
+        '#ghd-settings label { margin-left:.5rem; position:relative; top:-1px }',
+        '#ghd-settings-close { height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer }',
+        '#ghd-settings-close:hover { fill: #ccc }',
+        '#ghd-settings .ghd-right { float: right; }',
+        '#ghd-settings p { line-height: 25px; }',
         '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }',
-        '#ghd-options .checkbox input { margin-top: .35em }',
+        '#ghd-settings .checkbox input { margin-top: .35em }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
@@ -411,12 +411,12 @@
         themes += '<option value="' + opt + '">' + opt + '</option>';
       });
 
-      // Options overlay markup
+      // Settings panel markup
       $('body').append([
-        '<div id="ghd-options">',
-          '<div id="ghd-options-inner" class="boxed-group">',
-            '<h3>GitHub-Dark Options',
-            '<svg id="ghd-options-close" xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="160 160 608 608"><path d="M686.2 286.8L507.7 465.3l178.5 178.5-45 45-178.5-178.5-178.5 178.5-45-45 178.5-178.5-178.5-178.5 45-45 178.5 178.5 178.5-178.5z"/></svg>',
+        '<div id="ghd-settings">',
+          '<div id="ghd-settings-inner" class="boxed-group">',
+            '<h3>GitHub-Dark Settings',
+            '<svg id="ghd-settings-close" xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="160 160 608 608"><path d="M686.2 286.8L507.7 465.3l178.5 178.5-45 45-178.5-178.5-178.5 178.5-45-45 178.5-178.5-178.5-178.5 45-45 178.5 178.5 178.5-178.5z"/></svg>',
             '</h3>',
             '<div class="boxed-group-inner">',
               '<form>',
@@ -459,7 +459,7 @@
                  '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
                 '</p>',
                 '<p>',
-                  '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset</a>&nbsp;&nbsp;',
+                  '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>&nbsp;&nbsp;',
                   '<a href="#" class="ghd-update ghd-right btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a>',
                 '</p>',
               '</form>',
@@ -476,11 +476,11 @@
     },
 
     bindEvents : function() {
-      var $panel = $('#ghd-options-inner'),
+      var $panel = $('#ghd-settings-inner'),
         $swatch = $panel.find('#ghd-swatch');
 
       // finish initialization
-      $('#ghd-options-inner .ghd-enable')[0].checked = this.data.enable;
+      $('#ghd-settings-inner .ghd-enable')[0].checked = this.data.enable;
       $('body')
         .toggleClass('ghd-disabled', !this.data.enable)
         .toggleClass('nowrap', this.data.wrap);
@@ -495,16 +495,16 @@
       $('#ghd-menu').on('click', function() {
         $('.modal-backdrop').click();
         ghd.updatePanel();
-        $('#ghd-options').addClass('in');
+        $('#ghd-settings').addClass('in');
       });
 
       // add bindings
-      $('#ghd-options, #ghd-options-close').on('click keyup', function(e) {
-        // press escape to close options
+      $('#ghd-settings, #ghd-settings-close').on('click keyup', function(e) {
+        // press escape to close settings
         if (e.type === 'keyup' && e.which !== 27) {
           return;
         }
-        $('#ghd-options').removeClass('in');
+        $('#ghd-settings').removeClass('in');
         ghd.picker.hide();
 
         // apply changes when the panel is closed
@@ -583,7 +583,7 @@
   $(function() {
     // apply script if option dropdown exists
     if ($('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]').length) {
-      ghd.buildOptions();
+      ghd.buildSettings();
       // add event binding on document ready
       ghd.bindEvents();
     }
