@@ -225,7 +225,7 @@
         // remove default syntax
         .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
 
-        return css;
+      return css;
     },
 
     // this.data.themeCss should be populated with user selected theme
