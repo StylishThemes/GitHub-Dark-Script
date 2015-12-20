@@ -61,6 +61,11 @@
       'fit'   : 'background-repeat: no-repeat !important; background-size: cover !important; background-position: center top !important;'
     },
 
+    wrapCss : {
+      'wrapped' : 'white-space: pre-wrap !important; word-break: break-all !important; display: block !important;',
+      'unwrap'  : 'white-space: pre !important; word-break: normal !important; display: block !important;'
+    },
+
     wrapIcon : '<div class="ghd-wrap-toggle tooltipped tooltipped-n" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768"><path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/></svg></div>',
 
     // extract style & theme name
@@ -397,14 +402,14 @@
         '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:1000; }',
         // icons inside a wrapper immediatly around a pre
         '.highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }',
-        '.ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
         '.ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(255,255,255,.4); }',
+        '.ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
         // 'body:not(.nowrap) .ghd-wrap-toggle svg { fill:rgba(255,255,255,.8) }',
-        'body:not(.nowrap) .ghd-wrap-toggle:hover svg { fill:#006400; }', // wrap enabled (green)
+        'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
         '.blob-wrapper, .markdown-body > pre, .markdown-body > .highlight { position:relative; }',
         // hide wrap icon when style disabled
         'body.ghd-disabled .ghd-wrap-toggle { display: none; }'
-     ].join(''));
+      ].join(''));
 
       var themes = '<select class="ghd-theme ghd-right">';
       $.each(this.themes, function(opt) {
@@ -466,10 +471,15 @@
             '</div>',
           '</div>',
         '</div>',
-     ].join(''));
+      ].join(''));
 
       // add wrap code icons
       $('.blob-wrapper, .markdown-body > .highlight').prepend(this.wrapIcon);
+      $('pre').each(function() {
+        if (!$(this).closest('.highlight').length) {
+          $(ghd.wrapIcon).insertBefore(this);
+        }
+      });
       $('.markdown-body > pre')
         .before(this.wrapIcon)
         .parent().css('position', 'relative');
@@ -533,9 +543,22 @@
       });
 
       $('.ghd-wrap-toggle').on('click', function() {
-        ghd.data.wrap = !ghd.data.wrap;
-        $('body').toggleClass('nowrap', !ghd.data.wrap);
-        ghd.setStoredValues();
+        var css,
+          $this = $(this),
+          $code = $this.next('code, pre');
+        if ($code.find('code').length) {
+          $code = $code.find('code');
+        }
+        css = $code.attr('style') || '';
+        if (css === '') {
+          css = ghd.wrapCss[$('body').hasClass('nowrap') ? 'wrapped' : 'unwrap'];
+        } else {
+          css = ghd.wrapCss[css === ghd.wrapCss.wrapped ? 'unwrap' : 'wrapped'];
+        }
+        $code.attr('style', css);
+        $this
+          .toggleClass('wrapped', css === ghd.wrapCss.wrapped)
+          .toggleClass('unwrap', css === ghd.wrapCss.unwrap);
       });
 
       this.picker = new jscolor($panel.find('.ghd-color')[0]);
