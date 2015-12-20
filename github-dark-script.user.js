@@ -142,7 +142,7 @@
       GM_setValue('enable', data.enable);
       GM_setValue('font', data.font);
       GM_setValue('image', data.image);
-      GM_setValue('processedCss', ghd.$style.html());
+      GM_setValue('processedCss', ghd.$style.text());
       GM_setValue('rawCss', data.rawCss);
       GM_setValue('tab', data.tab);
       GM_setValue('theme', data.theme);
@@ -236,14 +236,14 @@
       if (this.debug) {
         console.log('Adding syntax theme to css');
       }
-      var css = this.$style.html() || '';
+      var css = this.$style.text() || '';
       // look for /*[[syntax-theme]]*/ label, if it doesn't exist, reprocess raw css
       if (!/syntax-theme/.test(css)) {
         if (this.debug) {
           console.log('Need to process raw style before applying theme');
         }
         this.applyStyle(this.processStyle());
-        css = this.$style.html() || '';
+        css = this.$style.text() || '';
       }
       // add syntax highlighting theme
       css = css.replace('/*[[syntax-theme]]*/', this.data.themeCss || '');
@@ -253,7 +253,7 @@
           (this.data.themeCss || '').match(this.regex) + '"');
       }
 
-      this.$style.html(css);
+      this.$style.text(css);
       this.setStoredValues();
     },
 
@@ -262,7 +262,7 @@
         console.log('Applying style', '"' + (css || '').match(this.regex) + '"');
       }
       // add to style
-      this.$style.html(css || '');
+      this.$style.text(css || '');
       // save style to localstorage from this.data.savedStyle
       this.setStoredValues();
     },
@@ -501,7 +501,7 @@
           console.log('Adding previously saved style');
         }
         // apply already processed css to prevent FOUC
-        this.$style.html(this.data.processedCss);
+        this.$style.text(this.data.processedCss);
       } else {
         if (this.debug) {
           console.log('No saved processed data, loading github-dark.css');
