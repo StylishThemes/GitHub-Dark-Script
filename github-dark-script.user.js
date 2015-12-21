@@ -26,8 +26,9 @@
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
 
-    // base url to fetch style and package.json
-    root : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
+    // base urls to fetch style and package.json
+    root : 'https://stylishthemes.github.io/GitHub-Dark/',
+    rootDev : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
 
     // url gets replaced by css when loaded
     themes : {
@@ -80,6 +81,7 @@
         data.theme = 'Twilight';
       }
       $panel.find('.ghd-enable').prop('checked', data.enable);
+      $panel.find('.ghd-dev').prop('checked', data.dev);
       $panel.find('.ghd-wrap').prop('checked', data.wrap);
       $panel.find('.ghd-theme').val(data.theme);
       $panel.find('.ghd-font').val(data.font || 'Menlo');
@@ -109,6 +111,7 @@
         attach  : (reset ? '' : GM_getValue('attach', ''))  || 'scroll',
         color   : (reset ? '' : GM_getValue('color', ''))   || '#4183C4',
         date    : (reset ? '' : GM_getValue('date', ''))    || 0,
+        dev     : (reset ? '' : GM_getValue('dev', ''))     || false,
         enable  : (reset ? '' : GM_getValue('enable', ''))  || true,
         font    : (reset ? '' : GM_getValue('font', ''))    || 'Menlo',
         image   : (reset ? '' : GM_getValue('image', ''))   || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
@@ -126,6 +129,7 @@
       // no panel on init
       if ($panel.length) {
         $panel.find('.ghd-enable')[0].checked = data.enable;
+        $panel.find('.ghd-dev')[0].checked = data.dev;
         $panel.find('.ghd-wrap')[0].checked = data.wrap;
 
         this.updatePanel();
@@ -177,7 +181,7 @@
       debug('Fetching package.json');
       GM_xmlhttpRequest({
         method : 'GET',
-        url : ghd.root + 'package.json',
+        url : (ghd.data.dev ? ghd.rootDev : ghd.root) + 'package.json',
         onload : function(response) {
           // store package JSON
           ghd.data.package = $.parseJSON(response.responseText);
@@ -205,7 +209,7 @@
       debug('Fetching github-dark.css');
       GM_xmlhttpRequest({
         method : 'GET',
-        url : ghd.root + 'github-dark.css',
+        url : (ghd.data.dev ? ghd.rootDev : ghd.root) + 'github-dark.css',
         onload : function(response) {
           ghd.data.rawCss = response.responseText;
           ghd.applyStyle(ghd.processStyle());
@@ -229,10 +233,11 @@
       var name = this.data.theme || 'Twilight';
       // test if this.themes contains the url (.min.css), or the actual css
       if (/\.min\.css$/.test(this.themes[name])) {
-        debug('Loading "' + name + '" theme', ghd.root + ghd.themes[name]);
+        var themeUrl = (ghd.data.dev ? ghd.rootDev : ghd.root) + ghd.themes[name];
+        debug('Loading "' + name + '" theme', url);
         GM_xmlhttpRequest({
           method : 'GET',
-          url : ghd.root + ghd.themes[name],
+          url : themeUrl,
           onload : function(response) {
             ghd.themes[name] = response.responseText;
             ghd.data.themeCss = response.responseText;
@@ -330,6 +335,7 @@
       data.attach = $panel.find('.ghd-attach').val();
       data.color  = $panel.find('.ghd-color').val();
       data.enable = $panel.find('.ghd-enable').is(':checked');
+      data.dev    = $panel.find('.ghd-dev').is(':checked');
       data.font   = $panel.find('.ghd-font').val();
       data.image  = $panel.find('.ghd-image').val();
       data.tab    = $panel.find('.ghd-tab').val();
@@ -403,6 +409,9 @@
                 '<p class="checkbox">',
                  '<label>Enable GitHub-Dark<input class="ghd-enable ghd-right" type="checkbox"></label>',
                 '</p>',
+                '<p class="checkbox">',
+                 '<label>Use development version<input class="ghd-dev ghd-right" type="checkbox"></label>',
+                '</p>',
                '<p>',
                   '<label>Color:</label> <input class="ghd-color ghd-right" type="text" value="#4183C4">',
                   '<span id="ghd-swatch" class="ghd-right"></span>',
@@ -459,6 +468,7 @@
 
       // finish initialization
       $('#ghd-settings-inner .ghd-enable')[0].checked = this.data.enable;
+      $('#ghd-settings-inner .ghd-dev')[0].checked = this.data.dev;
       $('body')
         .toggleClass('ghd-disabled', !this.data.enable)
         .toggleClass('nowrap', this.data.wrap);
