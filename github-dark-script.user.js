@@ -26,9 +26,6 @@
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
 
-    // include a "?debug" anywhere in the browser URL to enable debugging
-    debug : /\?debug/.test(window.location.href),
-
     // gh-pages url prefix for theme url
     root : 'https://stylishthemes.github.io/GitHub-Dark/',
 
@@ -138,9 +135,7 @@
         this.setStoredValues();
       }
 
-      if (this.debug) {
-        console.log((reset ? 'Reset' : 'Retrieved') + ' stored values', this.data);
-      }
+      debug((reset ? 'Reset' : 'Retrieved') + ' stored values', this.data);
     },
 
     setStoredValues : function() {
@@ -162,9 +157,7 @@
       GM_setValue('themeCss', data.themeCss);
       GM_setValue('processedCss', ghd.$style.text());
 
-      if (this.debug) {
-        console.log('Saving current values', data);
-      }
+      debug('Saving current values', data);
     },
 
     // convert version "1.2.3" into "001002003" for easier comparison
@@ -176,16 +169,12 @@
       for (index = 0; index < len; index++) {
         str += ('000' + parts[index]).slice(-3);
       }
-      if (this.debug) {
-        console.log('Converted version "' + val + '" to "' + str + '" for easy comparison');
-      }
+      debug('Converted version "' + val + '" to "' + str + '" for easy comparison');
       return val ? str : val;
     },
 
     checkVersion : function() {
-      if (this.debug) {
-        console.log('Loading package.json');
-      }
+      debug('Loading package.json');
       GM_xmlhttpRequest({
         method : 'GET',
         url : 'https://stylishthemes.github.io/GitHub-Dark/package.json',
@@ -195,12 +184,11 @@
           var version = ghd.convertVersion(ghd.data.package.version);
           // if new available, load it & parse
           if (version > ghd.data.version) {
+            debug('Updating from', ghd.data.version, 'to', version);
             ghd.data.version = version;
             // save last loaded date, so package.json is only loaded once a day
             ghd.data.date = new Date().getTime();
-            if (ghd.debug) {
-              console.log('Loading github-dark.css');
-            }
+            debug('Loading github-dark.css');
             // apply style
             GM_xmlhttpRequest({
               method : 'GET',
@@ -219,9 +207,7 @@
     },
 
     addSavedStyle : function() {
-      if (this.debug) {
-        console.log('Adding previously saved style');
-      }
+      debug('Adding previously saved style');
       // apply already processed css to prevent FOUC
       this.$style.text(this.data.processedCss);
     },
@@ -229,17 +215,13 @@
     // load syntax highlighting theme, if necessary
     getTheme : function() {
       if (!this.data.enable) {
-        if (this.debug) {
-          console.log('Disabled: stop theme processing');
-        }
+        debug('Disabled: stop theme processing');
         return;
       }
       var name = this.data.theme || 'Twilight';
       // test if this.themes contains the url (.min.css), or the actual css
       if (/\.min\.css$/.test(this.themes[name])) {
-        if (this.debug) {
-          console.log('Loading "' + name + '" theme', ghd.root + ghd.themes[name]);
-        }
+        debug('Loading "' + name + '" theme', ghd.root + ghd.themes[name]);
         GM_xmlhttpRequest({
           method : 'GET',
           url : ghd.root + ghd.themes[name],
@@ -280,14 +262,10 @@
         url = /^url/.test(data.image || '') ? data.image :
           (data.image === 'none' ? 'none' : 'url("' + data.image + '")');
       if (!data.enable) {
-        if (this.debug) {
-          console.log('Disabled: stop processing');
-        }
+        debug('Disabled: stop processing');
         return;
       }
-      if (this.debug) {
-        console.log('Processing set styles');
-      }
+      debug('Processing set styles');
       css = css
         // remove moz-document wrapper
         .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
@@ -312,34 +290,26 @@
     // this.data.themeCss should be populated with user selected theme
     // called asynchronously from processStyle()
     processTheme : function() {
-      if (this.debug) {
-        console.log('Adding syntax theme to css');
-      }
+      debug('Adding syntax theme to css');
       var css = this.$style.text() || '';
       // look for /*[[syntax-theme]]*/ label, if it doesn't exist, reprocess raw css
       if (!/syntax-theme/.test(css)) {
-        if (this.debug) {
-          console.log('Need to process raw style before applying theme');
-        }
+        debug('Need to process raw style before applying theme');
         this.applyStyle(this.processStyle());
         css = this.$style.text() || '';
       }
       // add syntax highlighting theme
       css = css.replace('/*[[syntax-theme]]*/', this.data.themeCss || '');
 
-      if (this.debug) {
-        console.log('Applying "' + this.data.theme + '" theme', '"' +
-          (this.data.themeCss || '').match(this.regex) + '"');
-      }
+      debug('Applying "' + this.data.theme + '" theme', '"' +
+        (this.data.themeCss || '').match(this.regex) + '"');
 
       this.$style.text(css);
       this.setStoredValues();
     },
 
     applyStyle : function(css) {
-      if (this.debug) {
-        console.log('Applying style', '"' + (css || '').match(this.regex) + '"');
-      }
+      debug('Applying style', '"' + (css || '').match(this.regex) + '"');
       // add to style
       this.$style.text(css || '');
       this.setStoredValues();
@@ -359,9 +329,7 @@
       data.type   = $panel.find('.ghd-type').val();
       data.wrap   = $panel.find('.ghd-wrap').is(':checked');
 
-      if (this.debug) {
-        console.log('updating user settings', data);
-      }
+      debug('Updating user settings', data);
 
       this.$style.prop('disabled', !data.enable);
       $('body')
@@ -380,9 +348,7 @@
     },
 
     buildSettings : function() {
-      if (this.debug) {
-        console.log('Adding settings panel & GitHub Dark link to profile dropdown');
-      }
+      debug('Adding settings panel & GitHub Dark link to profile dropdown');
       // Script-specific CSS
       GM_addStyle([
         '#ghd-menu:hover { cursor:pointer }',
@@ -407,7 +373,7 @@
         '.ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
         // 'body:not(.nowrap) .ghd-wrap-toggle svg { fill:rgba(255,255,255,.8) }',
         'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
-        '.blob-wrapper, .markdown-body > pre, .markdown-body > .highlight { position:relative; }',
+        '.blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }',
         // hide wrap icon when style disabled
         'body.ghd-disabled .ghd-wrap-toggle { display: none; }'
       ].join(''));
@@ -466,7 +432,7 @@
                 '</p>',
                 '<p>',
                   '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>&nbsp;&nbsp;',
-                  '<a href="#" class="ghd-update ghd-right btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update</a>',
+                  '<a href="#" class="ghd-update ghd-right btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>',
                 '</p>',
               '</form>',
             '</div>',
@@ -475,15 +441,8 @@
       ].join(''));
 
       // add wrap code icons
-      $('.blob-wrapper, .markdown-body > .highlight').prepend(this.wrapIcon);
-      $('pre').each(function() {
-        if (!$(this).closest('.highlight').length) {
-          $(ghd.wrapIcon).insertBefore(this);
-        }
-      });
-      $('.markdown-body > pre')
-        .before(this.wrapIcon)
-        .parent().css('position', 'relative');
+      $('.blob-wrapper').prepend(this.wrapIcon);
+      $('.markdown-body pre').before(ghd.wrapIcon);
     },
 
     bindEvents : function() {
@@ -582,9 +541,7 @@
     },
 
     init : function() {
-      if (this.debug) {
-        console.log('GitHub-Dark script initializing!');
-      }
+      debug('GitHub-Dark Script initializing!');
 
       // add style tag to head
       ghd.$style = $('<style class="ghd-style">').appendTo('head');
@@ -594,7 +551,7 @@
       this.$style.prop('disabled', !this.data.enable);
 
       // only load package.json once a day
-      if (new Date().getTime() > this.data.date + this.delay) {
+      if ((new Date().getTime() > this.data.date + this.delay) || !this.data.version) {
         // get package.json from GitHub-Dark & compare versions
         // load new script if a newer one is available
         this.checkVersion();
@@ -616,4 +573,11 @@
       ghd.bindEvents();
     }
   });
+
+  // include a "?debug" anywhere in the browser URL to enable debugging
+  function debug() {
+    if (/\?debug/.test(window.location.href)) {
+      console.log.apply(console, arguments);
+    }
+  }
 })(jQuery.noConflict(true));
