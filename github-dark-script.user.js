@@ -550,7 +550,7 @@
 
       this.$style.prop('disabled', !this.data.enable);
 
-      // only load package.json once a day
+      // only load package.json once a day, or after a forced update
       if ((new Date().getTime() > this.data.date + this.delay) || !this.data.version) {
         // get package.json from GitHub-Dark & compare versions
         // load new script if a newer one is available
