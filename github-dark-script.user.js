@@ -26,8 +26,8 @@
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
 
-    // gh-pages url prefix for theme url
-    root : 'https://stylishthemes.github.io/GitHub-Dark/',
+    // base url to fetch style and package.json
+    root : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
 
     // url gets replaced by css when loaded
     themes : {
@@ -118,9 +118,9 @@
         version : (reset ? '' : GM_getValue('version', '')) || 0,
         wrap    : (reset ? '' : GM_getValue('wrap', ''))    || true,
 
-        rawCss       : GM_getValue('rawCss', ''),
-        themeCss     : GM_getValue('themeCss', ''),
-        processedCss : GM_getValue('processedCss', '')
+        rawCss       : reset ? '' : GM_getValue('rawCss', ''),
+        themeCss     : reset ? '' : GM_getValue('themeCss', ''),
+        processedCss : reset ? '' : GM_getValue('processedCss', '')
       };
 
       // no panel on init
@@ -174,10 +174,10 @@
     },
 
     checkVersion : function() {
-      debug('Loading package.json');
+      debug('Fetching package.json');
       GM_xmlhttpRequest({
         method : 'GET',
-        url : 'https://stylishthemes.github.io/GitHub-Dark/package.json',
+        url : ghd.root + 'package.json',
         onload : function(response) {
           // store package JSON
           ghd.data.package = $.parseJSON(response.responseText);
@@ -185,23 +185,31 @@
           // if new available, load it & parse
           if (version > ghd.data.version) {
             debug('Updating from', ghd.data.version, 'to', version);
-            ghd.data.version = version;
-            // save last loaded date, so package.json is only loaded once a day
-            ghd.data.date = new Date().getTime();
-            debug('Loading github-dark.css');
-            // apply style
-            GM_xmlhttpRequest({
-              method : 'GET',
-              url : ghd.root + 'github-dark.css',
-              onload : function(response) {
-                ghd.data.rawCss = response.responseText;
-                ghd.applyStyle(ghd.processStyle());
-                ghd.getTheme();
-              }
-            });
+            ghd.saveVersion(version);
+            ghd.fetchAndApplyStyle();
           } else {
             ghd.addSavedStyle();
           }
+        }
+      });
+    },
+
+    saveVersion : function(version) {
+      ghd.data.version = version;
+      // save last loaded date, so package.json is only loaded once a day
+      ghd.data.date = new Date().getTime();
+      ghd.setStoredValues();
+    },
+
+    fetchAndApplyStyle : function() {
+      debug('Fetching github-dark.css');
+      GM_xmlhttpRequest({
+        method : 'GET',
+        url : ghd.root + 'github-dark.css',
+        onload : function(response) {
+          ghd.data.rawCss = response.responseText;
+          ghd.applyStyle(ghd.processStyle());
+          ghd.getTheme();
         }
       });
     },
@@ -497,7 +505,7 @@
         this.select();
       });
 
-      $panel.find('select, input').on('change', function(){
+      $panel.find('select, input').on('change', function() {
         ghd.updateStyle();
       });
 
@@ -551,7 +559,7 @@
       this.$style.prop('disabled', !this.data.enable);
 
       // only load package.json once a day, or after a forced update
-      if ((new Date().getTime() > this.data.date + this.delay) || !this.data.version) {
+      if ((new Date().getTime() > this.data.date + this.delay) || this.data.version === 0) {
         // get package.json from GitHub-Dark & compare versions
         // load new script if a newer one is available
         this.checkVersion();
@@ -559,7 +567,6 @@
         this.addSavedStyle();
       }
     }
-
   };
 
   // add style at document-start
