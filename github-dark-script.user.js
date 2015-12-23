@@ -30,6 +30,18 @@
     root : 'https://stylishthemes.github.io/GitHub-Dark/',
     rootDev : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
 
+    defaults : {
+      attach : 'scroll',
+      color  : '#4183C4',
+      enable : true,
+      font   : 'Menlo',
+      image  : 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
+      tab    : 4,
+      theme  : 'Twilight',
+      type   : 'tiled',
+      wrap   : true
+    },
+
     // url gets replaced by css when loaded
     themes : {
       'Ambiance' : 'themes/ambiance.min.css',
@@ -70,27 +82,26 @@
     regex: /\/\*! [^\*]+ \*\//,
 
     updatePanel : function() {
+      // prevent multiple change events from processing
+      this.isUpdating = true;
+
       var color,
         data = this.data,
+        defaults = this.defaults,
         $panel = $('#ghd-settings-inner');
 
-      // update this.themes so the saved theme isn't reloaded
-      if (data.theme) {
-        this.themes[data.theme] = data.themeCss;
-      } else {
-        data.theme = 'Twilight';
-      }
-      $panel.find('.ghd-enable').prop('checked', data.enable);
-      $panel.find('.ghd-dev').prop('checked', data.dev);
-      $panel.find('.ghd-wrap').prop('checked', data.wrap);
-      $panel.find('.ghd-theme').val(data.theme);
-      $panel.find('.ghd-font').val(data.font || 'Menlo');
-      $panel.find('.ghd-image').val(data.image || '');
-      $panel.find('.ghd-type').val(data.type || 'tiled');
-      $panel.find('.ghd-attach').val(data.attach || 'scroll');
-      $panel.find('.ghd-tab').val(data.tab || 4);
+      $panel.find('.ghd-attach').val(data.attach || defaults.attach);
+      $panel.find('.ghd-font').val(data.font || defaults.font);
+      $panel.find('.ghd-image').val(data.image || defaults.image);
+      $panel.find('.ghd-tab').val(data.tab || defaults.tab);
+      $panel.find('.ghd-theme').val(data.theme || defaults.theme);
+      $panel.find('.ghd-type').val(data.type || defaults.type);
 
-      color = data.color || '#4183C4';
+      $panel.find('.ghd-dev').prop('checked', typeof data.dev === 'boolean' ? data.dev : false);
+      $panel.find('.ghd-enable').prop('checked', typeof data.enable === 'boolean' ? data.enable : defaults.enable);
+      $panel.find('.ghd-wrap').prop('checked', typeof data.wrap === 'boolean' ? data.wrap : defaults.wrap);
+
+      color = data.color || defaults.color;
       $panel.find('.ghd-color').val(color);
       // update swatch color & color picker value
       $panel.find('#ghd-swatch').css('background-color', color);
@@ -102,66 +113,89 @@
       $('body')
         .toggleClass('ghd-disabled', !data.enable)
         .toggleClass('nowrap', !data.wrap);
+
+      this.isUpdating = false;
     },
 
-    getStoredValues : function(reset) {
+    /*
+    this.data = {
+      attach  : 'scroll',
+      color   : '#4183C4',
+      enable  : true,
+      font    : 'Menlo',
+      image   : 'url()',
+      tab     : 4,
+      theme   : 'Tomorrow Night',
+      type    : 'tiled',
+      wrap    : true, // code: wrap long lines
+
+      date    : 1450159200000, // last loaded package.json
+      dev     : false, // load github-dark.css style from master branch vs. gh-pages
+      version : '001014032', // v1.14.32 = last stored GitHub-Dark version
+
+      rawCss       : '@-moz-document regexp("^...', // github-dark.css (unprocessed)
+      themeCss     : '/*! Tomorrow Night * /.ace_editor,.highlight{...', // theme/{name}.min.css
+      processedCss : '' // css saved directly from this.$style
+    }
+    */
+    getStoredValues : function() {
       var $panel = $('#ghd-settings-inner'),
+      defaults = this.defaults,
 
       data = this.data = {
-        attach  : (reset ? '' : GM_getValue('attach', ''))  || 'scroll',
-        color   : (reset ? '' : GM_getValue('color', ''))   || '#4183C4',
-        date    : (reset ? '' : GM_getValue('date', ''))    || 0,
-        dev     : (reset ? '' : GM_getValue('dev', ''))     || false,
-        enable  : (reset ? '' : GM_getValue('enable', ''))  || true,
-        font    : (reset ? '' : GM_getValue('font', ''))    || 'Menlo',
-        image   : (reset ? '' : GM_getValue('image', ''))   || 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAgMAAAANjH3HAAAACVBMVEUaGhohISElJSUh9lebAAAB20lEQVRIx4XWuZXDMAwE0C0SAQtggIIYoAAEU+aKOHhYojTrYP2+QfOW/5QIJOih/q8HwF/pb3EX+UPIveYcQGgEHiu9hI+ihEc5Jz5KBIlRRRaJ1JtoSAl5Hw96hLB1/up1tnIXOck5jZQy+3iU2hAOKSH1JvwxHsp+5TLF5MOl1/MQXsVs1miXc+KDbYydyMeUgpPQreZ7fWidbNhkXNJSeAhc6qHmHD8AYovunYyEACWEbyIhNeB9fRrH3hFi0bGPLuEW7xCNaohw1vAlS805nfsrTspclB/hVdoqusg53eH7FWot+wjYpOViX8KbFFKTwlnzvj65P9H/vD0/hibYBGhPwlPO8TmxRsaxsNnrUmUXpNhirlJMPr6Hqq9k5Xn/8iYQHYIuQsWFC6Z87IOxLxHphSY4SpuiU87xJnJr5axfeRd+lnMExXpEWPpuZ1v7qZdNBOjiHzDREHX5fs5Zz9p6X0vVKbKKchlSl5rv+3p//FJ/PYvoKryI8vs+2G9lzRmnEKkh+BU8yDk515jDj/HAswu7CCz6U/Mxb/PnC9N41ndpU4hUU7JGk/C9PmP/M2xZYdvBW2PObyf1IUiIzoHmHW9yTncliYs9A9tVNppdShfgQaTLMf+j3X723tLeHgAAAABJRU5ErkJggg==")',
-        tab     : (reset ? '' : GM_getValue('tab', ''))     || 4,
-        theme   : (reset ? '' : GM_getValue('theme', ''))   || 'Twilight',
-        type    : (reset ? '' : GM_getValue('type', ''))    || 'tiled',
-        version : (reset ? '' : GM_getValue('version', '')) || 0,
-        wrap    : (reset ? '' : GM_getValue('wrap', ''))    || true,
+        attach  : GM_getValue('attach', defaults.attach),
+        color   : GM_getValue('color', defaults.color),
+        enable  : GM_getValue('enable', defaults.enable),
+        font    : GM_getValue('font', defaults.font),
+        image   : GM_getValue('image', defaults.image),
+        tab     : GM_getValue('tab', defaults.tab),
+        theme   : GM_getValue('theme', defaults.theme),
+        type    : GM_getValue('type', defaults.type),
+        wrap    : GM_getValue('wrap', defaults.wrap),
 
-        rawCss       : reset ? '' : GM_getValue('rawCss', ''),
-        themeCss     : reset ? '' : GM_getValue('themeCss', ''),
-        processedCss : reset ? '' : GM_getValue('processedCss', '')
+        date    : GM_getValue('date', 0),
+        dev     : GM_getValue('dev', false),
+        version : GM_getValue('version', 0),
+
+        rawCss       : GM_getValue('rawCss', ''),
+        themeCss     : GM_getValue('themeCss', ''),
+        processedCss : GM_getValue('processedCss', '')
       };
+
+      debug('Retrieved stored values', this.data);
 
       // no panel on init
       if ($panel.length) {
         $panel.find('.ghd-enable')[0].checked = data.enable;
         $panel.find('.ghd-dev')[0].checked = data.dev;
         $panel.find('.ghd-wrap')[0].checked = data.wrap;
-
-        this.updatePanel();
       }
 
-      if (reset) {
-        this.setStoredValues();
-      }
-
-      debug((reset ? 'Reset' : 'Retrieved') + ' stored values', this.data);
+      this.updatePanel();
     },
 
-    setStoredValues : function() {
-      var data = this.data;
+    setStoredValues : function(reset) {
+      var data = this.data,
+        defaults = this.defaults;
 
-      GM_setValue('attach', data.attach);
-      GM_setValue('color', data.color);
-      GM_setValue('date', data.date);
-      GM_setValue('enable', data.enable);
-      GM_setValue('font', data.font);
-      GM_setValue('image', data.image);
-      GM_setValue('tab', data.tab);
-      GM_setValue('theme', data.theme);
-      GM_setValue('type', data.type);
-      GM_setValue('version', data.version);
-      GM_setValue('wrap', data.wrap);
+      GM_setValue('attach', reset ? defaults.attach : data.attach);
+      GM_setValue('color',  reset ? defaults.color  : data.color);
+      GM_setValue('enable', reset ? defaults.enable : data.enable);
+      GM_setValue('font',   reset ? defaults.font   : data.font);
+      GM_setValue('image',  reset ? defaults.image  : data.image);
+      GM_setValue('tab',    reset ? defaults.tab    : data.tab);
+      GM_setValue('theme',  reset ? defaults.theme  : data.theme);
+      GM_setValue('type',   reset ? defaults.type   : data.type);
+      GM_setValue('wrap',   reset ? defaults.wrap   : data.wrap);
+
+      GM_setValue('date',    reset ? 0 : data.date);
+      GM_setValue('version', reset ? 0 : data.version);
 
       GM_setValue('rawCss', data.rawCss);
       GM_setValue('themeCss', data.themeCss);
       GM_setValue('processedCss', ghd.$style.text());
 
-      debug('Saving current values', data);
+      debug((reset ? 'Reseting' : 'Saving') + ' current values', data);
     },
 
     // convert version "1.2.3" into "001002003" for easier comparison
@@ -234,14 +268,19 @@
       // test if this.themes contains the url (.min.css), or the actual css
       if (/\.min\.css$/.test(this.themes[name])) {
         var themeUrl = (ghd.data.dev ? ghd.rootDev : ghd.root) + ghd.themes[name];
-        debug('Loading "' + name + '" theme', url);
+        debug('Loading "' + name + '" theme', themeUrl);
         GM_xmlhttpRequest({
           method : 'GET',
           url : themeUrl,
           onload : function(response) {
-            ghd.themes[name] = response.responseText;
-            ghd.data.themeCss = response.responseText;
-            ghd.processTheme();
+            var theme = response.responseText;
+            if (theme) {
+              ghd.themes[name] = theme;
+              ghd.data.themeCss = theme;
+              ghd.processTheme();
+            } else {
+              debug('Failed to load theme file', '"' + theme + '"');
+            }
           }
         });
       } else {
@@ -250,25 +289,6 @@
       }
     },
 
-    /*
-    this.data = {
-      attach  : 'scroll',
-      color   : '#4183C4',
-      date    : 1450159200000, // last loaded package.json
-      enable  : true,
-      font    : 'Menlo',
-      image   : 'url()',
-      tab     : 4,
-      theme   : 'Tomorrow Night',
-      type    : 'tiled',
-      version : '001014032', // v1.14.32 = last stored GitHub-Dark version
-      wrap    : true, // code: wrap long lines
-
-      rawCss       : '@-moz-document regexp("^...', // github-dark.css (unprocessed)
-      themeCss     : '/*! Tomorrow Night * /.ace_editor,.highlight{...', // theme/{name}.min.css
-      processedCss : '' // css saved directly from this.$style
-    }
-    */
     processStyle : function() {
       var data = this.data,
         css = data.rawCss || '',
@@ -319,6 +339,7 @@
 
       this.$style.text(css);
       this.setStoredValues();
+      this.isUpdating = false;
     },
 
     applyStyle : function(css) {
@@ -329,6 +350,7 @@
     },
 
     updateStyle : function() {
+      this.isUpdating = true;
       var $panel = $('#ghd-settings-inner'),
       data = this.data;
 
@@ -504,8 +526,14 @@
       });
 
       $panel.find('.ghd-reset').on('click', function() {
+        ghd.isUpdating = true;
         // pass true to reset values
-        ghd.getStoredValues(true);
+        ghd.setStoredValues(true);
+        // add reset values back to this.data
+        ghd.getStoredValues();
+        // add reset values to panel
+        ghd.updatePanel();
+        // update style
         ghd.updateStyle();
         return false;
       });
@@ -516,7 +544,9 @@
       });
 
       $panel.find('select, input').on('change', function() {
-        ghd.updateStyle();
+        if (!ghd.isUpdating) {
+          ghd.updateStyle();
+        }
       });
 
       $panel.find('.ghd-update').on('click', function() {
