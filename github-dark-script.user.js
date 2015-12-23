@@ -26,6 +26,11 @@
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
 
+    // Keyboard shortcut to open ghd panel (only a two key combo coded)
+    keyboardShortcut : "g+o",
+    // keyboard shortcut delay from first to second letter
+    keyboardDelay : 1000,
+
     // base urls to fetch style and package.json
     root : 'https://stylishthemes.github.io/GitHub-Dark/',
     rootDev : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
@@ -484,8 +489,24 @@
       $('.markdown-body pre').before(ghd.wrapIcon);
     },
 
+    // add keyboard shortcut to help menu (press "?")
+    buildShortcut : function() {
+      var parts = this.keyboardShortcut.split('+');
+      if (!$('.ghd-shortcut').length) {
+        $('.keyboard-mappings:eq(0) tbody:eq(0)').append([
+          '<tr class="ghd-shortcut">',
+            '<td class="keys">',
+              '<kbd>' + parts[0] + '</kbd> <kbd>' + parts[1] + '</kbd>',
+            '</td>',
+            '<td>Go to GitHub-Dark settings</td>',
+          '</tr>'
+        ].join(''));
+      }
+    },
+
     bindEvents : function() {
-      var $panel = $('#ghd-settings-inner'),
+      var menu, lastKey,
+        $panel = $('#ghd-settings-inner'),
         $swatch = $panel.find('#ghd-swatch');
 
       // finish initialization
@@ -496,16 +517,37 @@
         .toggleClass('nowrap', this.data.wrap);
 
       // Create our menu entry
-      var menu = $('<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>');
+      menu = $('<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>');
       $('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]')
         // gists only have the "go to profile" item; GitHub has both
         .filter(':last')
         .after(menu);
 
       $('#ghd-menu').on('click', function() {
-        $('.modal-backdrop').click();
-        ghd.updatePanel();
-        $('#ghd-settings').addClass('in');
+        ghd.openPanel();
+      });
+
+      // not sure what GitHub uses, so rolling our own
+      $(document).on('keyup', function(e) {
+        clearTimeout(ghd.timer);
+        // use "g+o" to open up ghd options panel
+        var parts = ghd.keyboardShortcut.split('+'),
+          key = String.fromCharCode(e.which).toLowerCase();
+        if (lastKey === parts[0] && key === parts[1] && !$('#ghd-settings').hasClass('in')) {
+          ghd.openPanel();
+        }
+        lastKey = key;
+        ghd.timer = setTimeout(function() {
+          lastKey = null;
+        }, ghd.keyboardDelay);
+
+        // add shortcut to help menu
+        if (e.which === 191) {
+          // table doesn't exist until user presses "?"
+          setTimeout(function() {
+            ghd.buildShortcut();
+          }, 300);
+        }
       });
 
       // add bindings
@@ -586,6 +628,12 @@
 
       // update panel & options
       this.getStoredValues();
+    },
+
+    openPanel : function() {
+      $('.modal-backdrop').click();
+      ghd.updatePanel();
+      $('#ghd-settings').addClass('in');
     },
 
     init : function() {
