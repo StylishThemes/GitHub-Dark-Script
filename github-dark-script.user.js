@@ -407,6 +407,7 @@
         '#ghd-settings .boxed-group-inner { padding: 0; }',
         '#ghd-settings .ghd-footer { padding: 10px; border-top: #555 solid 1px; }',
         '#ghd-settings .ghd-settings-wrapper { max-height: 60vh; overflow:scroll; padding: 1px 10px; }',
+        '#ghd-settings .ghd-tab { width: 5em; }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
