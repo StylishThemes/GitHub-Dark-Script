@@ -541,8 +541,20 @@
         clearTimeout(ghd.timer);
         // use "g+o" to open up ghd options panel
         var parts = ghd.keyboardShortcut.split('+'),
-          key = String.fromCharCode(e.which).toLowerCase();
-        if (lastKey === parts[0] && key === parts[1] && !$('#ghd-settings').hasClass('in')) {
+          key = String.fromCharCode(e.which).toLowerCase(),
+          panelVisible = $('#ghd-settings').hasClass('in');
+
+        // press escape to close the panel
+        if (e.which === 27 && panelVisible) {
+          ghd.closePanel();
+          return;
+        }
+
+        if (lastKey === parts[0] && key === parts[1] &&
+          !panelVisible &&
+          // prevent opening panel while typing "go" in comments
+          !/(input|textarea)/i.test(document.activeElement.nodeName)
+        ) {
           ghd.openPanel();
         }
         lastKey = key;
@@ -565,11 +577,7 @@
         if (e.type === 'keyup' && e.which !== 27) {
           return;
         }
-        $('#ghd-settings').removeClass('in');
-        ghd.picker.hide();
-
-        // apply changes when the panel is closed
-        ghd.updateStyle();
+        ghd.closePanel();
       });
 
       $panel.on('click', function(e) {
@@ -643,6 +651,14 @@
       $('.modal-backdrop').click();
       ghd.updatePanel();
       $('#ghd-settings').addClass('in');
+    },
+
+    closePanel : function(){
+      $('#ghd-settings').removeClass('in');
+      ghd.picker.hide();
+
+      // apply changes when the panel is closed
+      ghd.updateStyle();
     },
 
     init : function() {
