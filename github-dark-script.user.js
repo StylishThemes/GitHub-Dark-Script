@@ -415,6 +415,8 @@
         '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:1000; }',
         // icons inside a wrapper immediatly around a pre
         '.highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }',
+        // icons for non-syntax highlighted code blocks; see
+        '.markdown-body:not(.comment-body) .ghd-wrap-toggle:not(:first-child) { right: 3.4em; }',
         '.ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(255,255,255,.4); }',
         '.ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
         // 'body:not(.nowrap) .ghd-wrap-toggle svg { fill:rgba(255,255,255,.8) }',
