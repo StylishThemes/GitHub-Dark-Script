@@ -13,8 +13,8 @@
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
-// @updateURL    https://cdn.rawgit.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
-// @downloadURL  https://cdn.rawgit.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
+// @updateURL    https://github.com/StylishThemes/GitHub-Dark-Script/raw/master/github-dark-script.user.js
+// @downloadURL  https://github.com/StylishThemes/GitHub-Dark-Script/raw/master/github-dark-script.user.js
 // ==/UserScript==
 /* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
@@ -31,8 +31,8 @@
     // keyboard shortcut delay from first to second letter
     keyboardDelay : 1000,
 
-    // base urls to fetch style and package.json - using rawgit cdn instead of github raw content
-    root : 'https://cdn.rawgit.com/StylishThemes/GitHub-Dark/master/',
+    // base urls to fetch style and package.json
+    root : 'https://github.com/StylishThemes/GitHub-Dark-Script/raw/master/',
 
     defaults : {
       attach : 'scroll',
