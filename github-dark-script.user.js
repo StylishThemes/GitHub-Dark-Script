@@ -467,7 +467,7 @@
                   '<p><label>Theme:</label> ' + themes + '</select></p>',
                   '<p>',
                     '<label>Font Name:</label> <input class="ghd-font ghd-right" type="text">',
-                    '<a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-e" aria-label="Add a system installed font name;&#10;this script will not load external fonts!"><sup>?</sup></a>',
+                    '<a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-e" aria-label="Add a system installed (monospaced) font name;&#10;this script will not load external fonts!"><sup>?</sup></a>',
                   '</p>',
                   '<p>',
                     '<label>Tab Size:</label> <input class="ghd-tab ghd-right" type="text">',
