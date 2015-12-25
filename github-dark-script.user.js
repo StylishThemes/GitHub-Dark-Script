@@ -13,8 +13,8 @@
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
-// @updateURL    https://github.com/StylishThemes/GitHub-Dark-Script/raw/master/github-dark-script.user.js
-// @downloadURL  https://github.com/StylishThemes/GitHub-Dark-Script/raw/master/github-dark-script.user.js
+// @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
+// @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
 /* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
@@ -32,7 +32,7 @@
     keyboardDelay : 1000,
 
     // base urls to fetch style and package.json
-    root : 'https://github.com/StylishThemes/GitHub-Dark-Script/raw/master/',
+    root : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
 
     defaults : {
       attach : 'scroll',
