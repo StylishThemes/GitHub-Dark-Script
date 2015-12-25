@@ -13,8 +13,8 @@
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @require      https://cdn.rawgit.com/EastDesire/jscolor/master/jscolor.min.js
-// @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
-// @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
+// @updateURL    https://cdn.rawgit.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
+// @downloadURL  https://cdn.rawgit.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
 /* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
@@ -31,9 +31,8 @@
     // keyboard shortcut delay from first to second letter
     keyboardDelay : 1000,
 
-    // base urls to fetch style and package.json
-    root : 'https://stylishthemes.github.io/GitHub-Dark/',
-    rootDev : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
+    // base urls to fetch style and package.json - using rawgit cdn instead of github raw content
+    root : 'https://cdn.rawgit.com/StylishThemes/GitHub-Dark/master/',
 
     defaults : {
       attach : 'scroll',
@@ -102,7 +101,6 @@
       $panel.find('.ghd-theme').val(data.theme || defaults.theme);
       $panel.find('.ghd-type').val(data.type || defaults.type);
 
-      $panel.find('.ghd-dev').prop('checked', typeof data.dev === 'boolean' ? data.dev : false);
       $panel.find('.ghd-enable').prop('checked', typeof data.enable === 'boolean' ? data.enable : defaults.enable);
       $panel.find('.ghd-wrap').prop('checked', typeof data.wrap === 'boolean' ? data.wrap : defaults.wrap);
 
@@ -135,10 +133,9 @@
       wrap    : true, // code: wrap long lines
 
       date    : 1450159200000, // last loaded package.json
-      dev     : false, // load github-dark.css style from master branch vs. gh-pages
       version : '001014032', // v1.14.32 = last stored GitHub-Dark version
 
-      rawCss       : '@-moz-document regexp("^...', // github-dark.css (unprocessed)
+      rawCss       : '@-moz-document regexp("^...', // github-dark.css (unprocessed css)
       themeCss     : '/*! Tomorrow Night * /.ace_editor,.highlight{...', // theme/{name}.min.css
       processedCss : '' // css saved directly from this.$style
     }
@@ -159,7 +156,6 @@
         wrap    : GM_getValue('wrap', defaults.wrap),
 
         date    : GM_getValue('date', 0),
-        dev     : GM_getValue('dev', false),
         version : GM_getValue('version', 0),
 
         rawCss       : GM_getValue('rawCss', ''),
@@ -172,7 +168,6 @@
       // no panel on init
       if ($panel.length) {
         $panel.find('.ghd-enable')[0].checked = data.enable;
-        $panel.find('.ghd-dev')[0].checked = data.dev;
         $panel.find('.ghd-wrap')[0].checked = data.wrap;
       }
 
@@ -200,7 +195,7 @@
       GM_setValue('themeCss', data.themeCss);
       GM_setValue('processedCss', ghd.$style.text());
 
-      debug((reset ? 'Reseting' : 'Saving') + ' current values', data);
+      debug((reset ? 'Resetting' : 'Saving') + ' current values', data);
     },
 
     // convert version "1.2.3" into "001002003" for easier comparison
@@ -220,14 +215,16 @@
       debug('Fetching package.json');
       GM_xmlhttpRequest({
         method : 'GET',
-        url : (ghd.data.dev ? ghd.rootDev : ghd.root) + 'package.json',
+        url : ghd.root + 'package.json',
         onload : function(response) {
           // store package JSON
           ghd.data.package = $.parseJSON(response.responseText);
           var version = ghd.convertVersion(ghd.data.package.version);
           // if new available, load it & parse
           if (version > ghd.data.version) {
-            debug('Updating from', ghd.data.version, 'to', version);
+            if (ghd.data.version !== 0) {
+              debug('Updating from', ghd.data.version, 'to', version);
+            }
             ghd.saveVersion(version);
             ghd.fetchAndApplyStyle();
           } else {
@@ -248,7 +245,7 @@
       debug('Fetching github-dark.css');
       GM_xmlhttpRequest({
         method : 'GET',
-        url : (ghd.data.dev ? ghd.rootDev : ghd.root) + 'github-dark.css',
+        url : ghd.root + 'github-dark.css',
         onload : function(response) {
           ghd.data.rawCss = response.responseText;
           ghd.applyStyle(ghd.processStyle());
@@ -272,7 +269,7 @@
       var name = this.data.theme || 'Twilight';
       // test if this.themes contains the url (.min.css), or the actual css
       if (/\.min\.css$/.test(this.themes[name])) {
-        var themeUrl = (ghd.data.dev ? ghd.rootDev : ghd.root) + ghd.themes[name];
+        var themeUrl = ghd.root + ghd.themes[name];
         debug('Loading "' + name + '" theme', themeUrl);
         GM_xmlhttpRequest({
           method : 'GET',
@@ -362,7 +359,6 @@
       data.attach = $panel.find('.ghd-attach').val();
       data.color  = $panel.find('.ghd-color').val();
       data.enable = $panel.find('.ghd-enable').is(':checked');
-      data.dev    = $panel.find('.ghd-dev').is(':checked');
       data.font   = $panel.find('.ghd-font').val();
       data.image  = $panel.find('.ghd-image').val();
       data.tab    = $panel.find('.ghd-tab').val();
@@ -442,12 +438,9 @@
               '<form>',
                 '<div class="ghd-settings-wrapper">',
                   '<p class="checkbox">',
-                   '<label>Enable GitHub-Dark<input class="ghd-enable ghd-right" type="checkbox"></label>',
+                    '<label>Enable GitHub-Dark<input class="ghd-enable ghd-right" type="checkbox"></label>',
                   '</p>',
-                  '<p class="checkbox">',
-                   '<label>Use development version<input class="ghd-dev ghd-right" type="checkbox"></label>',
-                  '</p>',
-                 '<p>',
+                  '<p>',
                     '<label>Color:</label> <input class="ghd-color ghd-right" type="text" value="#4183C4">',
                     '<span id="ghd-swatch" class="ghd-right"></span>',
                   '</p>',
@@ -484,8 +477,8 @@
                   '</p>',
                 '</div>',
                 '<div class="ghd-footer">',
-                  '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>&nbsp;&nbsp;',
-                  '<a href="#" class="ghd-update ghd-right btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>',
+                  '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>&nbsp;',
+                  '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>',
                 '</div>',
               '</form>',
             '</div>',
@@ -520,7 +513,6 @@
 
       // finish initialization
       $('#ghd-settings-inner .ghd-enable')[0].checked = this.data.enable;
-      $('#ghd-settings-inner .ghd-dev')[0].checked = this.data.dev;
       $('body')
         .toggleClass('ghd-disabled', !this.data.enable)
         .toggleClass('nowrap', this.data.wrap);
@@ -550,8 +542,7 @@
           return;
         }
 
-        if (lastKey === parts[0] && key === parts[1] &&
-          !panelVisible &&
+        if (lastKey === parts[0] && key === parts[1] && !panelVisible &&
           // prevent opening panel while typing "go" in comments
           !/(input|textarea)/i.test(document.activeElement.nodeName)
         ) {
