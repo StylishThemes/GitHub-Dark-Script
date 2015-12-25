@@ -9,4 +9,4 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # Screenshot
 
-![Settings panel screenshot](https://cloud.githubusercontent.com/assets/136959/11981918/954c47f2-a96c-11e5-81bc-e39fa200aeaf.png)
+![settings panel screenshot](https://cloud.githubusercontent.com/assets/136959/11998939/1529c5c8-aa79-11e5-87b8-8b94deddf444.png)
