@@ -27,7 +27,7 @@
     delay : 8.64e7, // 24 hours in milliseconds
 
     // Keyboard shortcut to open ghd panel (only a two key combo coded)
-    keyboardShortcut : 'g+o',
+    keyboardShortcut : 'g+0',
     // keyboard shortcut delay from first to second letter
     keyboardDelay : 1000,
 
