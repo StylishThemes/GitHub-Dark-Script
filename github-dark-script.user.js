@@ -217,29 +217,27 @@
         method : 'GET',
         url : ghd.root + 'package.json',
         onload : function(response) {
-          // store package JSON
+          // store package JSON (not accessed anywhere else, but just in case)
           ghd.data.package = $.parseJSON(response.responseText);
+
+          // save last loaded date, so package.json is only loaded once a day
+          ghd.data.date = new Date().getTime();
+          GM_setValue('date', ghd.data.date);
+
           var version = ghd.convertVersion(ghd.data.package.version);
           // if new available, load it & parse
           if (version > ghd.data.version) {
             if (ghd.data.version !== 0) {
               debug('Updating from', ghd.data.version, 'to', version);
             }
-            ghd.saveVersion(version);
+            ghd.data.version = version;
+            GM_setValue('version', ghd.data.version);
             ghd.fetchAndApplyStyle();
           } else {
             ghd.addSavedStyle();
           }
         }
       });
-    },
-
-    saveVersion : function(version) {
-      ghd.data.version = version;
-      // save last loaded date, so package.json is only loaded once a day
-      ghd.data.date = new Date().getTime();
-      console.log( version , ghd.data.date );
-      ghd.setStoredValues();
     },
 
     fetchAndApplyStyle : function() {
