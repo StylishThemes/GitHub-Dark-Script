@@ -692,6 +692,9 @@
       .on('pjax:complete', function() {
         ghd.buildCodeWrap();
       });
+
+    // save object to jQuery data in main window for easier debugging
+    unsafeWindow.jQuery('#ghd-settings').data('ghd', ghd);
   });
 
   // include a "?debug" anywhere in the browser URL to enable debugging
