@@ -16,9 +16,9 @@
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
+/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor, unsafeWindow */
 /* eslint-disable indent, quotes */
-(function($) {
+(function(unsafeWindow, $) {
   'use strict';
 
   var ghd = {
@@ -238,6 +238,7 @@
       ghd.data.version = version;
       // save last loaded date, so package.json is only loaded once a day
       ghd.data.date = new Date().getTime();
+      console.log( version , ghd.data.date );
       ghd.setStoredValues();
     },
 
@@ -486,9 +487,13 @@
         '</div>',
       ].join(''));
 
+      ghd.buildCodeWrap();
+    },
+
+    buildCodeWrap : function() {
       // add wrap code icons
       $('.blob-wrapper').prepend(this.wrapIcon);
-      $('.markdown-body pre').before(ghd.wrapIcon);
+      $('.markdown-body pre').before(this.wrapIcon);
     },
 
     // add keyboard shortcut to help menu (press "?")
@@ -604,7 +609,7 @@
         return false;
       });
 
-      $('.ghd-wrap-toggle').on('click', function() {
+      $('body').on('click', '.ghd-wrap-toggle', function() {
         var css,
           $this = $(this),
           $code = $this.next('code, pre');
@@ -683,6 +688,12 @@
       // add event binding on document ready
       ghd.bindEvents();
     }
+
+    // easier to bind to these events than use mutation observer
+    unsafeWindow.jQuery('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity')
+      .on('pjax:complete', function() {
+        ghd.buildCodeWrap();
+      });
   });
 
   // include a "?debug" anywhere in the browser URL to enable debugging
@@ -691,4 +702,4 @@
       console.log.apply(console, arguments);
     }
   }
-})(jQuery.noConflict(true));
+})(typeof unsafeWindow !== 'undefined' ? unsafeWindow : window, jQuery.noConflict(true));
