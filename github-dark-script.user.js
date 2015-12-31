@@ -408,13 +408,15 @@
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
         '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:1000; }',
+        // file & diff code tables
+        '.ghd-wrap-table td.blob-code-inner { white-space: pre-wrap !important; word-break: break-all !important; }',
+        '.ghd-unwrap-table td.blob-code-inner { white-space: pre !important; word-break: normal !important; }',
         // icons inside a wrapper immediatly around a pre
         '.highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }',
         // icons for non-syntax highlighted code blocks; see https://github.com/gjtorikian/html-proofer/blob/master/README.md
         '.markdown-body:not(.comment-body) .ghd-wrap-toggle:not(:first-child) { right: 3.4em; }',
-        '.ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(255,255,255,.4); }',
+        '.ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(110,110,110,.4); }',
         '.ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
-        // 'body:not(.nowrap) .ghd-wrap-toggle svg { fill:rgba(255,255,255,.8) }',
         'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
         '.blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }',
         // hide wrap icon when style disabled
@@ -609,21 +611,37 @@
 
       $('body').on('click', '.ghd-wrap-toggle', function() {
         var css,
+          overallNoWrap = $('body').hasClass('nowrap'),
           $this = $(this),
-          $code = $this.next('code, pre');
+          $code = $this.next('code, pre, .highlight');
         if ($code.find('code').length) {
           $code = $code.find('code');
         }
-        css = $code.attr('style') || '';
-        if (css === '') {
-          css = ghd.wrapCss[$('body').hasClass('nowrap') ? 'wrapped' : 'unwrap'];
+        // code with line numbers
+        if ($code[0].nodeName === 'TABLE') {
+          if ($code[0].className.indexOf('ghd-') < 0) {
+            css = overallNoWrap;
+          } else {
+            css = $code.hasClass('ghd-unwrap-table');
+          }
+          $code
+            .toggleClass('ghd-wrap-table', css)
+            .toggleClass('ghd-unwrap-table', !css);
+          $this
+            .toggleClass('wrapped', css)
+            .toggleClass('unwrap', !css);
         } else {
-          css = ghd.wrapCss[css === ghd.wrapCss.wrapped ? 'unwrap' : 'wrapped'];
+          css = $code.attr('style') || '';
+          if (css === '') {
+            css = ghd.wrapCss[overallNoWrap ? 'wrapped' : 'unwrap'];
+          } else {
+            css = ghd.wrapCss[css === ghd.wrapCss.wrapped ? 'unwrap' : 'wrapped'];
+          }
+          $code.attr('style', css);
+          $this
+            .toggleClass('wrapped', css === ghd.wrapCss.wrapped)
+            .toggleClass('unwrap', css === ghd.wrapCss.unwrap);
         }
-        $code.attr('style', css);
-        $this
-          .toggleClass('wrapped', css === ghd.wrapCss.wrapped)
-          .toggleClass('unwrap', css === ghd.wrapCss.unwrap);
       });
 
       this.picker = new jscolor($panel.find('.ghd-color')[0]);
