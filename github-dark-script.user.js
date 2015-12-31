@@ -165,13 +165,6 @@
 
       debug('Retrieved stored values', this.data);
 
-      // no panel on init
-      if ($panel.length) {
-        $panel.find('.ghd-enable')[0].checked = data.enable;
-        $panel.find('.ghd-wrap')[0].checked = data.wrap;
-      }
-
-      this.updatePanel();
     },
 
     setStoredValues : function(reset) {
@@ -350,7 +343,7 @@
       this.setStoredValues();
     },
 
-    updateStyle : function() {
+    updateStyle : function(applyStyle) {
       this.isUpdating = true;
       var $panel = $('#ghd-settings-inner'),
       data = this.data;
@@ -372,8 +365,10 @@
         .toggleClass('ghd-disabled', !data.enable)
         .toggleClass('nowrap', !data.wrap);
 
-      this.applyStyle(this.processStyle());
-      this.getTheme();
+      if (applyStyle !== false) {
+        this.applyStyle(this.processStyle());
+        this.getTheme();
+      }
       this.isUpdating = false;
     },
 
@@ -439,7 +434,7 @@
               '<form>',
                 '<div class="ghd-settings-wrapper">',
                   '<p class="checkbox">',
-                    '<label>Enable GitHub-Dark<input class="ghd-enable ghd-right" type="checkbox"></label>',
+                    '<label>Enable GitHub-Dark<input class="ghd-enable ghd-right ghd-ignoreChange" type="checkbox"></label>',
                   '</p>',
                   '<p>',
                     '<label>Color:</label> <input class="ghd-color ghd-right" type="text" value="#4183C4">',
@@ -474,7 +469,7 @@
                     '<label>Tab Size:</label> <input class="ghd-tab ghd-right" type="text">',
                   '</p>',
                   '<p class="checkbox">',
-                   '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
+                   '<label>Wrap<input class="ghd-wrap ghd-right ghd-ignoreChange" type="checkbox"></label>',
                   '</p>',
                 '</div>',
                 '<div class="ghd-footer">',
@@ -600,7 +595,9 @@
 
       $panel.find('select, input').on('change', function() {
         if (!ghd.isUpdating) {
-          ghd.updateStyle();
+          // pass false for settings that don't need the style to be
+          // modified (code wrap or enable/disable)
+          ghd.updateStyle(!$(this).hasClass('ghd-ignoreChange'));
         }
       });
 
@@ -655,8 +652,6 @@
         $swatch[0].style.backgroundColor = '#' + ghd.picker;
       };
 
-      // update panel & options
-      this.getStoredValues();
     },
 
     openPanel : function() {
