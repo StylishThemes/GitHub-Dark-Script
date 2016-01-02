@@ -80,6 +80,20 @@
       'unwrap'  : 'white-space: pre !important; word-break: normal !important; display: block !important;'
     },
 
+    wrapCodeCss : [
+      '/* GitHub Bug: Enable wrapping of long code lines */',
+      '  .blob-code-inner,',
+      '  .markdown-body pre > code,',
+      '  .markdown-body .highlight > pre {',
+      '    white-space: pre-wrap !important;',
+      '    word-break: break-all !important;',
+      '    display: block !important;',
+      '  }',
+      '  td.blob-code-inner {',
+      '    display: table-cell !important;',
+      '  }'
+    ].join('\n'),
+
     wrapIcon : '<div class="ghd-wrap-toggle tooltipped tooltipped-n" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768"><path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/></svg></div>',
 
     // extract style & theme name
@@ -285,7 +299,6 @@
 
     processStyle : function() {
       var data = this.data,
-        css = data.rawCss || '',
         url = /^url/.test(data.image || '') ? data.image :
           (data.image === 'none' ? 'none' : 'url("' + data.image + '")');
       if (!data.enable) {
@@ -293,7 +306,7 @@
         return;
       }
       debug('Processing set styles');
-      css = css
+      return (data.rawCss || '')
         // remove moz-document wrapper
         .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
         // replace background image; if no 'url' at start, then use 'none'
@@ -308,10 +321,11 @@
         .replace('/*[[font-choice]]*/', data.font || 'Menlo')
         // add tab size
         .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
+        // code wrap css
+        .replace(/\s+\/\* grunt-remove-block-below (.*(\n|\r))+\s+\/\* grunt-remove-block-above \*\//gm, '')
+        .replace('/*[[code-wrap]]*/', data.wrap ? ghd.wrapCodeCss : '')
         // remove default syntax
         .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
-
-      return css;
     },
 
     // this.data.themeCss should be populated with user selected theme
@@ -469,7 +483,7 @@
                     '<label>Tab Size:</label> <input class="ghd-tab ghd-right" type="text">',
                   '</p>',
                   '<p class="checkbox">',
-                   '<label>Wrap<input class="ghd-wrap ghd-right ghd-ignoreChange" type="checkbox"></label>',
+                   '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
                   '</p>',
                 '</div>',
                 '<div class="ghd-footer">',
@@ -513,9 +527,7 @@
 
       // finish initialization
       $('#ghd-settings-inner .ghd-enable')[0].checked = this.data.enable;
-      $('body')
-        .toggleClass('ghd-disabled', !this.data.enable)
-        .toggleClass('nowrap', this.data.wrap);
+      $('body').toggleClass('ghd-disabled', !this.data.enable);
 
       // Create our menu entry
       menu = $('<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>');
@@ -608,7 +620,7 @@
 
       $('body').on('click', '.ghd-wrap-toggle', function() {
         var css,
-          overallNoWrap = $('body').hasClass('nowrap'),
+          overallWrap = ghd.data.wrap,
           $this = $(this),
           $code = $this.next('code, pre, .highlight');
         if ($code.find('code').length) {
@@ -617,7 +629,7 @@
         // code with line numbers
         if ($code[0].nodeName === 'TABLE') {
           if ($code[0].className.indexOf('ghd-') < 0) {
-            css = overallNoWrap;
+            css = !overallWrap;
           } else {
             css = $code.hasClass('ghd-unwrap-table');
           }
@@ -630,7 +642,7 @@
         } else {
           css = $code.attr('style') || '';
           if (css === '') {
-            css = ghd.wrapCss[overallNoWrap ? 'wrapped' : 'unwrap'];
+            css = ghd.wrapCss[overallWrap ? 'unwrap' : 'wrapped'];
           } else {
             css = ghd.wrapCss[css === ghd.wrapCss.wrapped ? 'unwrap' : 'wrapped'];
           }
@@ -675,6 +687,8 @@
       ghd.$style = $('<style class="ghd-style">').appendTo('head');
 
       this.getStoredValues();
+      // save stored theme stored themes
+      this.themes[this.data.theme] = this.data.themeCss;
 
       this.$style.prop('disabled', !this.data.enable);
 
