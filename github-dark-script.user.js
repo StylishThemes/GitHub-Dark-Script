@@ -27,7 +27,8 @@
     delay : 8.64e7, // 24 hours in milliseconds
 
     // Keyboard shortcut to open ghd panel (only a two key combo coded)
-    keyboardShortcut : 'g+0',
+    keyboardOpen : 'g+0',
+    keyboardToggle : 'g+-',
     // keyboard shortcut delay from first to second letter
     keyboardDelay : 1000,
 
@@ -506,14 +507,21 @@
 
     // add keyboard shortcut to help menu (press "?")
     buildShortcut : function() {
-      var parts = this.keyboardShortcut.split('+');
+      var openPanel = this.keyboardOpen.split('+'),
+        toggleStyle = this.keyboardToggle.split('+');
       if (!$('.ghd-shortcut').length) {
         $('.keyboard-mappings:eq(0) tbody:eq(0)').append([
           '<tr class="ghd-shortcut">',
             '<td class="keys">',
-              '<kbd>' + parts[0] + '</kbd> <kbd>' + parts[1] + '</kbd>',
+              '<kbd>' + openPanel[0] + '</kbd> <kbd>' + openPanel[1] + '</kbd>',
             '</td>',
-            '<td>Go to GitHub-Dark settings</td>',
+            '<td>GitHub-Dark: open settings</td>',
+          '</tr>',
+          '<tr class="ghd-shortcut">',
+            '<td class="keys">',
+              '<kbd>' + toggleStyle[0] + '</kbd> <kbd>' + toggleStyle[1] + '</kbd>',
+            '</td>',
+            '<td>GitHub-Dark: toggle style</td>',
           '</tr>'
         ].join(''));
       }
@@ -540,10 +548,11 @@
       });
 
       // not sure what GitHub uses, so rolling our own
-      $(document).on('keyup', function(e) {
+      $(document).on('keypress keydown', function(e) {
         clearTimeout(ghd.timer);
         // use "g+o" to open up ghd options panel
-        var parts = ghd.keyboardShortcut.split('+'),
+        var openPanel = ghd.keyboardOpen.split('+'),
+          toggleStyle = ghd.keyboardToggle.split('+'),
           key = String.fromCharCode(e.which).toLowerCase(),
           panelVisible = $('#ghd-settings').hasClass('in');
 
@@ -552,12 +561,20 @@
           ghd.closePanel();
           return;
         }
-
-        if (lastKey === parts[0] && key === parts[1] && !panelVisible &&
-          // prevent opening panel while typing "go" in comments
-          !/(input|textarea)/i.test(document.activeElement.nodeName)
-        ) {
-          ghd.openPanel();
+        // use e.which from keypress for shortcuts
+        // prevent opening panel while typing "go" in comments
+        if (e.type === 'keydown' || /(input|textarea)/i.test(document.activeElement.nodeName)) {
+          return;
+        }
+        if (lastKey === openPanel[0] && key === openPanel[1]) {
+          if (panelVisible) {
+            ghd.closePanel();
+          } else {
+            ghd.openPanel();
+          }
+        }
+        if (lastKey === toggleStyle[0] && key === toggleStyle[1]) {
+          ghd.toggleStyle();
         }
         lastKey = key;
         ghd.timer = setTimeout(function() {
@@ -565,7 +582,7 @@
         }, ghd.keyboardDelay);
 
         // add shortcut to help menu
-        if (e.which === 191) {
+        if (key === '?') {
           // table doesn't exist until user presses "?"
           setTimeout(function() {
             ghd.buildShortcut();
@@ -674,6 +691,17 @@
 
       // apply changes when the panel is closed
       ghd.updateStyle();
+    },
+
+    toggleStyle : function() {
+      var isEnabled = !this.data.enable;
+      this.data.enable = isEnabled;
+      $('#ghd-settings-inner .ghd-enable').prop('checked', isEnabled);
+      // add processedCss back into style (emptied when disabled)
+      if (isEnabled) {
+        this.addSavedStyle();
+      }
+      this.$style.prop('disabled', !isEnabled);
     },
 
     init : function() {
