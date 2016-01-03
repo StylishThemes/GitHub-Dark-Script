@@ -703,12 +703,10 @@
   ghd.init();
 
   $(function() {
-    // apply script if option dropdown exists
-    if ($('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]').length) {
-      ghd.buildSettings();
-      // add event binding on document ready
-      ghd.bindEvents();
-    }
+    // add panel even if you're not logged in - open panel using keyboard shortcut
+    ghd.buildSettings();
+    // add event binding on document ready
+    ghd.bindEvents();
 
     var targets = document.querySelectorAll('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity');
 
