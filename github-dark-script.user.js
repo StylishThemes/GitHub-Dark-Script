@@ -16,9 +16,9 @@
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor, unsafeWindow */
+/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
 /* eslint-disable indent, quotes */
-(function(unsafeWindow, $) {
+(function($) {
   'use strict';
 
   var ghd = {
@@ -155,10 +155,9 @@
     }
     */
     getStoredValues : function() {
-      var $panel = $('#ghd-settings-inner'),
-      defaults = this.defaults,
+      var defaults = this.defaults;
 
-      data = this.data = {
+      this.data = {
         attach  : GM_getValue('attach', defaults.attach),
         color   : GM_getValue('color', defaults.color),
         enable  : GM_getValue('enable', defaults.enable),
@@ -178,7 +177,6 @@
       };
 
       debug('Retrieved stored values', this.data);
-
     },
 
     setStoredValues : function(reset) {
@@ -498,9 +496,12 @@
     },
 
     buildCodeWrap : function() {
+      // mutation events happen quick, so we still add an update flag
+      this.isUpdating = true;
       // add wrap code icons
       $('.blob-wrapper').prepend(this.wrapIcon);
       $('.markdown-body pre').before(this.wrapIcon);
+      this.isUpdating = false;
     },
 
     // add keyboard shortcut to help menu (press "?")
@@ -659,7 +660,6 @@
       this.picker.onFineChange = function() {
         $swatch[0].style.backgroundColor = '#' + ghd.picker;
       };
-
     },
 
     openPanel : function() {
@@ -710,14 +710,21 @@
       ghd.bindEvents();
     }
 
-    // easier to bind to these events than use mutation observer
-    unsafeWindow.jQuery('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity')
-      .on('pjax:complete', function() {
-        ghd.buildCodeWrap();
-      });
+    var targets = document.querySelectorAll('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity');
 
-    // save object to jQuery data in main window for easier debugging
-    unsafeWindow.jQuery('#ghd-settings').data('ghd', ghd);
+    Array.prototype.forEach.call(targets, function(target) {
+      new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          // preform checks before adding code wrap to minimize function calls
+          if (!(ghd.isUpdating || document.querySelectorAll('.ghd-wrap-toggle').length) && mutation.target === target) {
+            ghd.buildCodeWrap();
+          }
+        });
+      }).observe(target, {
+        childList: true,
+        subtree: true
+      });
+    });
   });
 
   // include a "?debug" anywhere in the browser URL to enable debugging
@@ -726,4 +733,4 @@
       console.log.apply(console, arguments);
     }
   }
-})(typeof unsafeWindow !== 'undefined' ? unsafeWindow : window, jQuery.noConflict(true));
+})(jQuery.noConflict(true));
