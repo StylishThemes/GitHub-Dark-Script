@@ -224,7 +224,7 @@
         url : ghd.root + 'package.json',
         onload : function(response) {
           // store package JSON (not accessed anywhere else, but just in case)
-          ghd.data.package = $.parseJSON(response.responseText);
+          ghd.data.package = JSON.parse(response.responseText);
 
           // save last loaded date, so package.json is only loaded once a day
           ghd.data.date = new Date().getTime();
