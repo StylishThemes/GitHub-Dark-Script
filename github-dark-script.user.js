@@ -325,7 +325,9 @@
         // code wrap css
         .replace('/*[[code-wrap]]*/', data.wrap ? ghd.wrapCodeCss : '')
         // remove default syntax
-        .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
+        .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '')
+        // reset checkboxes - see https://github.com/StylishThemes/GitHub-Dark/issues/275
+        .replace(/select, input, textarea/, 'select, input:not([type="checkbox"]), textarea');
     },
 
     // this.data.themeCss should be populated with user selected theme
