@@ -23,6 +23,8 @@
 
   var ghd = {
 
+    version : '1.0.0-beta',
+
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
 
@@ -409,6 +411,7 @@
         '#ghd-settings .ghd-footer { padding: 10px; border-top: #555 solid 1px; }',
         '#ghd-settings .ghd-settings-wrapper { max-height: 60vh; overflow-y:auto; padding: 1px 10px; }',
         '#ghd-settings .ghd-tab { width: 5em; }',
+        '#ghd-settings .ghd-info { vertical-align: middle; }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
@@ -428,9 +431,13 @@
         'body.ghd-disabled .ghd-wrap-toggle { display: none; }'
       ].join(''));
 
-      var themes = '<select class="ghd-theme ghd-right">';
+      var version = [],
+        themes = '<select class="ghd-theme ghd-right">';
       $.each(this.themes, function(opt) {
         themes += '<option value="' + opt + '">' + opt + '</option>';
+      });
+      $.each(this.data.version.match(/\d{3}/g), function(i, v) {
+        version.push(parseInt(v, 10));
       });
 
       // Settings panel markup
@@ -485,6 +492,7 @@
                 '<div class="ghd-footer">',
                   '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>&nbsp;',
                   '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>',
+                  '<span class="ghd-info ghd-right tooltipped tooltipped-n" aria-label="Script v' + this.version + '&#10;CSS v' + version.join('.') + '"><span class="octicon octicon-info"></span></span>',
                 '</div>',
               '</form>',
             '</div>',
