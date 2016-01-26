@@ -44,7 +44,7 @@
       tab    : 4,
       theme  : 'Twilight',
       type   : 'tiled',
-      wrap   : true
+      wrap   : false
     },
 
     // url gets replaced by css when loaded
@@ -82,7 +82,7 @@
     },
 
     wrapCodeCss : [
-      '/* GitHub Bug: Enable wrapping of long code lines */',
+      '/* GitHub: Enable wrapping of long code lines */',
       '  .blob-code-inner,',
       '  .markdown-body pre > code,',
       '  .markdown-body .highlight > pre {',
@@ -321,7 +321,6 @@
         // add tab size
         .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
         // code wrap css
-        .replace(/\s+\/\* grunt-remove-block-below (.*(\n|\r))+\s+\/\* grunt-remove-block-above \*\//gm, '')
         .replace('/*[[code-wrap]]*/', data.wrap ? ghd.wrapCodeCss : '')
         // remove default syntax
         .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
