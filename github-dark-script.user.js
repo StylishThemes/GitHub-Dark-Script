@@ -721,7 +721,9 @@
 
       this.getStoredValues();
       // save stored theme stored themes
-      this.themes[this.data.theme] = this.data.themeCss;
+      if (this.data.themeCss) {
+        this.themes[this.data.theme] = this.data.themeCss;
+      }
 
       this.$style.prop('disabled', !this.data.enable);
 
