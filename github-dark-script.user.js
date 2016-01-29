@@ -417,7 +417,7 @@
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
-        '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:1000; }',
+        '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:20; }',
         // file & diff code tables
         '.ghd-wrap-table td.blob-code-inner { white-space: pre-wrap !important; word-break: break-all !important; }',
         '.ghd-unwrap-table td.blob-code-inner { white-space: pre !important; word-break: normal !important; }',
