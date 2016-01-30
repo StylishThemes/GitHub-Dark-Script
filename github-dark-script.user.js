@@ -365,7 +365,8 @@
       data = this.data;
 
       data.attach = $panel.find('.ghd-attach').val();
-      data.color  = $panel.find('.ghd-color').val();
+      // get hex value directly
+      data.color = this.picker.toHEXString();
       data.enable = $panel.find('.ghd-enable').is(':checked');
       data.font   = $panel.find('.ghd-font').val();
       data.image  = $panel.find('.ghd-image').val();
