@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Dark Script
-// @version      1.0.4-beta
+// @version      1.0.5-beta
 // @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
@@ -11,7 +11,7 @@
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
 // @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=97027
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
@@ -23,7 +23,7 @@
 
   var ghd = {
 
-    version : '1.0.2-beta',
+    version : '1.0.5-beta',
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
