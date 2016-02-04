@@ -447,7 +447,7 @@
         themes += '<option value="' + opt + '">' + opt + '</option>';
       });
       $.each(this.data.version.match(/\d{3}/g), function(_i, v) {
-        version.push(parseInt(v, 10));
+        version.push(parseInt(v));
       });
 
       // Settings panel markup
