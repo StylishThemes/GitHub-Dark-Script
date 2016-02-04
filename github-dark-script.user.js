@@ -307,7 +307,8 @@
         return;
       }
       debug('Processing set styles');
-      return (data.rawCss || '')
+
+      var ret = (data.rawCss || '')
         // remove moz-document wrapper
         .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
         // replace background image; if no 'url' at start, then use 'none'
@@ -325,9 +326,15 @@
         // code wrap css
         .replace('/*[[code-wrap]]*/', data.wrap ? ghd.wrapCodeCss : '')
         // remove default syntax
-        .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '')
-        // reset checkboxes - see https://github.com/StylishThemes/GitHub-Dark/issues/275
-        .replace(/select, input, textarea/, 'select, input:not([type="checkbox"]), textarea');
+        .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
+
+      // see https://github.com/StylishThemes/GitHub-Dark/issues/275
+      if (/firefox/i.test(navigator.userAgent)) {
+        ret = ret
+          .replace(/select, input, textarea/, 'select, input:not([type="checkbox"]), textarea')
+          .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, '');
+      }
+      return ret;
     },
 
     // this.data.themeCss should be populated with user selected theme
