@@ -23,7 +23,7 @@
 
   var ghd = {
 
-    version : '1.0.6-beta',
+    version : '1.0.7-beta',
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
