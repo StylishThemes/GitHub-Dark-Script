@@ -136,7 +136,7 @@ rules:
   padded-blocks:               [2, "never"]
   quote-props:                 [0]
   quotes:                      [2, "double", "avoid-escape"]
-  radix:                       [2, "as-needed"]
+  radix:                       [0]
   semi-spacing:                [2, {before: false, after: true}]
   semi:                        [2, "always"]
   space-before-keywords:       [2, "always"]

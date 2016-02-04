@@ -446,7 +446,7 @@
       $.each(this.themes, function(opt) {
         themes += '<option value="' + opt + '">' + opt + '</option>';
       });
-      $.each(this.data.version.match(/\d{3}/g), function(i, v) {
+      $.each(this.data.version.match(/\d{3}/g), function(_i, v) {
         version.push(parseInt(v, 10));
       });
 
