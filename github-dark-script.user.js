@@ -396,9 +396,17 @@
 
     // user can force GitHub-dark update
     forceUpdate : function() {
-      // clear saved date
-      GM_setValue('version', 0);
-      document.location.reload();
+      var raw = $('#ghd-settings-inner').find('.dropdown-menu').val();
+      if (raw === '') {
+        // clear saved date
+        GM_setValue('version', 0);
+        document.location.reload();
+      } else {
+        // Add raw css directly for style testing
+        ghd.data.rawCss = raw;
+        ghd.applyStyle(ghd.processStyle());
+        ghd.getTheme();
+      }
     },
 
     buildSettings : function() {
@@ -422,6 +430,9 @@
         '#ghd-settings .ghd-settings-wrapper { max-height: 60vh; overflow-y:auto; padding: 1px 10px; }',
         '#ghd-settings .ghd-tab { width: 5em; }',
         '#ghd-settings .ghd-info { vertical-align: middle; }',
+        // flip arrow -> dropup menu
+        '#ghd-settings .ghd-textarea-toggle:after { border-top-color:transparent !important; border-bottom-color:#eee !important; vertical-align:3px; }',
+        '#ghd-settings .dropdown-menu { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px; z-index:0; }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
         // icons next to a pre
@@ -506,7 +517,13 @@
                   '</p>',
                 '</div>',
                 '<div class="ghd-footer">',
-                  '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>&nbsp;',
+                  '<div class="btn-group">',
+                   '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>',
+                   '<a href="#" class="ghd-textarea-toggle btn btn-sm select-menu-button"></a>',
+                   '<div class="dropdown-menu-content" aria-hidden="true">',
+                     '<textarea class="dropdown-menu" placeholder="Enter a &quot;raw&quot; GitHub-Dark Style, then press &quot;Force Update Style&quot;"></textarea>',
+                   '</div>',
+                  '</div>&nbsp;',
                   '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>',
                   '<span class="ghd-right tooltipped tooltipped-n" aria-label="Script v' + this.version + '&#10;CSS ' + (version.length ? 'v' + version.join('.') : 'unknown') + '">',
                     '<svg class="ghd-info" xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24">',
@@ -681,6 +698,18 @@
       $panel.find('.ghd-update').on('click', function() {
         ghd.forceUpdate();
         return false;
+      });
+
+      $panel.find('.ghd-textarea-toggle').on('click', function() {
+        var $this = $(this),
+          $dropdown = $this
+            .removeClass('selected')
+            .next('.dropdown-menu-content')
+            .toggle();
+        if ($dropdown.is(':visible')) {
+          $this.addClass('selected');
+          $dropdown.find('textarea').focus();
+        }
       });
 
       // code wrap toggle
