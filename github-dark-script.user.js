@@ -429,8 +429,6 @@
         '#ghd-settings .ghd-settings-wrapper { max-height: 60vh; overflow-y:auto; padding: 1px 10px; }',
         '#ghd-settings .ghd-tab { width: 5em; }',
         '#ghd-settings .ghd-info { vertical-align: middle; }',
-        // flip arrow -> dropup menu
-        '#ghd-settings .ghd-textarea-toggle:after { border-top-color:transparent !important; border-bottom-color:#eee !important; vertical-align:3px; }',
         '#ghd-settings .paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px; z-index:0; }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
@@ -518,7 +516,11 @@
                 '<div class="ghd-footer">',
                   '<div class="btn-group">',
                    '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>',
-                   '<a href="#" class="ghd-textarea-toggle btn btn-sm select-menu-button" aria-label="Paste CSS update"></a>',
+                   '<a href="#" class="ghd-textarea-toggle btn btn-sm tooltipped tooltipped-n" aria-label="Paste CSS update">',
+                     '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewbox="0 0 16 16" fill="#eee">',
+                       '<path d="M15 11 1 11 8 3z"/>',
+                     '</svg>',
+                   '</a>',
                    '<div class="paste-area-content" aria-hidden="true" style="display:none">',
                      '<textarea class="paste-area" placeholder="Paste GitHub-Dark Style here!"></textarea>',
                    '</div>',
@@ -707,7 +709,10 @@
             .toggle();
         if ($dropdown.is(':visible')) {
           $this.addClass('selected');
-          $dropdown.find('textarea').focus();
+          $dropdown
+            .find('textarea')
+            .focus()
+            .select();
         }
         return false;
       });
