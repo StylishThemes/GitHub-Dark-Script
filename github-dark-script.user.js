@@ -438,7 +438,9 @@
         'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
         '.blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }',
         // hide wrap icon when style disabled
-        'body.ghd-disabled .ghd-wrap-toggle { display: none; }'
+        'body.ghd-disabled .ghd-wrap-toggle { display: none; }',
+        // monospace font toggle
+        '.ghd-monospace-font { font-family: Menlo, Inconsolata, "Droid Mono", monospace !important; font-size: 1em !important; }'
       ].join(''));
 
       var version = [],
@@ -519,6 +521,7 @@
       ].join(''));
 
       ghd.buildCodeWrap();
+      ghd.addMonospaceToggle();
     },
 
     buildCodeWrap : function() {
@@ -527,6 +530,29 @@
       // add wrap code icons
       $('.blob-wrapper').prepend(this.wrapIcon);
       $('.markdown-body pre').before(this.wrapIcon);
+      this.isUpdating = false;
+    },
+
+    addMonospaceToggle : function() {
+      this.isUpdating = true;
+      var indx, $el,
+        $toolbars = $('.toolbar-commenting'),
+        len = $toolbars.length;
+      for (indx = 0; indx < len; indx++) {
+        $el = $toolbars.eq(indx);
+        if (!$el.find('.ghd-monospace').length) {
+          $el.prepend([
+            '<button type="button" class="ghd-monospace toolbar-item tooltipped tooltipped-n" aria-label="Toggle monospaced font" tabindex="-1">',
+              '<svg class="octicon" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="18px" height="18px" viewBox="0 0 25 25" fill="#767676">',
+                '<rect x="11.5" y="2.5"  width="3" height="3"/><rect x="11.5" y="7.5"  width="3" height="3"/>',
+                '<rect x="11.5" y="11.5" width="3" height="3"/><rect x="11.5" y="15.5" width="3" height="3"/>',
+                '<rect x="11.5" y="19.5" width="3" height="3"/><rect x="15.5" y="19.5" width="3" height="3"/>',
+                '<rect x="7.5" y="19.5" width="3" height="3"/><rect x="7.5" y="7.5" width="3" height="3"/>',
+              '</svg>',
+            '</button>'
+          ].join(''));
+        }
+      }
       this.isUpdating = false;
     },
 
@@ -657,6 +683,7 @@
         return false;
       });
 
+      // code wrap toggle
       $('body').on('click', '.ghd-wrap-toggle', function() {
         var css,
           overallWrap = ghd.data.wrap,
@@ -690,6 +717,20 @@
             .toggleClass('wrapped', css === ghd.wrapCss.wrapped)
             .toggleClass('unwrap', css === ghd.wrapCss.unwrap);
         }
+      });
+
+      // monospace font toggle
+      $('body').on('click', '.ghd-monospace', function(e) {
+        e.stopPropagation();
+        var $this = $(this),
+          $textarea = $this
+            // each comment
+            .closest('.timeline-comment')
+            .find('.comment-form-textarea')
+            .toggleClass('ghd-monospace-font')
+            .focus();
+        $this.toggleClass('ghd-icon-active', $textarea.hasClass('ghd-monospace-font'));
+        return false;
       });
 
       this.picker = new jscolor($panel.find('.ghd-color')[0]);
@@ -771,6 +812,7 @@
           // preform checks before adding code wrap to minimize function calls
           if (!(ghd.isUpdating || document.querySelectorAll('.ghd-wrap-toggle').length) && mutation.target === target) {
             ghd.buildCodeWrap();
+            ghd.addMonospaceToggle();
           }
         });
       }).observe(target, {
