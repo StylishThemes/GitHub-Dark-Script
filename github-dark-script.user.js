@@ -444,7 +444,7 @@
       var version = [],
         themes = '<select class="ghd-theme ghd-right">',
         // convert stored css version from "001014049" into "1.14.49" for tooltip
-        parts = ('' + this.data.version).match(/\d{3}/g);
+        parts = String(this.data.version).match(/\d{3}/g);
       $.each(this.themes, function(opt) {
         themes += '<option value="' + opt + '">' + opt + '</option>';
       });
