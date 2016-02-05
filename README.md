@@ -9,7 +9,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # Screenshot
 
-![github-dark script settings panel](https://cloud.githubusercontent.com/assets/136959/11998957/951061c0-aa79-11e5-87aa-2dec4afcca1f.png)
+![github-dark script settings panel](https://cloud.githubusercontent.com/assets/136959/12854563/fdaf38bc-cbff-11e5-88b3-ceb8d1a19a9f.png)
 
 # Basic Usage
 
