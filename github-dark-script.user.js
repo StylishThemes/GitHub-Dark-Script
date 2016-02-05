@@ -519,7 +519,7 @@
                   '<div class="btn-group">',
                    '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>',
                    '<a href="#" class="ghd-textarea-toggle btn btn-sm select-menu-button" aria-label="Paste CSS update"></a>',
-                   '<div class="paste-area-content" aria-hidden="true">',
+                   '<div class="paste-area-content" aria-hidden="true" style="display:none">',
                      '<textarea class="paste-area" placeholder="Paste GitHub-Dark Style here!"></textarea>',
                    '</div>',
                   '</div>&nbsp;',
@@ -716,7 +716,7 @@
         var $toggle = $panel.find('.ghd-textarea-toggle');
         var $textarea = $(e.target);
         setTimeout(function() {
-          $textarea.hide();
+          $textarea.parent().hide();
           $toggle.removeClass('selected');
           ghd.forceUpdate($textarea.val());
         }, 200);
