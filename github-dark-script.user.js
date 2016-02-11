@@ -12,7 +12,7 @@
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
-// @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=97027
+// @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
