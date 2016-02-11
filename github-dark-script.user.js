@@ -729,9 +729,13 @@
         var css,
           overallWrap = ghd.data.wrap,
           $this = $(this),
-          $code = $this.next('code, pre, .highlight');
+          $code = $this.next('code, pre, .highlight, .diff-table');
         if ($code.find('code').length) {
           $code = $code.find('code');
+        }
+        if (!$code.length) {
+          debug('Code wrap icon associated code not found', $this);
+          return;
         }
         // code with line numbers
         if ($code[0].nodeName === 'TABLE') {
