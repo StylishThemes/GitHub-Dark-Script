@@ -428,7 +428,7 @@
         '#ghd-settings .ghd-footer { padding: 10px; border-top: #555 solid 1px; }',
         '#ghd-settings .ghd-settings-wrapper { max-height: 60vh; overflow-y:auto; padding: 1px 10px; }',
         '#ghd-settings .ghd-tab { width: 5em; }',
-        '#ghd-settings .ghd-info { vertical-align: middle; }',
+        '#ghd-settings .ghd-info, .ghd-file-toggle svg { vertical-align: middle !important; }',
         '#ghd-settings .paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px; z-index:0; }',
 
         // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
@@ -446,9 +446,11 @@
         'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
         '.blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }',
         // hide wrap icon when style disabled
-        'body.ghd-disabled .ghd-wrap-toggle { display: none; }',
+        'body.ghd-disabled .ghd-wrap-toggle, .ghd-collapsed-file { display: none; }',
         // monospace font toggle
-        '.ghd-monospace-font { font-family: Menlo, Inconsolata, "Droid Mono", monospace !important; font-size: 1em !important; }'
+        '.ghd-monospace-font { font-family: Menlo, Inconsolata, "Droid Mono", monospace !important; font-size: 1em !important; }',
+        // file collapsed icon
+        '.ghd-file-collapsed svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }'
       ].join(''));
 
       var version = [],
@@ -538,10 +540,10 @@
         '</div>',
       ].join(''));
 
-      ghd.buildCodeWrap();
-      ghd.addMonospaceToggle();
+      ghd.updateToggles();
     },
 
+    // Add code wrap toggle
     buildCodeWrap : function() {
       // mutation events happen quick, so we still add an update flag
       this.isUpdating = true;
@@ -551,6 +553,7 @@
       this.isUpdating = false;
     },
 
+    // Add monospace font toggle
     addMonospaceToggle : function() {
       this.isUpdating = true;
       var indx, $el,
@@ -569,6 +572,34 @@
         }
       }
       this.isUpdating = false;
+    },
+
+    // Add file diffs toggle
+    addFileToggle : function() {
+      this.updating = true;
+      var indx, $el,
+        $files = $('#files .file-actions'),
+        len = $files.length;
+      for (indx = 0; indx < len; indx++) {
+        $el = $files.eq(indx);
+        if (!$el.find('.ghd-file-toggle').length) {
+          $el.append([
+            '<button type="button" class="ghd-file-toggle btn btn-sm tooltipped tooltipped-n" aria-label="Click to Expand or Collapse file" tabindex="-1">',
+              '<svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">',
+                '<path d="M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z"/>',
+              '</svg>',
+            '</button>'
+          ].join(''));
+        }
+      }
+      this.updating = false;
+    },
+
+    // Add toggle buttons after page updates
+    updateToggles : function() {
+      ghd.buildCodeWrap();
+      ghd.addMonospaceToggle();
+      ghd.addFileToggle();
     },
 
     // add keyboard shortcut to help menu (press "?")
@@ -656,7 +687,7 @@
         }
       });
 
-      // add bindings
+      // add ghd-settings panel bindings
       $('#ghd-settings, #ghd-settings-close').on('click keyup', function(e) {
         // press escape to close settings
         if (e.type === 'keyup' && e.which !== 27) {
@@ -724,7 +755,7 @@
         }, 200);
       });
 
-      // code wrap toggle
+      // **** CODE WRAP TOGGLE ****
       $('body').on('click', '.ghd-wrap-toggle', function() {
         var css,
           overallWrap = ghd.data.wrap,
@@ -764,7 +795,7 @@
         }
       });
 
-      // monospace font toggle
+      // **** MONOSPACE FONT TOGGLE ****
       $('body').on('click', '.ghd-monospace', function(e) {
         e.stopPropagation();
         var $this = $(this),
@@ -778,6 +809,34 @@
         return false;
       });
 
+      // **** CODE DIFF COLLAPSE TOGGLE ****
+      $('body').on('click', '.ghd-file-toggle', function(e) {
+        e.stopPropagation();
+        ghd.updating = true;
+        $(this)
+          .toggleClass('ghd-file-collapsed')
+          .closest('.file-header')
+          // toggle view of file or image; "image" class added to "Diff suppressed..."
+          .next('.blob-wrapper, .render-wrapper, .image')
+          .toggleClass('ghd-collapsed-file');
+        // shift+click toggle all files!
+        if (e.shiftKey) {
+          var indx,
+            isCollapsed = $(this).hasClass('ghd-file-collapsed'),
+            $toggles = $('.ghd-file-toggle').not(this),
+            len = $toggles.length;
+          for (indx = 0; indx < len; indx++) {
+            $toggles.eq(indx)
+              .toggleClass('ghd-file-collapsed', isCollapsed)
+              .closest('.file-header')
+              .next('.blob-wrapper, .render-wrapper, .image')
+              .toggleClass('ghd-collapsed-file', isCollapsed);
+          }
+        }
+        ghd.updating = false;
+      });
+
+      // style color picker
       this.picker = new jscolor($panel.find('.ghd-color')[0]);
       this.picker.zIndex = 65536;
       this.picker.hash = true;
@@ -856,8 +915,7 @@
         mutations.forEach(function(mutation) {
           // preform checks before adding code wrap to minimize function calls
           if (!(ghd.isUpdating || document.querySelectorAll('.ghd-wrap-toggle').length) && mutation.target === target) {
-            ghd.buildCodeWrap();
-            ghd.addMonospaceToggle();
+            ghd.updateToggles();
           }
         });
       }).observe(target, {
