@@ -817,7 +817,7 @@
           .toggleClass('ghd-file-collapsed')
           .closest('.file-header')
           // toggle view of file or image; "image" class added to "Diff suppressed..."
-          .next('.blob-wrapper, .render-wrapper, .image')
+          .next('.blob-wrapper, .render-wrapper, .image, .rich-diff')
           .toggleClass('ghd-collapsed-file');
         // shift+click toggle all files!
         if (e.shiftKey) {
@@ -829,7 +829,7 @@
             $toggles.eq(indx)
               .toggleClass('ghd-file-collapsed', isCollapsed)
               .closest('.file-header')
-              .next('.blob-wrapper, .render-wrapper, .image')
+              .next('.blob-wrapper, .render-wrapper, .image, .rich-diff')
               .toggleClass('ghd-collapsed-file', isCollapsed);
           }
         }
