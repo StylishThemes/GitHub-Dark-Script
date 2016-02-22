@@ -21,3 +21,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
   * Use the "Enable GitHub-Dark" checkbox within the settings panel, or
   * Press <kbd>g</kbd>, then <kbd>-</kbd> (minus sign) within one second of each other.
 * For more details on other settings, see the [Home wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki).
+* Learn how to use the added buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles):
+  * Code wrap toggle.
+  * Comment monospace font toggle.
+  * Diff file collapse or expand toggle.
