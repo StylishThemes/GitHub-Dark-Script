@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Dark Script
-// @version      1.0.3
+// @version      1.0.4
 // @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
@@ -23,7 +23,7 @@
 
   var ghd = {
 
-    version : '1.0.3',
+    version : '1.0.4',
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
