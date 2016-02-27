@@ -62,6 +62,7 @@
       'Mono Industrial' : 'themes/mono-industrial.min.css',
       'Mono Industrial Clear' : 'themes/mono-industrial-clear.min.css',
       'Monokai' : 'themes/monokai.min.css',
+      'Obsidian' : 'themes/obsidian.min.css',
       'Pastel on Dark' : 'themes/pastel-on-dark.min.css',
       'Solarized Dark' : 'themes/solarized-dark.min.css',
       'Terminal' : 'themes/terminal.min.css',
