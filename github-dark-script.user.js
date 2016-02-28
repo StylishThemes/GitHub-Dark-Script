@@ -24,7 +24,7 @@
 
   var ghd = {
 
-    version : GM_info.version,
+    version : GM_info.script.version,
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds
