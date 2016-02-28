@@ -9,6 +9,7 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_info
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
@@ -16,14 +17,14 @@
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, GM_addStyle, GM_getValue, GM_setValue, GM_xmlhttpRequest, jscolor */
+/* global jQuery, jscolor */
 /* eslint-disable indent, quotes */
 (function($) {
   'use strict';
 
   var ghd = {
 
-    version : '1.0.4',
+    version : GM_info.version,
 
     // delay until package.json allowed to load
     delay : 8.64e7, // 24 hours in milliseconds

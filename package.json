@@ -5,7 +5,7 @@
   "license": "CC-BY-SA-4.0",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
-    "eslint": "^1.10.3"
+    "eslint": "^2.2.0"
   },
   "scripts": {
     "lint": "eslint *.js || true"
