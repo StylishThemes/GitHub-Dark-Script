@@ -448,7 +448,7 @@
         'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
         '.blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }',
         // hide wrap icon when style disabled
-        'body.ghd-disabled .ghd-wrap-toggle, .ghd-collapsed-file { display: none; }',
+        'body.ghd-disabled .ghd-wrap-toggle, .ghd-collapsed-file, .file.open .data.ghd-collapsed-file { display: none; }',
         // monospace font toggle
         '.ghd-monospace-font { font-family: Menlo, Inconsolata, "Droid Mono", monospace !important; font-size: 1em !important; }',
         // file collapsed icon
@@ -819,7 +819,7 @@
           .toggleClass('ghd-file-collapsed')
           .closest('.file-header')
           // toggle view of file or image; "image" class added to "Diff suppressed..."
-          .next('.blob-wrapper, .render-wrapper, .image, .rich-diff')
+          .nextAll('.blob-wrapper, .render-wrapper, .image, .rich-diff')
           .toggleClass('ghd-collapsed-file');
         // shift+click toggle all files!
         if (e.shiftKey) {
