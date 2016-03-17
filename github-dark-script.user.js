@@ -803,7 +803,7 @@
         var $this = $(this),
           $textarea = $this
             // each comment
-            .closest('.timeline-comment')
+            .closest('.previewable-comment-form')
             .find('.comment-form-textarea')
             .toggleClass('ghd-monospace-font')
             .focus();
