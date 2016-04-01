@@ -421,7 +421,7 @@
         '#ghd-settings label { margin-left:.5rem; position:relative; top:-1px }',
         '#ghd-settings-close { height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer }',
         '#ghd-settings-close:hover { fill: #ccc }',
-        '#ghd-settings .ghd-right { float: right; }',
+        '#ghd-settings .ghd-right { float: right; padding:5px; }',
         '#ghd-settings p { line-height: 25px; }',
         '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }',
         '#ghd-settings .checkbox input { margin-top: .35em }',
