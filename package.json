@@ -1,11 +1,11 @@
 {
   "name": "github-dark-script",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "GitHub Dark in userscript form, with an options panel",
   "license": "CC-BY-SA-4.0",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
-    "eslint": "^2.3.0"
+    "eslint": "^2.5.3"
   },
   "scripts": {
     "lint": "eslint *.js || true"

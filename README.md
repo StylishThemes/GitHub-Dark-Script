@@ -1,7 +1,12 @@
 # GitHub Dark Script [![tag](https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Script.svg)](https://github.com/StylishThemes/GitHub-Dark-Script/tags) [![devdeps](https://img.shields.io/david/dev/StylishThemes/GitHub-Dark-Script.svg)](https://david-dm.org/StylishThemes/GitHub-Dark-Script#info=devDependencies)
 > GitHub Dark in userscript form, with a settings panel
 
-This script loads and applies the [GitHub Dark](https://github.com/StylishThemes/GitHub-Dark) and adds an option panel to change settings on-the-fly without the need to reinstall.
+This script loads and applies the [GitHub Dark](https://github.com/StylishThemes/GitHub-Dark)
+
+* An options panel allows you to change settings on-the-fly without the need to reinstall.
+* Adds a code wrap toggle button to every code block.
+* Adds a monospace font toggle to comment textareas.
+* Adds a diff file view toggle to collapse or expand blocks.
 
 # [Installation](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install)
 
@@ -21,7 +26,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
   * Use the "Enable GitHub-Dark" checkbox within the settings panel, or
   * Press <kbd>g</kbd>, then <kbd>-</kbd> (minus sign) within one second of each other.
 * For more details on other settings, see the [Home wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki).
-* Learn how to use the added buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles):
+* Learn how to use the toggle buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles):
   * Code wrap toggle.
   * Comment monospace font toggle.
   * Diff file collapse or expand toggle.
