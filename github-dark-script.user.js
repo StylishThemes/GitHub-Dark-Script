@@ -11,6 +11,7 @@
 // @grant        GM_setValue
 // @grant        GM_info
 // @grant        GM_xmlhttpRequest
+// @connect      githubusercontent.com
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
 // @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
