@@ -33,7 +33,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 * Learn how to use the toggle buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles).
 * These toggles are included within the GitHub Dark script; there is no need to install these scripts unless you do not want to use the GitHub Dark Script.
-* To install these toggles independent from the GitHub Dark Script, click the link below (or from [GreasyFork](https://greasyfork.org/en/users/24857-stylishthemes-github):
-  * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js).
-  * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js).
-  * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js).
+* To install these toggles independent from the GitHub Dark Script, click the link below:
+  * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18789-github-toggle-code-wrap)).
+  * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18787-github-monospace-font-toggle)).
+  * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18788-github-diff-file-toggle)).
