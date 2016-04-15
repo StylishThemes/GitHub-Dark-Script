@@ -19,7 +19,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # [Using the Script](https://github.com/StylishThemes/GitHub-Dark-Script/wiki)
 
-## Main Script
+### Main Script
 
 * Open GitHub Dark setting panel
   * Click on avatar &amp; choose "GitHub Dark Settings", or
@@ -29,11 +29,11 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
   * Press <kbd>g</kbd>, then <kbd>-</kbd> (minus sign) within one second of each other.
 * For more details on other settings, see the [Home wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki).
 
-## Toggles
+### Toggles
 
-* Learn how to use the toggle buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles).
-* These toggles are included within the GitHub Dark script; there is no need to install these scripts unless you do not want to use the GitHub Dark Script.
-* To install these toggles independent from the GitHub Dark Script, click the link below:
+* **These toggles are included with the GitHub Dark script**.
+* Learn how to use the toggle buttons from the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles).
+* There is no need to install these toggle scripts separately unless you *do not* want to use the GitHub Dark Script; to install, click the link below:
   * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18789-github-toggle-code-wrap)).
   * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18787-github-monospace-font-toggle)).
   * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18788-github-diff-file-toggle)).
