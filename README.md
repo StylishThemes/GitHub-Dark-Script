@@ -19,6 +19,8 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # [Using the Script](https://github.com/StylishThemes/GitHub-Dark-Script/wiki)
 
+## Main Script
+
 * Open GitHub Dark setting panel
   * Click on avatar &amp; choose "GitHub Dark Settings", or
   * Press <kbd>g</kbd>, then <kbd>0</kbd> (zero) within one second of each other.
@@ -26,7 +28,12 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
   * Use the "Enable GitHub-Dark" checkbox within the settings panel, or
   * Press <kbd>g</kbd>, then <kbd>-</kbd> (minus sign) within one second of each other.
 * For more details on other settings, see the [Home wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki).
-* Learn how to use the toggle buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles):
-  * Code wrap toggle.
-  * Comment monospace font toggle.
-  * Diff file collapse or expand toggle.
+
+## Toggles
+
+* Learn how to use the toggle buttons on the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles).
+* These toggles are included within the GitHub Dark script; there is no need to install these scripts unless you do not want to use the GitHub Dark Script.
+* To install these toggles independent from the GitHub Dark Script, click the link below (or from [GreasyFork](https://greasyfork.org/en/users/24857-stylishthemes-github):
+  * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js).
+  * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js).
+  * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js).
