@@ -203,8 +203,8 @@
       GM_setValue('date',    reset ? 0 : data.date);
       GM_setValue('version', reset ? 0 : data.version);
 
-      GM_setValue('rawCss', data.rawCss);
-      GM_setValue('themeCss', data.themeCss);
+      GM_setValue('rawCss', reset ? '' : data.rawCss);
+      GM_setValue('themeCss', reset ? '' : data.themeCss);
       GM_setValue('processedCss', ghd.$style.text());
 
       debug((reset ? 'Resetting' : 'Saving') + ' current values', data);
@@ -244,8 +244,7 @@
             }
             ghd.data.version = version;
             GM_setValue('version', ghd.data.version);
-            ghd.fetchAndApplyStyle();
-            ghd.getTheme();
+            ghd.fetchAndApplyStyle(ghd.fetchAndApplyTheme.bind(ghd));
           } else {
             ghd.addSavedStyle();
           }
@@ -253,7 +252,7 @@
       });
     },
 
-    fetchAndApplyStyle : function() {
+    fetchAndApplyStyle : function(cb) {
       debug('Fetching github-dark.css');
       GM_xmlhttpRequest({
         method : 'GET',
@@ -261,18 +260,13 @@
         onload : function(response) {
           ghd.data.rawCss = response.responseText;
           ghd.applyStyle(ghd.processStyle());
+          if (cb) cb();
         }
       });
     },
 
-    addSavedStyle : function() {
-      debug('Adding previously saved style');
-      // apply already processed css to prevent FOUC
-      this.$style.text(this.data.processedCss);
-    },
-
-    // load syntax highlighting theme, if necessary
-    getTheme : function() {
+    // load syntax highlighting theme
+    fetchAndApplyTheme : function(cb) {
       if (!this.data.enable) {
         debug('Disabled: stop theme processing');
         return;
@@ -285,15 +279,28 @@
         url : themeUrl,
         onload : function(response) {
           var theme = response.responseText;
-          if (theme) {
-            ghd.themes[name] = theme;
+          if (response.status === 200 && theme) {
             ghd.data.themeCss = theme;
-            ghd.processTheme();
+
+            debug('Adding syntax theme to css');
+            var css = ghd.$style.text() || '';
+            css = css.replace('/*[[syntax-theme]]*/', ghd.data.themeCss || '');
+
+            ghd.applyStyle(css);
+            ghd.isUpdating = false;
+            if (cb) cb();
           } else {
-            debug('Failed to load theme file', '"' + theme + '"');
+            throw Error('Failed to load theme file', '"' + theme + '"');
           }
         }
       });
+    },
+
+
+    addSavedStyle : function() {
+      debug('Adding previously saved style');
+      // apply already processed css to prevent FOUC
+      this.$style.text(this.data.processedCss);
     },
 
     processStyle : function() {
@@ -335,27 +342,6 @@
       return ret;
     },
 
-    // this.data.themeCss should be populated with user selected theme
-    // called asynchronously from processStyle()
-    processTheme : function() {
-      debug('Adding syntax theme to css');
-      var css = this.$style.text() || '';
-      // look for /*[[syntax-theme]]*/ label, if it doesn't exist, reprocess raw css
-      if (!/syntax-theme/.test(css)) {
-        debug('Need to process raw style before applying theme');
-        this.applyStyle(this.processStyle());
-        css = this.$style.text() || '';
-      }
-      // add syntax highlighting theme
-      css = css.replace('/*[[syntax-theme]]*/', this.data.themeCss || '');
-
-      debug('Applying "' + this.data.theme + '" theme', '"' +
-        (this.data.themeCss || '').match(this.regex) + '"');
-
-      applyStyle(css);
-      this.isUpdating = false;
-    },
-
     applyStyle : function(css) {
       debug('Applying style', '"' + (css || '').match(this.regex) + '"');
       this.$style.text(css || '');
@@ -385,8 +371,7 @@
         .toggleClass('ghd-disabled', !data.enable)
         .toggleClass('nowrap', !data.wrap);
 
-      this.applyStyle(this.processStyle());
-      this.getTheme();
+      this.fetchAndApplyStyle(this.fetchAndApplyTheme.bind(this));
       this.isUpdating = false;
     },
 
@@ -394,9 +379,8 @@
     forceUpdate : function(css) {
       if (css) {
         // add raw css directly for style testing
-        ghd.data.rawCss = css;
-        ghd.applyStyle(ghd.processStyle());
-        ghd.getTheme();
+        this.data.rawCss = css;
+        this.fetchAndApplyTheme();
       } else {
         // clear saved date
         GM_setValue('version', 0);
@@ -877,11 +861,6 @@
       ghd.$style = $('<style class="ghd-style">').appendTo('head');
 
       this.getStoredValues();
-      // save stored theme stored themes
-      if (this.data.themeCss) {
-        this.themes[this.data.theme] = this.data.themeCss;
-      }
-
       this.$style.prop('disabled', !this.data.enable);
 
       // only load package.json once a day, or after a forced update
