@@ -12,6 +12,7 @@
 // @grant        GM_info
 // @grant        GM_xmlhttpRequest
 // @connect      githubusercontent.com
+// @connect      raw.githubusercontent.com
 // @run-at       document-start
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
 // @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
@@ -244,6 +245,7 @@
             ghd.data.version = version;
             GM_setValue('version', ghd.data.version);
             ghd.fetchAndApplyStyle();
+            ghd.getTheme();
           } else {
             ghd.addSavedStyle();
           }
@@ -259,7 +261,6 @@
         onload : function(response) {
           ghd.data.rawCss = response.responseText;
           ghd.applyStyle(ghd.processStyle());
-          ghd.getTheme();
         }
       });
     },
@@ -277,28 +278,22 @@
         return;
       }
       var name = this.data.theme || 'Twilight';
-      // test if this.themes contains the url (.min.css), or the actual css
-      if (/\.min\.css$/.test(this.themes[name])) {
-        var themeUrl = ghd.root + ghd.themes[name];
-        debug('Loading "' + name + '" theme', themeUrl);
-        GM_xmlhttpRequest({
-          method : 'GET',
-          url : themeUrl,
-          onload : function(response) {
-            var theme = response.responseText;
-            if (theme) {
-              ghd.themes[name] = theme;
-              ghd.data.themeCss = theme;
-              ghd.processTheme();
-            } else {
-              debug('Failed to load theme file', '"' + theme + '"');
-            }
+      var themeUrl = ghd.root + ghd.themes[name];
+      debug('Fetching ' + name + ' theme', themeUrl);
+      GM_xmlhttpRequest({
+        method : 'GET',
+        url : themeUrl,
+        onload : function(response) {
+          var theme = response.responseText;
+          if (theme) {
+            ghd.themes[name] = theme;
+            ghd.data.themeCss = theme;
+            ghd.processTheme();
+          } else {
+            debug('Failed to load theme file', '"' + theme + '"');
           }
-        });
-      } else {
-        ghd.data.themeCss = ghd.themes[name];
-        ghd.processTheme();
-      }
+        }
+      });
     },
 
     processStyle : function() {
@@ -357,14 +352,12 @@
       debug('Applying "' + this.data.theme + '" theme', '"' +
         (this.data.themeCss || '').match(this.regex) + '"');
 
-      this.$style.text(css);
-      this.setStoredValues();
+      applyStyle(css);
       this.isUpdating = false;
     },
 
     applyStyle : function(css) {
       debug('Applying style', '"' + (css || '').match(this.regex) + '"');
-      // add to style
       this.$style.text(css || '');
       this.setStoredValues();
     },
