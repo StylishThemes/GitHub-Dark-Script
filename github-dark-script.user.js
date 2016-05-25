@@ -380,6 +380,7 @@
       if (css) {
         // add raw css directly for style testing
         this.data.rawCss = css;
+        this.applyStyle(ghd.processStyle());
         this.fetchAndApplyTheme();
       } else {
         // clear saved date
