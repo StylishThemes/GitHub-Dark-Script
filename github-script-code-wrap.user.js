@@ -31,7 +31,7 @@
 
   // inline code wrap css
   wrapCss = {
-    "wrapped" : "white-space: pre-wrap !important; word-break: break-all !important; display: block !important;",
+    "wrapped" : "white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: break-word !important; display: block !important;",
     "unwrap"  : "white-space: pre !important; word-break: normal !important; display: block !important;"
   },
 
@@ -188,6 +188,7 @@
       ".markdown-body .highlight > pre {",
         "white-space: pre-wrap !important;",
         "word-break: break-all !important;",
+        "overflow-wrap: break-word !important;",
         "display: block !important;",
       "}",
       "td.blob-code-inner {display: table-cell !important;}"
