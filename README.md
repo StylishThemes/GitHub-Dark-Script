@@ -1,6 +1,8 @@
 # GitHub Dark Script [![tag](https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Script.svg)](https://github.com/StylishThemes/GitHub-Dark-Script/tags) [![devdeps](https://img.shields.io/david/dev/StylishThemes/GitHub-Dark-Script.svg)](https://david-dm.org/StylishThemes/GitHub-Dark-Script#info=devDependencies)
 > GitHub Dark in userscript form, with a settings panel
 
+## Notice. Version 2.0.0 is now available, custom settings will get reset!
+
 This script loads and applies the [GitHub Dark](https://github.com/StylishThemes/GitHub-Dark)
 
 * An options panel allows you to change settings on-the-fly without the need to reinstall.
@@ -15,7 +17,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # Screenshot
 
-![github-dark script settings panel](https://cloud.githubusercontent.com/assets/136959/12854563/fdaf38bc-cbff-11e5-88b3-ceb8d1a19a9f.png)
+![github-dark script settings panel](https://cloud.githubusercontent.com/assets/136959/16171389/5666a2a0-3533-11e6-976d-09c038fee4c0.png)
 
 # [Using the Script](https://github.com/StylishThemes/GitHub-Dark-Script/wiki)
 
