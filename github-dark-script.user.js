@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Dark Script
-// @version      1.0.13
+// @version      2.0.0
 // @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
@@ -11,888 +11,1067 @@
 // @grant        GM_setValue
 // @grant        GM_info
 // @grant        GM_xmlhttpRequest
+// @grant        GM_registerMenuCommand
 // @connect      githubusercontent.com
 // @connect      raw.githubusercontent.com
 // @run-at       document-start
-// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js
 // @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
 // @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jQuery, jscolor */
+/* global GM_addStyle, GM_getValue, GM_setValue, GM_info, GM_xmlhttpRequest, GM_registerMenuCommand, jscolor */
 /* eslint-disable indent, quotes */
-(function($) {
+/* jshint esnext:true */
+(() => {
   'use strict';
 
-  var ghd = {
+  const version = GM_info.script.version,
 
-    version : GM_info.script.version,
+  // delay until package.json allowed to load
+  delay = 8.64e7, // 24 hours in milliseconds
 
-    // delay until package.json allowed to load
-    delay : 8.64e7, // 24 hours in milliseconds
+  // Keyboard shortcut to open ghd panel (only a two key combo coded)
+  keyboardOpen = 'g+0',
+  keyboardToggle = 'g+-',
+  // keyboard shortcut delay from first to second letter
+  keyboardDelay = 1000,
 
-    // Keyboard shortcut to open ghd panel (only a two key combo coded)
-    keyboardOpen : 'g+0',
-    keyboardToggle : 'g+-',
-    // keyboard shortcut delay from first to second letter
-    keyboardDelay : 1000,
+  // base urls to fetch style and package.json
+  root = 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
 
-    // base urls to fetch style and package.json
-    root : 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
+  defaults = {
+    attach : 'scroll',
+    color  : '#4183C4',
+    enable : true,
+    font   : 'Menlo',
+    image  : 'url("data:image/png;base64,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")',
+    tab    : 4,
+    theme  : 'Twilight',
+    type   : 'tiled',
+    wrap   : false,
 
-    defaults : {
-      attach : 'scroll',
-      color  : '#4183C4',
-      enable : true,
-      font   : 'Menlo',
-      image  : 'url("data:image/png;base64,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")',
-      tab    : 4,
-      theme  : 'Twilight',
-      type   : 'tiled',
-      wrap   : false
-    },
+    // toggle buttons
+    enableCodeWrap  : true,
+    enableMonospace : true,
+    // diff toggle + accordion mode
+    modeDiffToggle  : '1',
 
-    // url gets replaced by css when loaded
-    themes : {
-      'Ambiance' : 'themes/ambiance.min.css',
-      'Chaos' : 'themes/chaos.min.css',
-      'Clouds Midnight' : 'themes/clouds-midnight.min.css',
-      'Cobalt' : 'themes/cobalt.min.css',
-      'Idle Fingers' : 'themes/idle-fingers.min.css',
-      'Kr Theme' : 'themes/kr-theme.min.css',
-      'Merbivore' : 'themes/merbivore.min.css',
-      'Merbivore Soft' : 'themes/merbivore-soft.min.css',
-      'Mono Industrial' : 'themes/mono-industrial.min.css',
-      'Mono Industrial Clear' : 'themes/mono-industrial-clear.min.css',
-      'Monokai' : 'themes/monokai.min.css',
-      'Obsidian' : 'themes/obsidian.min.css',
-      'Pastel on Dark' : 'themes/pastel-on-dark.min.css',
-      'Solarized Dark' : 'themes/solarized-dark.min.css',
-      'Terminal' : 'themes/terminal.min.css',
-      'Tomorrow Night' : 'themes/tomorrow-night.min.css',
-      'Tomorrow Night Blue' : 'themes/tomorrow-night-blue.min.css',
-      'Tomorrow Night Bright' : 'themes/tomorrow-night-bright.min.css',
-      'Tomorrow Night Eigthies' : 'themes/tomorrow-night-eighties.min.css',
-      'Twilight' : 'themes/twilight.min.css',
-      'Vibrant Ink' : 'themes/vibrant-ink.min.css'
-    },
+    // internal variables
+    date         : 0,
+    version      : 0,
+    rawCss       : '',
+    themeCss     : '',
+    processedCss : '',
+    last         : {}
 
-    type : {
-      'tiled' : 'background-repeat: repeat !important; background-size: auto !important; background-position: left top !important;',
-      'fit'   : 'background-repeat: no-repeat !important; background-size: cover !important; background-position: center top !important;'
-    },
+  },
 
-    wrapCss : {
-      'wrapped' : 'white-space: pre-wrap !important; word-break: break-all !important; display: block !important;',
-      'unwrap'  : 'white-space: pre !important; word-break: normal !important; display: block !important;'
-    },
+  // extract style & theme name
+  regex = /\/\*! [^\*]+ \*\//,
+  // "themes/" prefix not included here
+  themes = {
+    'Ambiance' : 'ambiance.min.css',
+    'Chaos' : 'chaos.min.css',
+    'Clouds Midnight' : 'clouds-midnight.min.css',
+    'Cobalt' : 'cobalt.min.css',
+    'Idle Fingers' : 'idle-fingers.min.css',
+    'Kr Theme' : 'kr-theme.min.css',
+    'Merbivore' : 'merbivore.min.css',
+    'Merbivore Soft' : 'merbivore-soft.min.css',
+    'Mono Industrial' : 'mono-industrial.min.css',
+    'Mono Industrial Clear' : 'mono-industrial-clear.min.css',
+    'Monokai' : 'monokai.min.css',
+    'Obsidian' : 'obsidian.min.css',
+    'Pastel on Dark' : 'pastel-on-dark.min.css',
+    'Solarized Dark' : 'solarized-dark.min.css',
+    'Terminal' : 'terminal.min.css',
+    'Tomorrow Night' : 'tomorrow-night.min.css',
+    'Tomorrow Night Blue' : 'tomorrow-night-blue.min.css',
+    'Tomorrow Night Bright' : 'tomorrow-night-bright.min.css',
+    'Tomorrow Night Eigthies' : 'tomorrow-night-eighties.min.css',
+    'Twilight' : 'twilight.min.css',
+    'Vibrant Ink' : 'vibrant-ink.min.css'
+  },
 
-    wrapCodeCss : [
-      '/* GitHub: Enable wrapping of long code lines */',
-      '  .blob-code-inner,',
-      '  .markdown-body pre > code,',
-      '  .markdown-body .highlight > pre {',
-      '    white-space: pre-wrap !important;',
-      '    word-break: break-all !important;',
-      '    overflow-wrap: break-word !important;',
-      '    display: block !important;',
-      '  }',
-      '  td.blob-code-inner {',
-      '    display: table-cell !important;',
-      '  }'
-    ].join('\n'),
+  type = {
+    tiled : `
+      background-repeat: repeat !important;
+      background-size: auto !important;
+      background-position: left top !important;
+    `,
+    fit : `
+      background-repeat: no-repeat !important;
+      background-size: cover !important;
+      background-position: center top !important;
+    `
+  },
 
-    wrapIcon : '<div class="ghd-wrap-toggle tooltipped tooltipped-w" aria-label="Toggle code wrap"><svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768"><path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/></svg></div>',
+  wrapCss = {
+    wrapped : `
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+      overflow-wrap: break-word !important;
+      display: block !important;
+    `,
+    unwrap  : `
+      white-space: pre !important;
+      word-break: normal !important;
+      display: block !important;
+    `
+  },
 
-    // extract style & theme name
-    regex: /\/\*! [^\*]+ \*\//,
-
-    updatePanel : function() {
-      // prevent multiple change events from processing
-      this.isUpdating = true;
-
-      var color,
-        data = this.data,
-        defaults = this.defaults,
-        $panel = $('#ghd-settings-inner');
-
-      $panel.find('.ghd-attach').val(data.attach || defaults.attach);
-      $panel.find('.ghd-font').val(data.font || defaults.font);
-      $panel.find('.ghd-image').val(data.image || defaults.image);
-      $panel.find('.ghd-tab').val(data.tab || defaults.tab);
-      $panel.find('.ghd-theme').val(data.theme || defaults.theme);
-      $panel.find('.ghd-type').val(data.type || defaults.type);
-
-      $panel.find('.ghd-enable').prop('checked', typeof data.enable === 'boolean' ? data.enable : defaults.enable);
-      $panel.find('.ghd-wrap').prop('checked', typeof data.wrap === 'boolean' ? data.wrap : defaults.wrap);
-
-      color = data.color || defaults.color;
-      $panel.find('.ghd-color').val(color);
-      // update swatch color & color picker value
-      $panel.find('#ghd-swatch').css('background-color', color);
-
-      if (this.picker) {
-        this.picker.fromString(color);
+  // https://github.com/StylishThemes/GitHub-code-wrap/blob/master/github-code-wrap.css
+  wrapCodeCss = `
+    /* GitHub: Enable wrapping of long code lines */
+      .blob-code-inner,
+      .markdown-body pre > code,
+      .markdown-body .highlight > pre { ${wrapCss.wrapped} }
+      td.blob-code-inner {
+        display: table-cell !important;
       }
-      this.$style.prop('disabled', !data.enable);
-      $('body')
-        .toggleClass('ghd-disabled', !data.enable)
-        .toggleClass('nowrap', !data.wrap);
+  `,
 
-      this.isUpdating = false;
-    },
+  wrapIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768">
+      <path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/>
+    </svg>
+  `,
 
-    /*
-    this.data = {
-      attach  : 'scroll',
-      color   : '#4183C4',
-      enable  : true,
-      font    : 'Menlo',
-      image   : 'url()',
-      tab     : 4,
-      theme   : 'Tomorrow Night',
-      type    : 'tiled',
-      wrap    : true, // code: wrap long lines
+  monospaceIcon = `
+    <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32">
+      <path d="M5.91 7.31v8.41c0 .66.05 1.09.14 1.31.09.21.23.37.41.48.18.11.52.16 1.02.16v.41H2.41v-.41c.5 0 .86-.05 1.03-.14.16-.11.3-.27.41-.5.11-.23.16-.66.16-1.3V11.7c0-1.14-.04-1.87-.11-2.2-.04-.26-.13-.42-.24-.53-.11-.1-.27-.14-.46-.14-.21 0-.48.05-.77.18l-.18-.41 3.14-1.28h.52v-.01zm-.95-5.46c.32 0 .59.11.82.34.23.23.34.5.34.82 0 .32-.11.59-.34.82-.23.22-.51.34-.82.34-.32 0-.59-.11-.82-.34s-.36-.5-.36-.82c0-.32.11-.59.34-.82.24-.23.51-.34.84-.34zm19.636 19.006h-3.39v-1.64h5.39v9.8h3.43v1.66h-9.18v-1.66h3.77v-8.16h-.02zm.7-6.44c.21 0 .43.04.63.13.18.09.36.2.5.34s.25.3.34.5c.07.18.13.39.13.61 0 .22-.04.41-.13.61s-.19.36-.34.5-.3.25-.5.32c-.2.09-.39.13-.62.13-.21 0-.43-.04-.61-.12-.19-.07-.35-.19-.5-.34-.14-.14-.25-.3-.34-.5-.07-.2-.13-.39-.13-.61s.04-.43.13-.61c.07-.18.2-.36.34-.5s.31-.25.5-.34c.17-.09.39-.12.6-.12zM2 30L27.82 2H30L4.14 30H2z"/>
+    </svg>
+  `,
 
-      date    : 1450159200000, // last loaded package.json
-      version : '001014032', // v1.14.32 = last stored GitHub-Dark version
+  fileIcon = `
+    <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">
+      <path d="M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z"/>
+    </svg>
+  `,
 
-      rawCss       : '@-moz-document regexp("^...', // github-dark.css (unprocessed css)
-      themeCss     : '/*! Tomorrow Night * /.ace_editor,.highlight{...', // theme/{name}.min.css
-      processedCss : '' // css saved directly from this.$style
+  $style = make({
+    el: 'style',
+    cl4ss: 'ghd-style',
+    // add style tag to head
+    appendTo: 'head'
+  });
+
+  let timer, picker, // jscolor picker
+  isInitialized = false,
+  // prevent mutationObserver from going nuts
+  isUpdating = false,
+  // set when css code to test is pasted into the settings panel
+  testing = false,
+  //
+  debug = GM_getValue('debug', false),
+  data = {};
+
+  function updatePanel() {
+    if (!isInitialized) { return; }
+    // prevent multiple change events from processing
+    isUpdating = true;
+
+    let temp, el,
+      body = $('body'),
+      panel = $('#ghd-settings-inner');
+
+    $('.ghd-attach', panel).value = data.attach || defaults.attach;
+    $('.ghd-font', panel).value = data.font || defaults.font;
+    $('.ghd-image', panel).value = data.image || defaults.image;
+    $('.ghd-tab', panel).value = data.tab || defaults.tab;
+    $('.ghd-theme', panel).value = data.theme || defaults.theme;
+    $('.ghd-type', panel).value = data.type || defaults.type;
+
+    $('.ghd-enable', panel).checked = isBool('enable');
+    $('.ghd-wrap', panel).checked = isBool('wrap');
+
+    $('.ghd-codewrap-checkbox', panel).checked = isBool('enableCodeWrap');
+    $('.ghd-monospace-checkbox', panel).checked = isBool('enableMonospace');
+
+    el = $('.ghd-diff-select', panel);
+    temp = '' + (data.modeDiffToggle || defaults.modeDiffToggle);
+    el.value = temp;
+    toggleClass(el, 'enabled', temp !== '0');
+
+    // update version tooltip
+    $('.ghd-versions', panel).setAttribute('aria-label', getVersionTooltip());
+
+    temp = data.color || defaults.color;
+    $('.ghd-color').value = temp;
+    // update swatch color & color picker value
+    $('#ghd-swatch').style.backgroundColor = temp;
+
+    if (picker) {
+      picker.fromString(temp);
     }
-    */
-    getStoredValues : function() {
-      var defaults = this.defaults;
+    $style.disabled = !data.enable;
 
-      this.data = {
-        attach  : GM_getValue('attach', defaults.attach),
-        color   : GM_getValue('color', defaults.color),
-        enable  : GM_getValue('enable', defaults.enable),
-        font    : GM_getValue('font', defaults.font),
-        image   : GM_getValue('image', defaults.image),
-        tab     : GM_getValue('tab', defaults.tab),
-        theme   : GM_getValue('theme', defaults.theme),
-        type    : GM_getValue('type', defaults.type),
-        wrap    : GM_getValue('wrap', defaults.wrap),
+    toggleClass(body, 'ghd-disabled', !data.enable);
+    toggleClass(body, 'nowrap', !data.wrap);
 
-        date    : GM_getValue('date', 0),
-        version : GM_getValue('version', 0),
+    if (data.enableCodeWrap !== data.lastCW ||
+      data.enableMonospace !== data.lastMS ||
+      data.modeDiffToggle !== data.lastDT) {
 
-        rawCss       : GM_getValue('rawCss', ''),
-        themeCss     : GM_getValue('themeCss', ''),
-        processedCss : GM_getValue('processedCss', '')
-      };
+      data.lastCW = data.enableCodeWrap;
+      data.lastMS = data.enableMonospace;
+      data.lastDT = data.modeDiffToggle;
+      updateToggles();
+    }
 
-      debug('Retrieved stored values', this.data);
-    },
+    isUpdating = false;
+  }
 
-    setStoredValues : function(reset) {
-      var data = this.data,
-        defaults = this.defaults;
+  function getStoredValues(init) {
+    data = GM_getValue('data', defaults);
+    if (debug) {
+      if (init) {
+        console.log('GitHub-Dark Script initializing!');
+      }
+      console.log('Retrieved stored values', data);
+    }
+  }
 
-      GM_setValue('attach', reset ? defaults.attach : data.attach);
-      GM_setValue('color',  reset ? defaults.color  : data.color);
-      GM_setValue('enable', reset ? defaults.enable : data.enable);
-      GM_setValue('font',   reset ? defaults.font   : data.font);
-      GM_setValue('image',  reset ? defaults.image  : data.image);
-      GM_setValue('tab',    reset ? defaults.tab    : data.tab);
-      GM_setValue('theme',  reset ? defaults.theme  : data.theme);
-      GM_setValue('type',   reset ? defaults.type   : data.type);
-      GM_setValue('wrap',   reset ? defaults.wrap   : data.wrap);
+  function setStoredValues(reset) {
+    data.processedCss = $style.textContent;
+    GM_setValue('data', reset ? defaults : data);
+    updatePanel();
+    if (debug) {
+      console.log((reset ? 'Resetting' : 'Saving') + ' current values', data);
+    }
+  }
 
-      GM_setValue('date',    reset ? 0 : data.date);
-      GM_setValue('version', reset ? 0 : data.version);
-
-      GM_setValue('rawCss', reset ? '' : data.rawCss);
-      GM_setValue('themeCss', reset ? '' : data.themeCss);
-      GM_setValue('processedCss', ghd.$style.text());
-
-      debug((reset ? 'Resetting' : 'Saving') + ' current values', data);
-    },
-
-    // convert version "1.2.3" into "001002003" for easier comparison
-    convertVersion : function(val) {
-      var index,
+  // convert version "1.2.3" into "001002003" for easier comparison
+  function convertVersion(val) {
+    let index,
       parts = val ? val.split('.') : '',
       str = '',
       len = parts.length;
-      for (index = 0; index < len; index++) {
-        str += ('000' + parts[index]).slice(-3);
-      }
-      debug('Converted version "' + val + '" to "' + str + '" for easy comparison');
-      return val ? str : val;
-    },
+    for (index = 0; index < len; index++) {
+      str += ('000' + parts[index]).slice(-3);
+    }
+    if (debug) {
+      console.log(`Converted version "${val}" to "${str}" for easy comparison`);
+    }
+    return val ? str : val;
+  }
 
-    checkVersion : function() {
-      debug('Fetching package.json');
-      GM_xmlhttpRequest({
-        method : 'GET',
-        url : ghd.root + 'package.json',
-        onload : function(response) {
-          // store package JSON (not accessed anywhere else, but just in case)
-          ghd.data.package = JSON.parse(response.responseText);
+  function checkVersion() {
+    if (debug) {
+      console.log('Fetching package.json');
+    }
+    GM_xmlhttpRequest({
+      method : 'GET',
+      url : root + 'package.json',
+      onload : response => {
+        let pkg = JSON.parse(response.responseText);
 
-          // save last loaded date, so package.json is only loaded once a day
-          ghd.data.date = new Date().getTime();
-          GM_setValue('date', ghd.data.date);
+        // save last loaded date, so package.json is only loaded once a day
+        data.date = new Date().getTime();
 
-          var version = ghd.convertVersion(ghd.data.package.version);
-          // if new available, load it & parse
-          if (version > ghd.data.version) {
-            if (ghd.data.version !== 0) {
-              debug('Updating from', ghd.data.version, 'to', version);
-            }
-            ghd.data.version = version;
-            GM_setValue('version', ghd.data.version);
-            ghd.fetchAndApplyStyle(ghd.fetchAndApplyTheme.bind(ghd));
-          } else {
-            ghd.addSavedStyle();
+        let ver = convertVersion(pkg.version);
+        // if new available, load it & parse
+        if (ver > data.version) {
+          if (data.version !== 0 && debug) {
+            console.log('Updating from ${data.version} to ${ver}');
           }
-        }
-      });
-    },
-
-    fetchAndApplyStyle : function(cb) {
-      debug('Fetching github-dark.css');
-      GM_xmlhttpRequest({
-        method : 'GET',
-        url : ghd.root + 'github-dark.css',
-        onload : function(response) {
-          ghd.data.rawCss = response.responseText;
-          ghd.applyStyle(ghd.processStyle());
-          if (cb) cb();
-        }
-      });
-    },
-
-    // load syntax highlighting theme
-    fetchAndApplyTheme : function(cb) {
-      if (!this.data.enable) {
-        debug('Disabled: stop theme processing');
-        return;
-      }
-      var name = this.data.theme || 'Twilight';
-      var themeUrl = ghd.root + ghd.themes[name];
-      debug('Fetching ' + name + ' theme', themeUrl);
-      GM_xmlhttpRequest({
-        method : 'GET',
-        url : themeUrl,
-        onload : function(response) {
-          var theme = response.responseText;
-          if (response.status === 200 && theme) {
-            ghd.data.themeCss = theme;
-
-            debug('Adding syntax theme to css');
-            var css = ghd.$style.text() || '';
-            css = css.replace('/*[[syntax-theme]]*/', ghd.data.themeCss || '');
-
-            ghd.applyStyle(css);
-            ghd.isUpdating = false;
-            if (cb) cb();
-          } else {
-            throw Error('Failed to load theme file', '"' + theme + '"');
-          }
-        }
-      });
-    },
-
-
-    addSavedStyle : function() {
-      debug('Adding previously saved style');
-      // apply already processed css to prevent FOUC
-      this.$style.text(this.data.processedCss);
-    },
-
-    processStyle : function() {
-      var data = this.data,
-        url = /^url/.test(data.image || '') ? data.image :
-          (data.image === 'none' ? 'none' : 'url("' + data.image + '")');
-      if (!data.enable) {
-        debug('Disabled: stop processing');
-        return;
-      }
-      debug('Processing set styles');
-
-      var ret = (data.rawCss || '')
-        // remove moz-document wrapper
-        .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
-        // replace background image; if no 'url' at start, then use 'none'
-        .replace(/\/\*\[\[bg-choice\]\]\*\/ url\(.*\)/, url)
-        // Add tiled or fit window size css
-        .replace('/*[[bg-options]]*/', this.type[data.type || 'tiled'])
-        // set scroll or fixed background image
-        .replace('/*[[bg-attachment]]*/ fixed', data.attach || 'scroll')
-        // replace base-color
-        .replace(/\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || '#4183C4')
-        // add font choice
-        .replace('/*[[font-choice]]*/', data.font || 'Menlo')
-        // add tab size
-        .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
-        // code wrap css
-        .replace('/*[[code-wrap]]*/', data.wrap ? ghd.wrapCodeCss : '')
-        // remove default syntax
-        .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
-
-      // see https://github.com/StylishThemes/GitHub-Dark/issues/275
-      if (/firefox/i.test(navigator.userAgent)) {
-        ret = ret
-          .replace(/select, input, textarea/, 'select, input:not([type="checkbox"]), textarea')
-          .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, '');
-      }
-      return ret;
-    },
-
-    applyStyle : function(css) {
-      debug('Applying style', '"' + (css || '').match(this.regex) + '"');
-      this.$style.text(css || '');
-      this.setStoredValues();
-    },
-
-    updateStyle : function() {
-      this.isUpdating = true;
-      var $panel = $('#ghd-settings-inner'),
-      data = this.data;
-
-      data.attach = $panel.find('.ghd-attach').val();
-      // get hex value directly
-      data.color = this.picker.toHEXString();
-      data.enable = $panel.find('.ghd-enable').is(':checked');
-      data.font   = $panel.find('.ghd-font').val();
-      data.image  = $panel.find('.ghd-image').val();
-      data.tab    = $panel.find('.ghd-tab').val();
-      data.theme  = $panel.find('.ghd-theme').val();
-      data.type   = $panel.find('.ghd-type').val();
-      data.wrap   = $panel.find('.ghd-wrap').is(':checked');
-
-      debug('Updating user settings', data);
-
-      this.$style.prop('disabled', !data.enable);
-      $('body')
-        .toggleClass('ghd-disabled', !data.enable)
-        .toggleClass('nowrap', !data.wrap);
-
-      this.fetchAndApplyStyle(this.fetchAndApplyTheme.bind(this));
-      this.isUpdating = false;
-    },
-
-    // user can force GitHub-dark update
-    forceUpdate : function(css) {
-      if (css) {
-        // add raw css directly for style testing
-        this.data.rawCss = css;
-        this.applyStyle(ghd.processStyle());
-        this.fetchAndApplyTheme();
-      } else {
-        // clear saved date
-        GM_setValue('version', 0);
-        document.location.reload();
-      }
-    },
-
-    buildSettings : function() {
-      debug('Adding settings panel & GitHub Dark link to profile dropdown');
-      // Script-specific CSS
-      GM_addStyle([
-        '#ghd-menu:hover { cursor:pointer }',
-        '#ghd-settings { position:fixed; z-index: 65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden; }',
-        '#ghd-settings.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5); }',
-        '#ghd-settings-inner { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow: 0 .5rem 1rem #111; color:#c0c0c0 }',
-        '#ghd-settings label { margin-left:.5rem; position:relative; top:-1px }',
-        '#ghd-settings-close { height: 1rem; width: 1rem; fill: #666; float:right; cursor:pointer }',
-        '#ghd-settings-close:hover { fill: #ccc }',
-        '#ghd-settings .ghd-right { float: right; padding:5px; }',
-        '#ghd-settings p { line-height: 25px; }',
-        '#ghd-swatch { width:25px; height:25px; display:inline-block; margin:3px 10px; border-radius:4px; }',
-        '#ghd-settings .checkbox input { margin-top: .35em }',
-        '#ghd-settings input[type="checkbox"] { width: 16px !important; height: 16px !important; border-radius: 3px !important; }',
-        '#ghd-settings .boxed-group-inner { padding: 0; }',
-        '#ghd-settings .ghd-footer { padding: 10px; border-top: #555 solid 1px; }',
-        '#ghd-settings .ghd-settings-wrapper { max-height: 60vh; overflow-y:auto; padding: 1px 10px; }',
-        '#ghd-settings .ghd-tab { width: 5em; }',
-        '#ghd-settings .ghd-info, .ghd-file-toggle svg { vertical-align: middle !important; }',
-        '#ghd-settings .paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px; z-index:0; }',
-
-        // code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
-        // icons next to a pre
-        '.ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:20; }',
-        // file & diff code tables
-        '.ghd-wrap-table td.blob-code-inner { white-space: pre-wrap !important; word-break: break-all !important; }',
-        '.ghd-unwrap-table td.blob-code-inner { white-space: pre !important; word-break: normal !important; }',
-        // icons inside a wrapper immediatly around a pre
-        '.highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }',
-        // icons for non-syntax highlighted code blocks; see https://github.com/gjtorikian/html-proofer/blob/master/README.md
-        '.markdown-body:not(.comment-body) .ghd-wrap-toggle:not(:first-child) { right: 3.4em; }',
-        '.ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(110,110,110,.4); }',
-        '.ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }', // wrap disabled (red)
-        'body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }', // wrap enabled (green)
-        '.blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }',
-        // hide wrap icon when style disabled
-        'body.ghd-disabled .ghd-wrap-toggle, .ghd-collapsed-file, .file.open .data.ghd-collapsed-file { display: none; }',
-        // monospace font toggle
-        '.ghd-monospace-font { font-family: Menlo, Inconsolata, "Droid Mono", monospace !important; font-size: 1em !important; }',
-        // file collapsed icon
-        '.ghd-file-collapsed svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }'
-      ].join(''));
-
-      var version = [],
-        themes = '<select class="ghd-theme ghd-right">',
-        // convert stored css version from "001014049" into "1.14.49" for tooltip
-        parts = String(this.data.version).match(/\d{3}/g);
-      $.each(this.themes, function(opt) {
-        themes += '<option value="' + opt + '">' + opt + '</option>';
-      });
-      if (parts && parts.length) {
-        $.each(parts, function(_i, v) {
-          version.push(parseInt(v));
-        });
-      }
-
-      // Settings panel markup
-      $('body').append([
-        '<div id="ghd-settings">',
-          '<div id="ghd-settings-inner" class="boxed-group">',
-            '<h3>GitHub-Dark Settings',
-            '<svg id="ghd-settings-close" xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="160 160 608 608"><path d="M686.2 286.8L507.7 465.3l178.5 178.5-45 45-178.5-178.5-178.5 178.5-45-45 178.5-178.5-178.5-178.5 45-45 178.5 178.5 178.5-178.5z"/></svg>',
-            '</h3>',
-            '<div class="boxed-group-inner">',
-              '<form>',
-                '<div class="ghd-settings-wrapper">',
-                  '<p class="checkbox">',
-                    '<label>Enable GitHub-Dark<input class="ghd-enable ghd-right" type="checkbox"></label>',
-                  '</p>',
-                  '<p>',
-                    '<label>Color:</label> <input class="ghd-color ghd-right" type="text" value="#4183C4">',
-                    '<span id="ghd-swatch" class="ghd-right"></span>',
-                  '</p>',
-                  '<h4>Background</h4>',
-                  '<p>',
-                    '<label>Image:</label> <input class="ghd-image ghd-right" type="text">',
-                    '<a href="https://github.com/StylishThemes/GitHub-Dark/wiki/Image" class="tooltipped tooltipped-e" aria-label="Click to learn about GitHub\'s Content Security&#10;Policy and how to add a custom image"><sup>?</sup></a>',
-                  '</p>',
-                  '<p>',
-                    '<label>Image type:</label>',
-                    '<select class="ghd-type ghd-right">',
-                      '<option value="tiled">Tiled</option>',
-                      '<option value="fit">Fit window</option>',
-                    '</select>',
-                  '</p>',
-                  '<p>',
-                    '<label>Image attachment:</label>',
-                    '<select class="ghd-attach ghd-right">',
-                      '<option value="scroll">Scroll</option>',
-                      '<option value="fixed">Fixed</option>',
-                    '</select>',
-                  '</p>',
-                  '<h4>Code</h4>',
-                  '<p><label>Theme:</label> ' + themes + '</select></p>',
-                  '<p>',
-                    '<label>Font Name:</label> <input class="ghd-font ghd-right" type="text">',
-                    '<a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-e" aria-label="Add a system installed (monospaced) font name;&#10;this script will not load external fonts!"><sup>?</sup></a>',
-                  '</p>',
-                  '<p>',
-                    '<label>Tab Size:</label> <input class="ghd-tab ghd-right" type="text">',
-                  '</p>',
-                  '<p class="checkbox">',
-                   '<label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>',
-                  '</p>',
-                '</div>',
-                '<div class="ghd-footer">',
-                  '<div class="btn-group">',
-                   '<a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>',
-                   '<a href="#" class="ghd-textarea-toggle btn btn-sm tooltipped tooltipped-n" aria-label="Paste CSS update">',
-                     '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewbox="0 0 16 16" fill="#eee">',
-                       '<path d="M15 11 1 11 8 3z"/>',
-                     '</svg>',
-                   '</a>',
-                   '<div class="paste-area-content" aria-hidden="true" style="display:none">',
-                     '<textarea class="paste-area" placeholder="Paste GitHub-Dark Style here!"></textarea>',
-                   '</div>',
-                  '</div>&nbsp;',
-                  '<a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>',
-                  '<span class="ghd-right tooltipped tooltipped-n" aria-label="Script v' + this.version + '&#10;CSS ' + (version.length ? 'v' + version.join('.') : 'unknown') + '">',
-                    '<svg class="ghd-info" xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24">',
-                      '<path fill="#444" d="M12,9c0.82,0,1.5-0.68,1.5-1.5S12.82,6,12,6s-1.5,0.68-1.5,1.5S11.18,9,12,9z M12,1.5 C6.211,1.5,1.5,6.211,1.5,12S6.211,22.5,12,22.5S22.5,17.789,22.5,12S17.789,1.5,12,1.5z M12,19.5c-4.148,0-7.5-3.352-7.5-7.5 S7.852,4.5,12,4.5s7.5,3.352,7.5,7.5S16.148,19.5,12,19.5z M13.5,12c0-0.75-0.75-1.5-1.5-1.5s-0.75,0-1.5,0S9,11.25,9,12h1.5 c0,0,0,3.75,0,4.5S11.25,18,12,18s0.75,0,1.5,0s1.5-0.75,1.5-1.5h-1.5C13.5,16.5,13.5,12.75,13.5,12z"/>',
-                    '</svg>',
-                  '</span>',
-                '</div>',
-              '</form>',
-            '</div>',
-          '</div>',
-        '</div>',
-      ].join(''));
-
-      ghd.updateToggles();
-    },
-
-    // Add code wrap toggle
-    buildCodeWrap : function() {
-      // mutation events happen quick, so we still add an update flag
-      this.isUpdating = true;
-      // add wrap code icons
-      $('.blob-wrapper').prepend(this.wrapIcon);
-      $('.markdown-body pre').before(this.wrapIcon);
-      this.isUpdating = false;
-    },
-
-    // Add monospace font toggle
-    addMonospaceToggle : function() {
-      this.isUpdating = true;
-      var indx, $el,
-        $toolbars = $('.toolbar-commenting'),
-        len = $toolbars.length;
-      for (indx = 0; indx < len; indx++) {
-        $el = $toolbars.eq(indx);
-        if (!$el.find('.ghd-monospace').length) {
-          $el.prepend([
-            '<button type="button" class="ghd-monospace toolbar-item tooltipped tooltipped-n" aria-label="Toggle monospaced font" tabindex="-1">',
-              '<svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewbox="0 0 32 32">',
-                '<path d="M5.91 7.31v8.41c0 .66.05 1.09.14 1.31.09.21.23.37.41.48.18.11.52.16 1.02.16v.41H2.41v-.41c.5 0 .86-.05 1.03-.14.16-.11.3-.27.41-.5.11-.23.16-.66.16-1.3V11.7c0-1.14-.04-1.87-.11-2.2-.04-.26-.13-.42-.24-.53-.11-.1-.27-.14-.46-.14-.21 0-.48.05-.77.18l-.18-.41 3.14-1.28h.52v-.01zm-.95-5.46c.32 0 .59.11.82.34.23.23.34.5.34.82 0 .32-.11.59-.34.82-.23.22-.51.34-.82.34-.32 0-.59-.11-.82-.34s-.36-.5-.36-.82c0-.32.11-.59.34-.82.24-.23.51-.34.84-.34zm19.636 19.006h-3.39v-1.64h5.39v9.8h3.43v1.66h-9.18v-1.66h3.77v-8.16h-.02zm.7-6.44c.21 0 .43.04.63.13.18.09.36.2.5.34s.25.3.34.5c.07.18.13.39.13.61 0 .22-.04.41-.13.61s-.19.36-.34.5-.3.25-.5.32c-.2.09-.39.13-.62.13-.21 0-.43-.04-.61-.12-.19-.07-.35-.19-.5-.34-.14-.14-.25-.3-.34-.5-.07-.2-.13-.39-.13-.61s.04-.43.13-.61c.07-.18.2-.36.34-.5s.31-.25.5-.34c.17-.09.39-.12.6-.12zM2 30L27.82 2H30L4.14 30H2z"/>',
-              '</svg>',
-            '</button>'
-          ].join(''));
-        }
-      }
-      this.isUpdating = false;
-    },
-
-    // Add file diffs toggle
-    addFileToggle : function() {
-      this.updating = true;
-      var indx, $el,
-        $files = $('#files .file-actions'),
-        len = $files.length;
-      for (indx = 0; indx < len; indx++) {
-        $el = $files.eq(indx);
-        if (!$el.find('.ghd-file-toggle').length) {
-          $el.append([
-            '<button type="button" class="ghd-file-toggle btn btn-sm tooltipped tooltipped-n" aria-label="Click to Expand or Collapse file" tabindex="-1">',
-              '<svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">',
-                '<path d="M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z"/>',
-              '</svg>',
-            '</button>'
-          ].join(''));
-        }
-      }
-      this.updating = false;
-    },
-
-    // Add toggle buttons after page updates
-    updateToggles : function() {
-      ghd.buildCodeWrap();
-      ghd.addMonospaceToggle();
-      ghd.addFileToggle();
-    },
-
-    // add keyboard shortcut to help menu (press "?")
-    buildShortcut : function() {
-      var openPanel = this.keyboardOpen.split('+'),
-        toggleStyle = this.keyboardToggle.split('+');
-      if (!$('.ghd-shortcut').length) {
-        $('.keyboard-mappings:eq(0) tbody:eq(0)').append([
-          '<tr class="ghd-shortcut">',
-            '<td class="keys">',
-              '<kbd>' + openPanel[0] + '</kbd> <kbd>' + openPanel[1] + '</kbd>',
-            '</td>',
-            '<td>GitHub-Dark: open settings</td>',
-          '</tr>',
-          '<tr class="ghd-shortcut">',
-            '<td class="keys">',
-              '<kbd>' + toggleStyle[0] + '</kbd> <kbd>' + toggleStyle[1] + '</kbd>',
-            '</td>',
-            '<td>GitHub-Dark: toggle style</td>',
-          '</tr>'
-        ].join(''));
-      }
-    },
-
-    bindEvents : function() {
-      var menu, lastKey,
-        $panel = $('#ghd-settings-inner'),
-        $swatch = $panel.find('#ghd-swatch');
-
-      // finish initialization
-      $('#ghd-settings-inner .ghd-enable')[0].checked = this.data.enable;
-      $('body').toggleClass('ghd-disabled', !this.data.enable);
-
-      // Create our menu entry
-      menu = $('<a id="ghd-menu" class="dropdown-item">GitHub Dark Settings</a>');
-      $('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]')
-        // gists only have the "go to profile" item; GitHub has both
-        .filter(':last')
-        .after(menu);
-
-      $('#ghd-menu').on('click', function() {
-        ghd.openPanel();
-      });
-
-      // not sure what GitHub uses, so rolling our own
-      $(document).on('keypress keydown', function(e) {
-        clearTimeout(ghd.timer);
-        // use "g+o" to open up ghd options panel
-        var openPanel = ghd.keyboardOpen.split('+'),
-          toggleStyle = ghd.keyboardToggle.split('+'),
-          key = String.fromCharCode(e.which).toLowerCase(),
-          panelVisible = $('#ghd-settings').hasClass('in');
-
-        // press escape to close the panel
-        if (e.which === 27 && panelVisible) {
-          ghd.closePanel();
-          return;
-        }
-        // use e.which from keypress for shortcuts
-        // prevent opening panel while typing "go" in comments
-        if (e.type === 'keydown' || /(input|textarea)/i.test(document.activeElement.nodeName)) {
-          return;
-        }
-        if (lastKey === openPanel[0] && key === openPanel[1]) {
-          if (panelVisible) {
-            ghd.closePanel();
-          } else {
-            ghd.openPanel();
-          }
-        }
-        if (lastKey === toggleStyle[0] && key === toggleStyle[1]) {
-          ghd.toggleStyle();
-        }
-        lastKey = key;
-        ghd.timer = setTimeout(function() {
-          lastKey = null;
-        }, ghd.keyboardDelay);
-
-        // add shortcut to help menu
-        if (key === '?') {
-          // table doesn't exist until user presses "?"
-          setTimeout(function() {
-            ghd.buildShortcut();
-          }, 300);
-        }
-      });
-
-      // add ghd-settings panel bindings
-      $('#ghd-settings, #ghd-settings-close').on('click keyup', function(e) {
-        // press escape to close settings
-        if (e.type === 'keyup' && e.which !== 27) {
-          return;
-        }
-        ghd.closePanel();
-      });
-
-      $panel.on('click', function(e) {
-        e.stopPropagation();
-      });
-
-      $panel.find('.ghd-reset').on('click', function() {
-        ghd.isUpdating = true;
-        // pass true to reset values
-        ghd.setStoredValues(true);
-        // add reset values back to this.data
-        ghd.getStoredValues();
-        // add reset values to panel
-        ghd.updatePanel();
-        // update style
-        ghd.updateStyle();
-        return false;
-      });
-
-      $panel.find('input[type="text"]').on('focus', function() {
-        // select all text when focused
-        this.select();
-      });
-
-      $panel.find('select, input').on('change', function() {
-        if (!ghd.isUpdating) {
-          ghd.updateStyle();
-        }
-      });
-
-      $panel.find('.ghd-update').on('click', function() {
-        ghd.forceUpdate();
-        return false;
-      });
-
-      $panel.find('.ghd-textarea-toggle').on('click', function() {
-        var $this = $(this),
-          $dropdown = $this
-            .removeClass('selected')
-            .next('.paste-area-content')
-            .toggle();
-        if ($dropdown.is(':visible')) {
-          $this.addClass('selected');
-          $dropdown
-            .find('textarea')
-            .focus()
-            .select();
-        }
-        return false;
-      });
-
-      $panel.find('.paste-area-content').on('paste', function(e) {
-        var $toggle = $panel.find('.ghd-textarea-toggle');
-        var $textarea = $(e.target);
-        setTimeout(function() {
-          $textarea.parent().hide();
-          $toggle.removeClass('selected');
-          ghd.forceUpdate($textarea.val());
-        }, 200);
-      });
-
-      // **** CODE WRAP TOGGLE ****
-      $('body').on('click', '.ghd-wrap-toggle', function() {
-        var css,
-          overallWrap = ghd.data.wrap,
-          $this = $(this),
-          $code = $this.next('code, pre, .highlight, .diff-table');
-        if ($code.find('code').length) {
-          $code = $code.find('code');
-        }
-        if (!$code.length) {
-          debug('Code wrap icon associated code not found', $this);
-          return;
-        }
-        // code with line numbers
-        if ($code[0].nodeName === 'TABLE') {
-          if ($code[0].className.indexOf('ghd-') < 0) {
-            css = !overallWrap;
-          } else {
-            css = $code.hasClass('ghd-unwrap-table');
-          }
-          $code
-            .toggleClass('ghd-wrap-table', css)
-            .toggleClass('ghd-unwrap-table', !css);
-          $this
-            .toggleClass('wrapped', css)
-            .toggleClass('unwrap', !css);
+          data.version = ver;
+          fetchAndApplyStyle();
         } else {
-          css = $code.attr('style') || '';
-          if (css === '') {
-            css = ghd.wrapCss[overallWrap ? 'unwrap' : 'wrapped'];
-          } else {
-            css = ghd.wrapCss[css === ghd.wrapCss.wrapped ? 'unwrap' : 'wrapped'];
-          }
-          $code.attr('style', css);
-          $this
-            .toggleClass('wrapped', css === ghd.wrapCss.wrapped)
-            .toggleClass('unwrap', css === ghd.wrapCss.unwrap);
+          addSavedStyle();
         }
-      });
-
-      // **** MONOSPACE FONT TOGGLE ****
-      $('body').on('click', '.ghd-monospace', function(e) {
-        e.stopPropagation();
-        var $this = $(this),
-          $textarea = $this
-            // each comment
-            .closest('.previewable-comment-form')
-            .find('.comment-form-textarea')
-            .toggleClass('ghd-monospace-font')
-            .focus();
-        $this.toggleClass('ghd-icon-active', $textarea.hasClass('ghd-monospace-font'));
-        return false;
-      });
-
-      // **** CODE DIFF COLLAPSE TOGGLE ****
-      $('body').on('click', '.ghd-file-toggle', function(e) {
-        e.stopPropagation();
-        ghd.updating = true;
-        $(this)
-          .toggleClass('ghd-file-collapsed')
-          .closest('.file-header')
-          // toggle view of file or image; "image" class added to "Diff suppressed..."
-          .nextAll('.blob-wrapper, .render-wrapper, .image, .rich-diff')
-          .toggleClass('ghd-collapsed-file');
-        // shift+click toggle all files!
-        if (e.shiftKey) {
-          var indx,
-            isCollapsed = $(this).hasClass('ghd-file-collapsed'),
-            $toggles = $('.ghd-file-toggle').not(this),
-            len = $toggles.length;
-          for (indx = 0; indx < len; indx++) {
-            $toggles.eq(indx)
-              .toggleClass('ghd-file-collapsed', isCollapsed)
-              .closest('.file-header')
-              .next('.blob-wrapper, .render-wrapper, .image, .rich-diff')
-              .toggleClass('ghd-collapsed-file', isCollapsed);
-          }
-        }
-        ghd.updating = false;
-      });
-
-      // style color picker
-      this.picker = new jscolor($panel.find('.ghd-color')[0]);
-      this.picker.zIndex = 65536;
-      this.picker.hash = true;
-      this.picker.backgroundColor = '#333';
-      this.picker.padding = 0;
-      this.picker.borderWidth = 0;
-      this.picker.borderColor = '#444';
-      this.picker.onFineChange = function() {
-        $swatch[0].style.backgroundColor = '#' + ghd.picker;
-      };
-    },
-
-    openPanel : function() {
-      $('.modal-backdrop').click();
-      ghd.updatePanel();
-      $('#ghd-settings').addClass('in');
-    },
-
-    closePanel : function() {
-      $('#ghd-settings').removeClass('in');
-      ghd.picker.hide();
-
-      // apply changes when the panel is closed
-      ghd.updateStyle();
-    },
-
-    toggleStyle : function() {
-      var isEnabled = !this.data.enable;
-      this.data.enable = isEnabled;
-      $('#ghd-settings-inner .ghd-enable').prop('checked', isEnabled);
-      // add processedCss back into style (emptied when disabled)
-      if (isEnabled) {
-        this.addSavedStyle();
+        // save new date/version
+        GM_setValue('data', data);
       }
-      this.$style.prop('disabled', !isEnabled);
-    },
+    });
+  }
 
-    init : function() {
-      debug('GitHub-Dark Script initializing!');
+  function fetchAndApplyStyle() {
+    if (debug) {
+      console.log(`Fetching ${root}github-dark.css`);
+    }
+    GM_xmlhttpRequest({
+      method : 'GET',
+      url : root + 'github-dark.css',
+      onload : response => {
+        data.rawCss = response.responseText;
+        processStyle();
+      }
+    });
+  }
 
-      // add style tag to head
-      ghd.$style = $('<style class="ghd-style">').appendTo('head');
+  // load syntax highlighting theme
+  function fetchAndApplyTheme() {
+    if (!data.enable) {
+      if (debug) {
+        console.log('Disabled: stop theme processing');
+      }
+      return;
+    }
+    if (data.lastTheme === data.theme && data.themeCss !== '') {
+      return applyTheme();
+    }
+    let name = data.theme || 'Twilight',
+      themeUrl = root + 'themes/' + themes[name];
+    if (debug) {
+      console.log(`Fetching ${name} theme`, themeUrl);
+    }
+    GM_xmlhttpRequest({
+      method : 'GET',
+      url : themeUrl,
+      onload : response => {
+        let theme = response.responseText;
+        if (response.status === 200 && theme) {
+          data.themeCss = theme;
+          data.lastTheme = name;
+          applyTheme();
+        } else {
+          throw Error(`Failed to load theme file: "${theme}"`);
+        }
+      }
+    });
+  }
 
-      this.getStoredValues();
-      this.$style.prop('disabled', !this.data.enable);
+  function applyTheme() {
+    if (debug) {
+      console.log('Adding syntax theme "' + (data.themeCss || '').match(regex) + '" to css');
+    }
+    let css = data.processedCss || '';
+    css = css.replace('/*[[syntax-theme]]*/', data.themeCss || '');
+    applyStyle(css);
+    setStoredValues();
+    isUpdating = false;
+  }
 
-      // only load package.json once a day, or after a forced update
-      if ((new Date().getTime() > this.data.date + this.delay) || this.data.version === 0) {
-        // get package.json from GitHub-Dark & compare versions
-        // load new script if a newer one is available
-        this.checkVersion();
+  function processStyle() {
+    let url = /^url/.test(data.image || '') ? data.image :
+      (data.image === 'none' ? 'none' : 'url("' + data.image + '")');
+    if (!data.enable) {
+      if (debug) {
+        console.log('Disabled: stop processing');
+      }
+      return;
+    }
+    if (debug) {
+      console.log('Processing set styles');
+    }
+
+    let processed = (data.rawCss || '')
+      // remove moz-document wrapper
+      .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
+      // replace background image; if no 'url' at start, then use 'none'
+      .replace(/\/\*\[\[bg-choice\]\]\*\/ url\(.*\)/, url)
+      // Add tiled or fit window size css
+      .replace('/*[[bg-options]]*/', type[data.type || 'tiled'])
+      // set scroll or fixed background image
+      .replace('/*[[bg-attachment]]*/ fixed', data.attach || 'scroll')
+      // replace base-color
+      .replace(/\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || '#4183C4')
+      // add font choice
+      .replace('/*[[font-choice]]*/', data.font || 'Menlo')
+      // add tab size
+      .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
+      // code wrap css
+      .replace('/*[[code-wrap]]*/', data.wrap ? wrapCodeCss : '')
+      // remove default syntax
+      .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
+
+    // see https://github.com/StylishThemes/GitHub-Dark/issues/275
+    if (/firefox/i.test(navigator.userAgent)) {
+      processed = processed
+        // line in github-dark.css = "select, input:not(.btn-link), textarea"
+        .replace('select, input:not(.btn-link)', 'input { color:#eee !important; } select')
+        .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, '');
+    }
+    data.processedCss = processed;
+    fetchAndApplyTheme();
+  }
+
+  function applyStyle(css) {
+    if (debug) {
+      console.log('Applying style', '"' + (css || '').match(regex) + '"');
+    }
+    $style.textContent = css || '';
+  }
+
+  function addSavedStyle() {
+    if (debug) {
+      console.log('Adding previously saved style');
+    }
+    // apply already processed css to prevent FOUC
+    $style.textContent = data.processedCss;
+  }
+
+  function updateStyle() {
+    isUpdating = true;
+
+    if (debug) {
+      console.log('Updating user settings');
+    }
+
+    let body = $('body'),
+      panel = $('#ghd-settings-inner');
+
+    data.attach = $('.ghd-attach', panel).value;
+    // get hex value directly
+    data.color = picker.toHEXString();
+    data.enable = $('.ghd-enable', panel).checked;
+    data.font   = $('.ghd-font', panel).value;
+    data.image  = $('.ghd-image', panel).value;
+    data.tab    = $('.ghd-tab', panel).value;
+    data.theme  = $('.ghd-theme', panel).value;
+    data.type   = $('.ghd-type', panel).value;
+    data.wrap   = $('.ghd-wrap', panel).checked;
+
+    data.enableCodeWrap  = $('.ghd-codewrap-checkbox', panel).checked;
+    data.enableMonospace = $('.ghd-monospace-checkbox', panel).checked;
+
+    data.modeDiffToggle  = $('.ghd-diff-select', panel).value;
+
+    $style.disabled = !data.enable;
+
+    toggleClass(body, 'ghd-disabled', !data.enable);
+    toggleClass(body, 'nowrap', !data.wrap);
+
+    if (testing) {
+      processStyle();
+      testing = false;
+    } else {
+      fetchAndApplyStyle();
+    }
+    isUpdating = false;
+  }
+
+  // user can force GitHub-dark update
+  function forceUpdate(css) {
+    if (css) {
+      // add raw css directly for style testing
+      data.rawCss = css;
+      processStyle();
+    } else {
+      // clear saved date
+      data.version = 0;
+      data.themeCss = '';
+      GM_setValue('data', data);
+      closePanel('forced');
+    }
+  }
+
+  function getVersionTooltip() {
+    let indx,
+      ver = [],
+      // convert stored css version from "001014049" into "1.14.49" for tooltip
+      parts = String(data.version).match(/\d{3}/g),
+      len = parts && parts.length || 0;
+    for (indx = 0; indx < len; indx++) {
+      ver.push(parseInt(parts[indx], 10));
+    }
+    return `Script v${version}\nCSS ${(ver.length ? 'v' + ver.join('.') : 'unknown')}`;
+  }
+
+  function buildSettings() {
+    if (debug) {
+      console.log('Adding settings panel & GitHub Dark link to profile dropdown');
+    }
+    // Script-specific CSS
+    GM_addStyle(`
+      #ghd-menu:hover { cursor:pointer }
+      #ghd-settings { position:fixed; z-index:65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden; }
+      #ghd-settings.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5); }
+      #ghd-settings-inner { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:25rem; box-shadow:0 .5rem 1rem #111; color:#c0c0c0 }
+      #ghd-settings label { margin-left:.5rem; position:relative; top:-1px }
+      #ghd-settings-close { height:1rem; width:1rem; fill:#666; float:right; cursor:pointer }
+      #ghd-settings-close:hover { fill:#ccc }
+      #ghd-settings .ghd-right { float:right; padding:5px; }
+      #ghd-settings p { line-height:22px; }
+      #ghd-settings .form-select, #ghd-settings input[type="text"] { height:30px; min-height:30px; }
+      #ghd-swatch { width:25px; height:22px; display:inline-block; margin:3px 10px; border-radius:4px; }
+      #ghd-settings input, #ghd-settings select { border:#555 1px solid; }
+      #ghd-settings .ghd-attach, #ghd-settings .ghd-diff-select { padding-right:25px; }
+      #ghd-settings input[type="checkbox"] { margin-top:3px; width: 16px !important; height: 16px !important; border-radius: 3px !important; }
+      #ghd-settings .boxed-group-inner { padding:0; }
+      #ghd-settings .ghd-footer { padding:10px; border-top:#555 solid 1px; }
+      #ghd-settings .ghd-settings-wrapper { max-height:60vh; overflow-y:auto; padding:4px 10px; }
+      #ghd-settings .ghd-tab { width:5em; }
+      #ghd-settings .octicon { vertical-align:text-bottom !important; }
+      #ghd-settings .ghd-paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px !important; height:-moz-calc(100% - 85px); border-style:solid; z-index:0; }
+
+      /* code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
+      icons next to a pre */
+      .ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:20; }
+      /* file & diff code tables */
+      .ghd-wrap-table .blob-code-inner { white-space:pre-wrap !important; word-break:break-all !important; }
+      .ghd-unwrap-table .blob-code-inner { white-space:pre !important; word-break:normal !important; }
+      .ghd-wrap-toggle > *, .ghd-monospace > *, .ghd-file-toggle > * { pointer-events:none; vertical-align:middle !important; }
+      /* icons inside a wrapper immediatly around a pre */
+      .highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }
+      /* icons for non-syntax highlighted code blocks; see https://github.com/gjtorikian/html-proofer/blob/master/README.md */
+      .markdown-body:not(.comment-body) .ghd-wrap-toggle:not(:first-child) { right:3.4em; }
+      .ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(110,110,110,.4); }
+      /* wrap disabled (red) */
+      .ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }
+      /* wrap enabled (green) */
+      body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }
+      .blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }
+      /* monospace font toggle */
+      .ghd-monospace-font { font-family:"${data.font}", Menlo, Inconsolata, "Droid Mono", monospace !important; font-size:1em !important; }
+      /* file collapsed icon */
+      .ghd-file-collapsed > :not(.file-header) { display:none !important; }
+      .ghd-file-collapsed .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }
+    `);
+
+    let panel, indx, theme, icon,
+      opts = '',
+      ver = getVersionTooltip(),
+      names = Object.keys(themes),
+      len = names.length;
+    for (indx = 0; indx < len; indx++) {
+      theme = names[indx];
+      opts += `<option value="${theme}">${theme}</option>`;
+    }
+
+    // circle-question-mark icon
+    icon = `
+      <svg class="octicon" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 16 14">
+        <path d="M6 10h2v2H6V10z m4-3.5c0 2.14-2 2.5-2 2.5H6c0-0.55 0.45-1 1-1h0.5c0.28 0 0.5-0.22 0.5-0.5v-1c0-0.28-0.22-0.5-0.5-0.5h-1c-0.28 0-0.5 0.22-0.5 0.5v0.5H4c0-1.5 1.5-3 3-3s3 1 3 2.5zM7 2.3c3.14 0 5.7 2.56 5.7 5.7S10.14 13.7 7 13.7 1.3 11.14 1.3 8s2.56-5.7 5.7-5.7m0-1.3C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7S10.86 1 7 1z" />
+      </svg>
+    `;
+
+    // Settings panel markup
+    panel = make({
+      el : 'div',
+      appendTo: 'body',
+      attr : { id: 'ghd-settings' },
+      html : `
+        <div id="ghd-settings-inner" class="boxed-group">
+          <h3>GitHub-Dark Settings
+            <a href="https://github.com/StylishThemes/GitHub-Dark-Script/wiki" class="tooltipped tooltipped-e" aria-label="See documentation">${icon}</a>
+            <svg id="ghd-settings-close" xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="160 160 608 608"><path d="M686.2 286.8L507.7 465.3l178.5 178.5-45 45-178.5-178.5-178.5 178.5-45-45 178.5-178.5-178.5-178.5 45-45 178.5 178.5 178.5-178.5z"/></svg>
+          </h3>
+          <div class="boxed-group-inner">
+            <form>
+              <div class="ghd-settings-wrapper">
+                <p class="ghd-checkbox">
+                  <label>Enable GitHub-Dark<input class="ghd-enable ghd-right" type="checkbox"></label>
+                </p>
+                <p>
+                  <label>Color:</label>
+                  <input class="ghd-color ghd-right" type="text" value="#4183C4">
+                  <span id="ghd-swatch" class="ghd-right"></span>
+                </p>
+                <h4>Background</h4>
+                <p>
+                  <label>Image:</label>
+                  <input class="ghd-image ghd-right" type="text">
+                  <a href="https://github.com/StylishThemes/GitHub-Dark/wiki/Image" class="tooltipped tooltipped-e" aria-label="Click to learn about GitHub\'s Content Security&#10;Policy and how to add a custom image">${icon}</a>
+                </p>
+                <p>
+                  <label>Image type:</label>
+                  <select class="ghd-type ghd-right form-select">
+                    <option value="tiled">Tiled</option>
+                    <option value="fit">Fit window</option>
+                  </select>
+                </p>
+                <p>
+                  <label>Image attachment:</label>
+                  <select class="ghd-attach ghd-right form-select">
+                    <option value="scroll">Scroll</option>
+                    <option value="fixed">Fixed</option>
+                  </select>
+                </p>
+                <h4>Code</h4>
+                <p><label>Theme:</label> <select class="ghd-theme ghd-right form-select">${opts}</select></p>
+                <p>
+                  <label>Font Name:</label> <input class="ghd-font ghd-right" type="text">
+                  <a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-e" aria-label="Add a system installed (monospaced) font name;&#10;this script will not load external fonts!">${icon}</a>
+                </p>
+                <p>
+                  <label>Tab Size:</label> <input class="ghd-tab ghd-right" type="text">
+                </p>
+                <p class="ghd-checkbox">
+                  <label>Wrap<input class="ghd-wrap ghd-right" type="checkbox"></label>
+                </p>
+                <h4>Toggles</h4>
+                <p class="ghd-checkbox">
+                  <label>Code Wrap<input class="ghd-codewrap-checkbox ghd-right" type="checkbox"></label>
+                </p>
+                <p class="ghd-checkbox">
+                  <label>Comment Monospace Font<input class="ghd-monospace-checkbox ghd-right" type="checkbox"></label>
+                </p>
+                <p class="ghd-range">
+                  <label>Diff File Collapse</label>
+                  <select class="ghd-diff-select ghd-right form-select">
+                    <option value="0">Disabled</option>
+                    <option value="1">Enabled</option>
+                    <option value="2">Accordion</option>
+                  </select>
+                </p>
+              </div>
+              <div class="ghd-footer">
+                <div class="btn-group">
+                  <a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>
+                  <a href="#" class="ghd-textarea-toggle btn btn-sm tooltipped tooltipped-n" aria-label="Paste CSS update">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 16 16" fill="#eee">
+                      <path d="M15 11 1 11 8 3z"/>
+                    </svg>
+                  </a>
+                  <div class="ghd-paste-area-content" aria-hidden="true" style="display:none">
+                    <textarea class="ghd-paste-area" placeholder="Paste GitHub-Dark Style here!"></textarea>
+                  </div>
+                </div>&nbsp;
+                <a href="#" class="ghd-reset btn btn-sm btn-danger tooltipped tooltipped-n" aria-label="Reset to defaults;&#10;there is no undo!">Reset All Settings</a>
+                <span class="ghd-versions ghd-right tooltipped tooltipped-n" aria-label="${ver}">
+                  <svg class="ghd-info" xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24">
+                    <path fill="#444" d="M12,9c0.82,0,1.5-0.68,1.5-1.5S12.82,6,12,6s-1.5,0.68-1.5,1.5S11.18,9,12,9z M12,1.5 C6.211,1.5,1.5,6.211,1.5,12S6.211,22.5,12,22.5S22.5,17.789,22.5,12S17.789,1.5,12,1.5z M12,19.5c-4.148,0-7.5-3.352-7.5-7.5 S7.852,4.5,12,4.5s7.5,3.352,7.5,7.5S16.148,19.5,12,19.5z M13.5,12c0-0.75-0.75-1.5-1.5-1.5s-0.75,0-1.5,0S9,11.25,9,12h1.5 c0,0,0,3.75,0,4.5S11.25,18,12,18s0.75,0,1.5,0s1.5-0.75,1.5-1.5h-1.5C13.5,16.5,13.5,12.75,13.5,12z"/>
+                  </svg>
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+      `
+    });
+
+    updateToggles();
+  }
+
+  // Add code wrap toggle
+  function buildCodeWrap() {
+    // mutation events happen quick, so we still add an update flag
+    isUpdating = true;
+    let icon = make({
+      el    : 'div',
+      cl4ss : 'ghd-wrap-toggle tooltipped tooltipped-w',
+      attr  : { 'aria-label' : 'Toggle code wrap' },
+      html  : wrapIcon
+    });
+    $$('.blob-wrapper').forEach(el => {
+      el.insertBefore(icon.cloneNode(true), el.childNodes[0]);
+    });
+    $$('.markdown-body pre').forEach(el => {
+      el.parentNode.insertBefore(icon.cloneNode(true), el);
+    });
+    isUpdating = false;
+  }
+
+  // Add monospace font toggle
+  function addMonospaceToggle() {
+    isUpdating = true;
+    let button = make({
+      el    : 'button',
+      cl4ss : 'ghd-monospace toolbar-item tooltipped tooltipped-n',
+      attr  : {
+        'type' : 'button',
+        'aria-label' : 'Toggle monospaced font',
+        'tabindex' : '-1'
+      },
+      html  : monospaceIcon
+    });
+    $$('.toolbar-commenting').forEach(el => {
+      if (!$('.ghd-monospace', el)) {
+        // prepend
+        el.insertBefore(button.cloneNode(true), el.childNodes[0]);
+      }
+    });
+    isUpdating = false;
+  }
+
+  // Add file diffs toggle
+  function addFileToggle() {
+    isUpdating = true;
+    let firstButton,
+      button = make({
+        el    : 'button',
+        cl4ss : 'ghd-file-toggle btn btn-sm tooltipped tooltipped-n',
+        attr  : {
+          'type' : 'button',
+          'aria-label' : 'Click to Expand or Collapse file',
+          'tabindex' : '-1'
+        },
+        html  : fileIcon
+      });
+    $$('#files .file-actions').forEach(el => {
+      if (!$('.ghd-file-toggle', el)) {
+        el.appendChild(button.cloneNode(true));
+      }
+    });
+    firstButton = $('.ghd-file-toggle');
+    // accordion mode = start with all but first entry collapsed
+    if (firstButton && data.modeDiffToggle === '2') {
+      toggleFile({
+        target: firstButton
+      }, true);
+    }
+    isUpdating = false;
+  }
+
+  // Add toggle buttons after page updates
+  function updateToggles() {
+    if (data.enableCodeWrap) {
+      buildCodeWrap();
+    } else {
+      removeAll('.ghd-wrap-toggle');
+      toggleClass($$('.ghd-file-collapsed'), 'ghd-file-collapsed', false);
+    }
+    if (data.enableMonospace) {
+      addMonospaceToggle();
+    } else {
+      removeAll('.ghd-monospace');
+      toggleClass($$('.ghd-monospace-font'), 'ghd-monospace-font', false);
+    }
+    if (data.modeDiffToggle !== '0') {
+      addFileToggle();
+    } else {
+      removeAll('.ghd-file-toggle');
+      toggleClass($$('.ghd-file-collapsed'), 'ghd-file-collapsed', false);
+    }
+  }
+
+  function makeRow(vals, str) {
+    return make({
+      el : 'tr',
+      cl4ss : 'ghd-shortcut',
+      html : `<td class="keys"><kbd>${vals[0]}</kbd> <kbd>${vals[1]}</kbd></td><td>${str}</td>`
+    });
+  }
+
+  // add keyboard shortcut to help menu (press "?")
+  function buildShortcut() {
+    let row,
+      el = $('.keyboard-mappings tbody');
+    if (el && !$('.ghd-shortcut')) {
+      row = makeRow(keyboardOpen.split('+'), 'GitHub-Dark: open settings');
+      el.appendChild(row);
+      row = makeRow(keyboardToggle.split('+'), 'GitHub-Dark: toggle style');
+      el.appendChild(row);
+    }
+  }
+
+  function toggleCodeWrap(el) {
+    let css,
+      overallWrap = data.wrap,
+      code = next(el, '.highlight, .diff-table, code, pre'),
+      tmp = code ? next(code, 'code') : '';
+    if (tmp) {
+      // find code element
+      code = tmp;
+    }
+    if (!code) {
+      if (debug) {
+        console.log('Code wrap icon associated code not found', el);
+      }
+      return;
+    }
+    // code with line numbers
+    if (code.nodeName === 'TABLE') {
+      if (code.className.indexOf('ghd-') < 0) {
+        css = !overallWrap;
       } else {
-        this.addSavedStyle();
+        css = code.classList.contains('ghd-unwrap-table');
+      }
+      toggleClass(code, 'ghd-wrap-table', css);
+      toggleClass(code, 'ghd-unwrap-table', !css);
+      toggleClass(el, 'wrapped', css);
+      toggleClass(el, 'unwrap', !css);
+    } else {
+      css = (code.getAttribute('style') || '').trim();
+      if (css === '') {
+        css = wrapCss[overallWrap ? 'unwrap' : 'wrapped'];
+      } else {
+        css = wrapCss[css === wrapCss.wrapped ? 'unwrap' : 'wrapped'];
+      }
+      code.setAttribute('style', css);
+      toggleClass(el, 'wrapped', css === wrapCss.wrapped);
+      toggleClass(el, 'unwrap', css === wrapCss.unwrap);
+    }
+  }
+
+  function toggleMonospace(el) {
+    let tmp = closest(el, '.previewable-comment-form'),
+      // single comment
+      textarea = $('.comment-form-textarea', tmp);
+    if (textarea) {
+      toggleClass(textarea, 'ghd-monospace-font');
+      textarea.focus();
+      tmp = textarea.classList.contains('ghd-monospace-font');
+      toggleClass(el, 'ghd-icon-active', tmp);
+    }
+  }
+
+  function toggleSibs(target, state) {
+    let el,
+      isCollapsed = state || target.classList.contains('ghd-file-collapsed'),
+      toggles = document.querySelectorAll('.file'),
+      indx = toggles.length;
+    while (indx--) {
+      el = toggles[indx];
+      if (el !== target) {
+        el.classList[isCollapsed ? 'add' : 'remove']('ghd-file-collapsed');
       }
     }
-  };
+  }
+
+  function toggleFile(event, init) {
+    isUpdating = true;
+    let el = closest(event.target, '.file');
+    if (data.modeDiffToggle === '2') {
+      if (!init) {
+        el.classList.toggle('ghd-file-collapsed');
+      }
+      toggleSibs(el, true);
+    } else {
+      el.classList.toggle('ghd-file-collapsed');
+      // shift+click toggle all files!
+      if (event.shiftKey) {
+        toggleSibs(el);
+      }
+    }
+    isUpdating = false;
+  }
+
+  function bindEvents() {
+    let el, menu, lastKey,
+      panel = $('#ghd-settings-inner'),
+      swatch = $('#ghd-swatch', panel);
+
+    // finish initialization
+    $('#ghd-settings-inner .ghd-enable').checked = data.enable;
+    toggleClass($('body'), 'ghd-disabled', !data.enable);
+
+    // Create our menu entry
+    menu = make({
+      el : 'a',
+      cl4ss : 'dropdown-item',
+      html : 'GitHub Dark Settings',
+      attr : { id : 'ghd-menu' }
+    });
+
+    el = $$('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]');
+    // get last found item - gists only have the "go to profile" item; GitHub has both
+    el = el[el.length - 1];
+    if (el) {
+      // insert after
+      el.parentNode.insertBefore(menu, el.nextSibling);
+      on($('#ghd-menu'), 'click', () => {
+        openPanel();
+      });
+    }
+
+    on(document, 'keypress keydown', event => {
+      clearTimeout(timer);
+      // use "g+o" to open up ghd options panel
+      let openKeys = keyboardOpen.split('+'),
+        toggleKeys = keyboardToggle.split('+'),
+        key = String.fromCharCode(event.which).toLowerCase(),
+        panelVisible = $('#ghd-settings').classList.contains('in');
+
+      // press escape to close the panel
+      if (event.which === 27 && panelVisible) {
+        closePanel();
+        return;
+      }
+      // use event.which from keypress for shortcuts
+      // prevent opening panel while typing "go" in comments
+      if (event.type === 'keydown' || /(input|textarea)/i.test(document.activeElement.nodeName)) {
+        return;
+      }
+      if (lastKey === openKeys[0] && key === openKeys[1]) {
+        if (panelVisible) {
+          closePanel();
+        } else {
+          openPanel();
+        }
+      }
+      if (lastKey === toggleKeys[0] && key === toggleKeys[1]) {
+        toggleStyle();
+      }
+      lastKey = key;
+      timer = setTimeout(() => {
+        lastKey = null;
+      }, keyboardDelay);
+
+      // add shortcut to help menu
+      if (key === '?') {
+        // table doesn't exist until user presses "?"
+        setTimeout(() => {
+          buildShortcut();
+        }, 300);
+      }
+    });
+
+    // add ghd-settings panel bindings
+    on($$('#ghd-settings, #ghd-settings-close'), 'click keyup', event => {
+      // press escape to close settings
+      if (event.type === 'keyup' && event.which !== 27) {
+        return;
+      }
+      closePanel();
+    });
+
+    on(panel, 'click', event => {
+      event.stopPropagation();
+    });
+
+    on($('.ghd-reset', panel), 'click', event => {
+      event.preventDefault();
+      isUpdating = true;
+      // pass true to reset values
+      setStoredValues(true);
+      // add reset values back to data
+      getStoredValues();
+      // add reset values to panel
+      updatePanel();
+      // update style
+      updateStyle();
+    });
+
+    on($$('input[type="text"]', panel), 'focus', function() {
+      // select all text when focused
+      this.select();
+    });
+
+    on($$('select, input', panel), 'change', () => {
+      if (!isUpdating) {
+        updateStyle();
+      }
+    });
+
+    on($('.ghd-update', panel), 'click', event => {
+      event.preventDefault();
+      forceUpdate();
+    });
+
+    on($('.ghd-textarea-toggle', panel), 'click', function(event) {
+      event.preventDefault();
+      let hidden, el;
+      this.classList.remove('selected');
+      el = next(this, '.ghd-paste-area-content');
+      if (el) {
+        hidden = el.style.display === 'none';
+        el.style.display = hidden ? '' : 'none';
+        if (el.style.display !== 'none') {
+          el.classList.add('selected');
+          el = $('textarea', el);
+          el.focus();
+          el.select();
+        }
+      }
+      return false;
+    });
+
+    on($('.ghd-paste-area-content', panel), 'paste', event => {
+      let toggle = $('.ghd-textarea-toggle', panel),
+        textarea = event.target;
+      setTimeout(() => {
+        textarea.parentNode.style.display = 'none';
+        toggle.classList.remove('selected');
+        testing = true;
+        forceUpdate(textarea.value);
+      }, 200);
+    });
+
+    // Toggles
+    on($('body'), 'click', event => {
+      let target = event.target;
+      if (data.enableCodeWrap && target.classList.contains('ghd-wrap-toggle')) {
+        // **** CODE WRAP TOGGLE ****
+        event.stopPropagation();
+        toggleCodeWrap(target);
+      } else if (data.enableMonospace && target.classList.contains('ghd-monospace')) {
+        // **** MONOSPACE FONT TOGGLE ****
+        event.stopPropagation();
+        toggleMonospace(target);
+        return false;
+      } else if (data.modeDiffToggle !== '0' && target.classList.contains('ghd-file-toggle')) {
+        // **** CODE DIFF COLLAPSE TOGGLE ****
+        event.stopPropagation();
+        toggleFile(event);
+      }
+    });
+
+    // style color picker
+    picker = new jscolor($('.ghd-color', panel));
+    picker.zIndex = 65536;
+    picker.hash = true;
+    picker.backgroundColor = '#333';
+    picker.padding = 0;
+    picker.borderWidth = 0;
+    picker.borderColor = '#444';
+    picker.onFineChange = () => {
+      swatch.style.backgroundColor = '#' + picker;
+    };
+  }
+
+  function openPanel() {
+    $('.modal-backdrop').click();
+    updatePanel();
+    $('#ghd-settings').classList.add('in');
+  }
+
+  function closePanel(flag) {
+    $('#ghd-settings').classList.remove('in');
+    picker.hide();
+
+    if (flag === 'forced') {
+      // forced update; partial re-initialization
+      init();
+    } else {
+      // apply changes when the panel is closed
+      updateStyle();
+    }
+  }
+
+  function toggleStyle() {
+    let isEnabled = !data.enable;
+    data.enable = isEnabled;
+    $('#ghd-settings-inner .ghd-enable').checked = isEnabled;
+    // add processedCss back into style (emptied when disabled)
+    if (isEnabled) {
+      // data.processedCss is empty when ghd is disabled on init
+      if (!data.processedCss) {
+        processStyle();
+      } else {
+        addSavedStyle();
+      }
+    }
+    $style.disabled = !isEnabled;
+  }
+
+  function init() {
+    getStoredValues(true);
+
+    $style.disabled = !data.enable;
+    data.lastTheme = data.theme;
+    data.lastCW = data.enableCodeWrap;
+    data.lastMS = data.enableMonospace;
+    data.lastDT = data.modeDiffToggle;
+
+    // only load package.json once a day, or after a forced update
+    if ((new Date().getTime() > data.date + delay) || data.version === 0) {
+      // get package.json from GitHub-Dark & compare versions
+      // load new script if a newer one is available
+      checkVersion();
+    } else {
+      addSavedStyle();
+    }
+  }
 
   // add style at document-start
-  ghd.init();
+  init();
 
-  $(function() {
+  on(document, 'DOMContentLoaded', () => {
     // add panel even if you're not logged in - open panel using keyboard shortcut
-    ghd.buildSettings();
+    buildSettings();
     // add event binding on document ready
-    ghd.bindEvents();
+    bindEvents();
 
-    var targets = document.querySelectorAll('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity');
-
-    Array.prototype.forEach.call(targets, function(target) {
-      new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
+    $$('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity').forEach(target => {
+      new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
           // preform checks before adding code wrap to minimize function calls
-          if (!(ghd.isUpdating || document.querySelectorAll('.ghd-wrap-toggle').length) && mutation.target === target) {
-            ghd.updateToggles();
+          if (!(isUpdating || $$('.ghd-wrap-toggle').length) &&
+            mutation.target === target) {
+            updateToggles();
           }
         });
       }).observe(target, {
@@ -900,12 +1079,89 @@
         subtree: true
       });
     });
+
+    isInitialized = true;
   });
 
-  // include a "?debug" anywhere in the browser URL to enable debugging
-  function debug() {
-    if (/\?debug/.test(window.location.href)) {
-      console.log.apply(console, arguments);
-    }
+  /* utility functions */
+  function isBool(name) {
+    let val = data[name];
+    return typeof val === 'boolean' ? val : defaults[name];
   }
-})(jQuery.noConflict(true));
+  function $(str, el) {
+    return (el || document).querySelector(str);
+  }
+  function $$(str, el) {
+    return Array.from((el || document).querySelectorAll(str));
+  }
+  function next(el, selector) {
+    while ((el = el.nextElementSibling)) {
+      if (el && el.matches(selector)) {
+        return el;
+      }
+    }
+    return null;
+  }
+  function closest(el, selector) {
+    while (el && el.nodeName !== 'BODY' && !el.matches(selector)) {
+      el = el.parentNode;
+    }
+    return el && el.matches(selector) ? el : [];
+  }
+  function make(obj) {
+    let key,
+      el = document.createElement(obj.el);
+    if (obj.cl4ss) { el.className = obj.cl4ss; }
+    if (obj.html) { el.innerHTML = obj.html; }
+    if (obj.attr) {
+      for (key in obj.attr) {
+        if (obj.attr.hasOwnProperty(key)) {
+          el.setAttribute(key, obj.attr[key]);
+        }
+      }
+    }
+    if (obj.appendTo) {
+      $(obj.appendTo).appendChild(el);
+    }
+    return el;
+  }
+  function removeAll(selector) {
+    $$(selector).forEach(el => {
+      el.parentNode.removeChild(el);
+    });
+  }
+  function on(els, name, callback) {
+    els = Array.isArray(els) ? els : [els];
+    let events = name.split(/\s+/);
+    els.forEach(el => {
+      events.forEach(ev => {
+        el.addEventListener(ev, callback);
+      });
+    });
+  }
+  function toggleClass(els, cl4ss, flag) {
+    els = Array.isArray(els) ? els : [els];
+    els.forEach(el => {
+      if (el) {
+        if (typeof flag === 'undefined') {
+          flag = !el.classList.contains(cl4ss);
+        }
+        if (flag) {
+          el.classList.add(cl4ss);
+        } else {
+          el.classList.remove(cl4ss);
+        }
+      }
+    });
+  }
+
+  // Add GM options
+  GM_registerMenuCommand("GitHub Dark Script debug logging", () => {
+    let val = prompt('Toggle GitHub Dark Script debug log (true/false):', !debug);
+    if (val) {
+      debug = /^t/.test(val);
+      GM_setValue('debug', debug);
+    }
+  });
+
+})();
