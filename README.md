@@ -3,7 +3,7 @@
 
 ## Notice. Version 2.0+ is now available, custom settings will get reset in versions less than 2.0.0!
 
-This script loads and applies the [GitHub Dark](https://github.com/StylishThemes/GitHub-Dark)
+This script loads and applies the [GitHub Dark](https://github.com/StylishThemes/GitHub-Dark) Style
 
 * An options panel allows you to change settings on-the-fly without the need to reinstall.
 * Adds a code wrap toggle button to every code block.
