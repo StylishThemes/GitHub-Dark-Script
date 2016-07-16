@@ -751,7 +751,7 @@
     let css,
       overallWrap = data.wrap,
       code = next(el, '.highlight, .diff-table, code, pre'),
-      tmp = code ? next(code, 'code') : '';
+      tmp = code ? $('code', code) : '';
     if (tmp) {
       // find code element
       code = tmp;
