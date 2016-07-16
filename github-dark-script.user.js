@@ -494,7 +494,8 @@
       #ghd-settings .ghd-settings-wrapper { max-height:60vh; overflow-y:auto; padding:4px 10px; }
       #ghd-settings .ghd-tab { width:5em; }
       #ghd-settings .octicon { vertical-align:text-bottom !important; }
-      #ghd-settings .ghd-paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px !important; height:-moz-calc(100% - 85px); border-style:solid; z-index:0; }
+      #ghd-settings .ghd-paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px !important; height:-moz-calc(100% - 85px);
+        resize:none !important; border-style:solid; z-index:0; }
 
       /* code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
       icons next to a pre */
