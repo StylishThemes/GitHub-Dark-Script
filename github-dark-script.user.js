@@ -151,13 +151,11 @@
 
   $style = make({
     el: 'style',
-    cl4ss: 'ghd-style',
-    // add style tag to head
-    appendTo: 'head'
+    cl4ss: 'ghd-style'
   });
 
   let timer, picker, // jscolor picker
-  isInitialized = false,
+  isInitialized = 'pending',
   // prevent mutationObserver from going nuts
   isUpdating = false,
   // set when css code to test is pasted into the settings panel
@@ -1039,21 +1037,25 @@
   }
 
   function init() {
-    getStoredValues(true);
+    if ($('body')) {
+      $('body').appendChild($style);
+      getStoredValues(true);
 
-    $style.disabled = !data.enable;
-    data.lastTheme = data.theme;
-    data.lastCW = data.enableCodeWrap;
-    data.lastMS = data.enableMonospace;
-    data.lastDT = data.modeDiffToggle;
+      $style.disabled = !data.enable;
+      data.lastTheme = data.theme;
+      data.lastCW = data.enableCodeWrap;
+      data.lastMS = data.enableMonospace;
+      data.lastDT = data.modeDiffToggle;
 
-    // only load package.json once a day, or after a forced update
-    if ((new Date().getTime() > data.date + delay) || data.version === 0) {
-      // get package.json from GitHub-Dark & compare versions
-      // load new script if a newer one is available
-      checkVersion();
-    } else {
-      addSavedStyle();
+      // only load package.json once a day, or after a forced update
+      if ((new Date().getTime() > data.date + delay) || data.version === 0) {
+        // get package.json from GitHub-Dark & compare versions
+        // load new script if a newer one is available
+        checkVersion();
+      } else {
+        addSavedStyle();
+      }
+      isInitialized = false;
     }
   }
 
@@ -1061,6 +1063,10 @@
   init();
 
   on(document, 'DOMContentLoaded', () => {
+    if (isInitialized === 'pending') {
+      // init after DOM loaded on .atom pages
+      init();
+    }
     // add panel even if you're not logged in - open panel using keyboard shortcut
     buildSettings();
     // add event binding on document ready
