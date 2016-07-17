@@ -20,149 +20,147 @@
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
 /* global GM_addStyle, GM_getValue, GM_setValue, GM_info, GM_xmlhttpRequest, GM_registerMenuCommand, jscolor */
-/* eslint-disable indent, quotes */
 /* jshint esnext:true */
 (() => {
   'use strict';
 
   const version = GM_info.script.version,
 
-  // delay until package.json allowed to load
-  delay = 8.64e7, // 24 hours in milliseconds
+    // delay until package.json allowed to load
+    delay = 8.64e7, // 24 hours in milliseconds
 
-  // Keyboard shortcut to open ghd panel (only a two key combo coded)
-  keyboardOpen = 'g+0',
-  keyboardToggle = 'g+-',
-  // keyboard shortcut delay from first to second letter
-  keyboardDelay = 1000,
+    // Keyboard shortcut to open ghd panel (only a two key combo coded)
+    keyboardOpen = 'g+0',
+    keyboardToggle = 'g+-',
+    // keyboard shortcut delay from first to second letter
+    keyboardDelay = 1000,
 
-  // base urls to fetch style and package.json
-  root = 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
+    // base urls to fetch style and package.json
+    root = 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
 
-  defaults = {
-    attach : 'scroll',
-    color  : '#4183C4',
-    enable : true,
-    font   : 'Menlo',
-    image  : 'url("data:image/png;base64,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")',
-    tab    : 4,
-    theme  : 'Twilight',
-    type   : 'tiled',
-    wrap   : false,
+    defaults = {
+      attach : 'scroll',
+      color  : '#4183C4',
+      enable : true,
+      font   : 'Menlo',
+      image  : 'url("data:image/png;base64,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")',
+      tab    : 4,
+      theme  : 'Twilight',
+      type   : 'tiled',
+      wrap   : false,
 
-    // toggle buttons
-    enableCodeWrap  : true,
-    enableMonospace : true,
-    // diff toggle + accordion mode
-    modeDiffToggle  : '1',
+      // toggle buttons
+      enableCodeWrap  : true,
+      enableMonospace : true,
+      // diff toggle + accordion mode
+      modeDiffToggle  : '1',
 
-    // internal variables
-    date         : 0,
-    version      : 0,
-    rawCss       : '',
-    themeCss     : '',
-    processedCss : '',
-    last         : {}
+      // internal variables
+      date         : 0,
+      version      : 0,
+      rawCss       : '',
+      themeCss     : '',
+      processedCss : '',
+      last         : {}
+    },
 
-  },
+    // extract style & theme name
+    regex = /\/\*! [^\*]+ \*\//,
+    // "themes/" prefix not included here
+    themes = {
+      'Ambiance' : 'ambiance.min.css',
+      'Chaos' : 'chaos.min.css',
+      'Clouds Midnight' : 'clouds-midnight.min.css',
+      'Cobalt' : 'cobalt.min.css',
+      'Idle Fingers' : 'idle-fingers.min.css',
+      'Kr Theme' : 'kr-theme.min.css',
+      'Merbivore' : 'merbivore.min.css',
+      'Merbivore Soft' : 'merbivore-soft.min.css',
+      'Mono Industrial' : 'mono-industrial.min.css',
+      'Mono Industrial Clear' : 'mono-industrial-clear.min.css',
+      'Monokai' : 'monokai.min.css',
+      'Obsidian' : 'obsidian.min.css',
+      'Pastel on Dark' : 'pastel-on-dark.min.css',
+      'Solarized Dark' : 'solarized-dark.min.css',
+      'Terminal' : 'terminal.min.css',
+      'Tomorrow Night' : 'tomorrow-night.min.css',
+      'Tomorrow Night Blue' : 'tomorrow-night-blue.min.css',
+      'Tomorrow Night Bright' : 'tomorrow-night-bright.min.css',
+      'Tomorrow Night Eigthies' : 'tomorrow-night-eighties.min.css',
+      'Twilight' : 'twilight.min.css',
+      'Vibrant Ink' : 'vibrant-ink.min.css'
+    },
 
-  // extract style & theme name
-  regex = /\/\*! [^\*]+ \*\//,
-  // "themes/" prefix not included here
-  themes = {
-    'Ambiance' : 'ambiance.min.css',
-    'Chaos' : 'chaos.min.css',
-    'Clouds Midnight' : 'clouds-midnight.min.css',
-    'Cobalt' : 'cobalt.min.css',
-    'Idle Fingers' : 'idle-fingers.min.css',
-    'Kr Theme' : 'kr-theme.min.css',
-    'Merbivore' : 'merbivore.min.css',
-    'Merbivore Soft' : 'merbivore-soft.min.css',
-    'Mono Industrial' : 'mono-industrial.min.css',
-    'Mono Industrial Clear' : 'mono-industrial-clear.min.css',
-    'Monokai' : 'monokai.min.css',
-    'Obsidian' : 'obsidian.min.css',
-    'Pastel on Dark' : 'pastel-on-dark.min.css',
-    'Solarized Dark' : 'solarized-dark.min.css',
-    'Terminal' : 'terminal.min.css',
-    'Tomorrow Night' : 'tomorrow-night.min.css',
-    'Tomorrow Night Blue' : 'tomorrow-night-blue.min.css',
-    'Tomorrow Night Bright' : 'tomorrow-night-bright.min.css',
-    'Tomorrow Night Eigthies' : 'tomorrow-night-eighties.min.css',
-    'Twilight' : 'twilight.min.css',
-    'Vibrant Ink' : 'vibrant-ink.min.css'
-  },
+    type = {
+      tiled : `
+        background-repeat: repeat !important;
+        background-size: auto !important;
+        background-position: left top !important;
+      `,
+      fit : `
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center top !important;
+      `
+    },
 
-  type = {
-    tiled : `
-      background-repeat: repeat !important;
-      background-size: auto !important;
-      background-position: left top !important;
+    wrapCss = {
+      wrapped : `
+        white-space: pre-wrap !important;
+        word-break: break-all !important;
+        overflow-wrap: break-word !important;
+        display: block !important;
+      `,
+      unwrap  : `
+        white-space: pre !important;
+        word-break: normal !important;
+        display: block !important;
+      `
+    },
+
+    // https://github.com/StylishThemes/GitHub-code-wrap/blob/master/github-code-wrap.css
+    wrapCodeCss = `
+      /* GitHub: Enable wrapping of long code lines */
+        .blob-code-inner,
+        .markdown-body pre > code,
+        .markdown-body .highlight > pre { ${wrapCss.wrapped} }
+        td.blob-code-inner {
+          display: table-cell !important;
+        }
     `,
-    fit : `
-      background-repeat: no-repeat !important;
-      background-size: cover !important;
-      background-position: center top !important;
-    `
-  },
 
-  wrapCss = {
-    wrapped : `
-      white-space: pre-wrap !important;
-      word-break: break-all !important;
-      overflow-wrap: break-word !important;
-      display: block !important;
+    wrapIcon = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768">
+        <path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/>
+      </svg>
     `,
-    unwrap  : `
-      white-space: pre !important;
-      word-break: normal !important;
-      display: block !important;
-    `
-  },
 
-  // https://github.com/StylishThemes/GitHub-code-wrap/blob/master/github-code-wrap.css
-  wrapCodeCss = `
-    /* GitHub: Enable wrapping of long code lines */
-      .blob-code-inner,
-      .markdown-body pre > code,
-      .markdown-body .highlight > pre { ${wrapCss.wrapped} }
-      td.blob-code-inner {
-        display: table-cell !important;
-      }
-  `,
+    monospaceIcon = `
+      <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32">
+        <path d="M5.91 7.31v8.41c0 .66.05 1.09.14 1.31.09.21.23.37.41.48.18.11.52.16 1.02.16v.41H2.41v-.41c.5 0 .86-.05 1.03-.14.16-.11.3-.27.41-.5.11-.23.16-.66.16-1.3V11.7c0-1.14-.04-1.87-.11-2.2-.04-.26-.13-.42-.24-.53-.11-.1-.27-.14-.46-.14-.21 0-.48.05-.77.18l-.18-.41 3.14-1.28h.52v-.01zm-.95-5.46c.32 0 .59.11.82.34.23.23.34.5.34.82 0 .32-.11.59-.34.82-.23.22-.51.34-.82.34-.32 0-.59-.11-.82-.34s-.36-.5-.36-.82c0-.32.11-.59.34-.82.24-.23.51-.34.84-.34zm19.636 19.006h-3.39v-1.64h5.39v9.8h3.43v1.66h-9.18v-1.66h3.77v-8.16h-.02zm.7-6.44c.21 0 .43.04.63.13.18.09.36.2.5.34s.25.3.34.5c.07.18.13.39.13.61 0 .22-.04.41-.13.61s-.19.36-.34.5-.3.25-.5.32c-.2.09-.39.13-.62.13-.21 0-.43-.04-.61-.12-.19-.07-.35-.19-.5-.34-.14-.14-.25-.3-.34-.5-.07-.2-.13-.39-.13-.61s.04-.43.13-.61c.07-.18.2-.36.34-.5s.31-.25.5-.34c.17-.09.39-.12.6-.12zM2 30L27.82 2H30L4.14 30H2z"/>
+      </svg>
+    `,
 
-  wrapIcon = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768">
-      <path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/>
-    </svg>
-  `,
+    fileIcon = `
+      <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">
+        <path d="M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z"/>
+      </svg>
+    `,
 
-  monospaceIcon = `
-    <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32">
-      <path d="M5.91 7.31v8.41c0 .66.05 1.09.14 1.31.09.21.23.37.41.48.18.11.52.16 1.02.16v.41H2.41v-.41c.5 0 .86-.05 1.03-.14.16-.11.3-.27.41-.5.11-.23.16-.66.16-1.3V11.7c0-1.14-.04-1.87-.11-2.2-.04-.26-.13-.42-.24-.53-.11-.1-.27-.14-.46-.14-.21 0-.48.05-.77.18l-.18-.41 3.14-1.28h.52v-.01zm-.95-5.46c.32 0 .59.11.82.34.23.23.34.5.34.82 0 .32-.11.59-.34.82-.23.22-.51.34-.82.34-.32 0-.59-.11-.82-.34s-.36-.5-.36-.82c0-.32.11-.59.34-.82.24-.23.51-.34.84-.34zm19.636 19.006h-3.39v-1.64h5.39v9.8h3.43v1.66h-9.18v-1.66h3.77v-8.16h-.02zm.7-6.44c.21 0 .43.04.63.13.18.09.36.2.5.34s.25.3.34.5c.07.18.13.39.13.61 0 .22-.04.41-.13.61s-.19.36-.34.5-.3.25-.5.32c-.2.09-.39.13-.62.13-.21 0-.43-.04-.61-.12-.19-.07-.35-.19-.5-.34-.14-.14-.25-.3-.34-.5-.07-.2-.13-.39-.13-.61s.04-.43.13-.61c.07-.18.2-.36.34-.5s.31-.25.5-.34c.17-.09.39-.12.6-.12zM2 30L27.82 2H30L4.14 30H2z"/>
-    </svg>
-  `,
-
-  fileIcon = `
-    <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">
-      <path d="M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z"/>
-    </svg>
-  `,
-
-  $style = make({
-    el: 'style',
-    cl4ss: 'ghd-style'
-  });
+    $style = make({
+      el: 'style',
+      cl4ss: 'ghd-style'
+    });
 
   let timer, picker, // jscolor picker
-  isInitialized = 'pending',
-  // prevent mutationObserver from going nuts
-  isUpdating = false,
-  // set when css code to test is pasted into the settings panel
-  testing = false,
-  //
-  debug = GM_getValue('debug', false),
-  data = {};
+    isInitialized = 'pending',
+    // prevent mutationObserver from going nuts
+    isUpdating = false,
+    // set when css code to test is pasted into the settings panel
+    testing = false,
+    //
+    debug = GM_getValue('debug', false),
+    data = {};
 
   function updatePanel() {
     if (!isInitialized) { return; }
@@ -519,7 +517,7 @@
       .ghd-file-collapsed .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }
     `);
 
-    let panel, indx, theme, icon,
+    let indx, theme, icon,
       opts = '',
       ver = getVersionTooltip(),
       names = Object.keys(themes),
@@ -537,7 +535,7 @@
     `;
 
     // Settings panel markup
-    panel = make({
+    make({
       el : 'div',
       appendTo: 'body',
       attr : { id: 'ghd-settings' },
