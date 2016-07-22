@@ -4,8 +4,7 @@
 // @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
-// @include      /render\.githubusercontent\.com/
-// @include      /raw\.githubusercontent\.com/
+// @include      /https?://(render|raw|gist)\.githubusercontent\.com/
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
