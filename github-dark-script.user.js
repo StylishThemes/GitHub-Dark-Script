@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Dark Script
-// @version      2.0.5
+// @version      2.0.6
 // @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
@@ -162,7 +162,7 @@
     data = {};
 
   function updatePanel() {
-    if (!isInitialized) { return; }
+    if (!isInitialized || !$('#ghd-settings-inner')) { return; }
     // prevent multiple change events from processing
     isUpdating = true;
 
@@ -1065,24 +1065,27 @@
       init();
     }
     // add panel even if you're not logged in - open panel using keyboard shortcut
-    buildSettings();
-    // add event binding on document ready
-    bindEvents();
+    // just not on githubusercontent pages (no settings panel needed)
+    if (window.location.host.indexOf('githubusercontent.com') < 0) {
+      buildSettings();
+      // add event binding on document ready
+      bindEvents();
 
-    $$('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity').forEach(target => {
-      new MutationObserver(mutations => {
-        mutations.forEach(mutation => {
-          // preform checks before adding code wrap to minimize function calls
-          if (!(isUpdating || $$('.ghd-wrap-toggle').length) &&
-            mutation.target === target) {
-            updateToggles();
-          }
+      $$('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity').forEach(target => {
+        new MutationObserver(mutations => {
+          mutations.forEach(mutation => {
+            // preform checks before adding code wrap to minimize function calls
+            if (!(isUpdating || $$('.ghd-wrap-toggle').length) &&
+              mutation.target === target) {
+              updateToggles();
+            }
+          });
+        }).observe(target, {
+          childList: true,
+          subtree: true
         });
-      }).observe(target, {
-        childList: true,
-        subtree: true
       });
-    });
+    }
 
     isInitialized = true;
   });
