@@ -236,6 +236,16 @@
     }
   }
 
+  // modified from http://stackoverflow.com/a/5624139/145346
+  function hexToRgb(hex) {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+      parseInt(result[1], 16),
+      parseInt(result[2], 16),
+      parseInt(result[3], 16)
+    ].join(", ") : "";
+  }
+
   // convert version "1.2.3" into "001002003" for easier comparison
   function convertVersion(val) {
     let index,
@@ -362,6 +372,8 @@
       .replace('/*[[bg-attachment]]*/ fixed', data.attach || 'scroll')
       // replace base-color
       .replace(/\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || '#4183C4')
+      // replace base-color-rgb
+      .replace(/\/\*\[\[base-color-rgb\]\]\*\//g, hexToRgb(data.color || '#4183c4'))
       // add font choice
       .replace('/*[[font-choice]]*/', data.font || 'Menlo')
       // add tab size
