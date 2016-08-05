@@ -782,7 +782,7 @@
       toggleClass(el, 'wrapped', css);
       toggleClass(el, 'unwrap', !css);
     } else {
-      css = (code.getAttribute('style') || '').trim();
+      css = code.getAttribute('style') || '';
       if (css === '') {
         css = wrapCss[overallWrap ? 'unwrap' : 'wrapped'];
       } else {
