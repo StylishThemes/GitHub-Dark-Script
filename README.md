@@ -59,3 +59,9 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
   * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18789-github-toggle-code-wrap)).
   * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18787-github-monospace-font-toggle)).
   * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18788-github-diff-file-toggle)).
+
+### Additional Scripts
+
+* [GitHub-Make-Tooltips](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js) - Convert browser default `title` attributes into GitHub styled tooltips.
+* [GitHub-Custom-Emojis](https://github.com/StylishThemes/GitHub-Custom-Emojis) - Add custom emojis anywhere on GitHub.
+* [GitHub-userscripts](https://github.com/Mottie/GitHub-userscripts) - Userscripts to add functionality to GitHub.
