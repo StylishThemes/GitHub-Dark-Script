@@ -62,6 +62,6 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 ### Additional Scripts
 
-* [GitHub-Make-Tooltips](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js) - Convert browser default `title` attributes into GitHub styled tooltips.
-* [GitHub-Custom-Emojis](https://github.com/StylishThemes/GitHub-Custom-Emojis) - Add custom emojis anywhere on GitHub.
-* [GitHub-userscripts](https://github.com/Mottie/GitHub-userscripts) - Userscripts to add functionality to GitHub.
+* [GitHub-Make-Tooltips](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/22194)) - Convert browser default `title` attributes into GitHub styled tooltips.
+* [GitHub-Custom-Emojis](https://github.com/StylishThemes/GitHub-Custom-Emojis) ([GreasyFork](https://greasyfork.org/en/scripts/17618)) - Add custom emojis anywhere on GitHub.
+* [GitHub-userscripts](https://github.com/Mottie/GitHub-userscripts) ([GreasyFork](https://greasyfork.org/en/users/24847)) - Userscripts to add functionality to GitHub.
