@@ -616,7 +616,7 @@
                 </p>
               </div>
               <div class="ghd-footer">
-                <div class="btn-group">
+                <div class="BtnGroup">
                   <a href="#" class="ghd-update btn btn-sm tooltipped tooltipped-n tooltipped-multiline" aria-label="Update style if the newest release is not loading; the page will reload!">Force Update Style</a>
                   <a href="#" class="ghd-textarea-toggle btn btn-sm tooltipped tooltipped-n" aria-label="Paste CSS update">
                     <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 16 16" fill="#eee">
