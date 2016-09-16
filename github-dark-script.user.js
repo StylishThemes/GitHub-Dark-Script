@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Dark Script
-// @version      2.0.10
+// @version      2.0.11
 // @description  GitHub Dark in userscript form, with a settings panel
 // @namespace    https://github.com/StylishThemes
 // @include      /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
