@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Monospace Font Toggle
-// @version      1.0.0
+// @version      1.0.1
 // @description  A userscript that adds monospace font toggle to comments
 // @license      https://creativecommons.org/licenses/by-sa/4.0/
 // @namespace    https://github.com/StylishThemes
@@ -35,7 +35,7 @@
     for (indx = 0; indx < len; indx++) {
       el = toolbars[indx];
       if (!el.querySelector(".ghd-monospace")) {
-        button = document.querySelector("button");
+        button = document.createElement("button");
         button.type = "button";
         button.className = "ghd-monospace toolbar-item tooltipped tooltipped-n";
         button.setAttribute("aria-label", "Toggle monospaced font");
@@ -72,7 +72,7 @@
         textarea.classList.toggle("ghd-monospace-font");
         textarea.focus();
         active = textarea.classList.contains("ghd-monospace-font");
-        target.classList[active ? "add" : "remove"]("ghd-icon-active");
+        target.classList[active ? "add" : "remove"]("text-blue");
         return false;
       }
     });
