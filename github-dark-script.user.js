@@ -221,6 +221,14 @@
 
   function getStoredValues(init) {
     data = GM_getValue('data', defaults);
+    try {
+      data = JSON.parse(data);
+      if (!Object.keys(data).length || !({}).toString.call(data) === "[object Object]") {
+        throw new Error();
+      }
+    } catch(err) { // compat
+      data = GM_getValue('data', defaults);
+    }
     if (debug) {
       if (init) {
         console.log('GitHub-Dark Script initializing!');
@@ -231,7 +239,7 @@
 
   function setStoredValues(reset) {
     data.processedCss = $style.textContent;
-    GM_setValue('data', reset ? defaults : data);
+    GM_setValue('data', JSON.stringify(reset ? defaults : data));
     updatePanel();
     if (debug) {
       console.log((reset ? 'Resetting' : 'Saving') + ' current values', data);
@@ -288,7 +296,7 @@
           addSavedStyle();
         }
         // save new date/version
-        GM_setValue('data', data);
+        GM_setValue('data', JSON.stringify(data));
       }
     });
   }
@@ -461,7 +469,7 @@
       // clear saved date
       data.version = 0;
       data.themeCss = '';
-      GM_setValue('data', data);
+      GM_setValue('data', JSON.stringify(data));
       closePanel('forced');
     }
   }
