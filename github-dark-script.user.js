@@ -223,7 +223,7 @@
     data = GM_getValue('data', defaults);
     try {
       data = JSON.parse(data);
-      if (!Object.keys(data).length || !({}).toString.call(data) === "[object Object]") {
+      if (!Object.keys(data).length || ({}).toString.call(data) !== "[object Object]") {
         throw new Error();
       }
     } catch(err) { // compat
