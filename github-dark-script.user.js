@@ -1056,26 +1056,26 @@
   }
 
   function init() {
-    if ($('body')) {
-      $('body').appendChild($style);
-      getStoredValues(true);
+    if (!document.head) return;
 
-      $style.disabled = !data.enable;
-      data.lastTheme = data.theme;
-      data.lastCW = data.enableCodeWrap;
-      data.lastMS = data.enableMonospace;
-      data.lastDT = data.modeDiffToggle;
+    document.head.appendChild($style);
+    getStoredValues(true);
 
-      // only load package.json once a day, or after a forced update
-      if ((new Date().getTime() > data.date + delay) || data.version === 0) {
-        // get package.json from GitHub-Dark & compare versions
-        // load new script if a newer one is available
-        checkVersion();
-      } else {
-        addSavedStyle();
-      }
-      isInitialized = false;
+    $style.disabled = !data.enable;
+    data.lastTheme = data.theme;
+    data.lastCW = data.enableCodeWrap;
+    data.lastMS = data.enableMonospace;
+    data.lastDT = data.modeDiffToggle;
+
+    // only load package.json once a day, or after a forced update
+    if ((new Date().getTime() > data.date + delay) || data.version === 0) {
+      // get package.json from GitHub-Dark & compare versions
+      // load new script if a newer one is available
+      checkVersion();
+    } else {
+      addSavedStyle();
     }
+    isInitialized = false;
   }
 
   // add style at document-start
