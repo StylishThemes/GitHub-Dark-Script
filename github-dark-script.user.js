@@ -19,7 +19,7 @@
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
 /* global GM_addStyle, GM_getValue, GM_setValue, GM_info, GM_xmlhttpRequest, GM_registerMenuCommand, jscolor */
-/* jshint esnext:true */
+/* jshint esnext:true, unused:true */
 (() => {
   'use strict';
 
@@ -144,7 +144,7 @@
 
     fileIcon = `
       <svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">
-        <path d="M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z"/>
+        <path d="M0 1.5L1.5 0l3.5 3.7L8.5.0 10 1.5 5 6.5 0 1.5z"/>
       </svg>
     `,
 
@@ -153,7 +153,7 @@
       cl4ss: 'ghd-style'
     });
 
-  let timer, picker, // jscolor picker
+  let timer, mutationTimer, picker, // jscolor picker
     isInitialized = 'pending',
     // prevent mutationObserver from going nuts
     isUpdating = false,
@@ -649,7 +649,6 @@
         </div>
       `
     });
-
     updateToggles();
   }
 
@@ -1093,13 +1092,20 @@
       // add event binding on document ready
       bindEvents();
 
-      $$('#js-repo-pjax-container, #js-pjax-container, .js-contribution-activity').forEach(target => {
+      $$(
+        `#js-repo-pjax-container,
+        #js-pjax-container,
+        .js-contribution-activity,
+        .js-diff-progressive-container`
+      ).forEach(target => {
         new MutationObserver(mutations => {
           mutations.forEach(mutation => {
             // preform checks before adding code wrap to minimize function calls
-            if (!(isUpdating || $$('.ghd-wrap-toggle').length) &&
-              mutation.target === target) {
-              updateToggles();
+            if (!isUpdating && mutation.target === target) {
+              clearTimeout(mutationTimer);
+              mutationTimer = setTimeout(() => {
+                updateToggles();
+              }, 400);
             }
           });
         }).observe(target, {

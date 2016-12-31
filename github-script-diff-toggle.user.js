@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Diff File Toggle
-// @version      1.1.0
+// @version      1.1.1
 // @description  A userscript that adds a toggle to show or hide diff files
 // @license      https://creativecommons.org/licenses/by-sa/4.0/
 // @namespace    https://github.com/StylishThemes
@@ -15,78 +15,63 @@
 // @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
 // ==/UserScript==
 /* global GM_addStyle, GM_getValue, GM_setValue, GM_registerMenuCommand */
+/* jshint esnext:true, unused:true */
 (function() {
   "use strict";
   /*
-  This code is also part of the GitHub-Dark Script (https://github.com/StylishThemes/GitHub-Dark-Script)
-  Extracted out into a separate userscript in case users only want to add this functionality
+  This code is also part of the GitHub-Dark Script
+  (https://github.com/StylishThemes/GitHub-Dark-Script)
+  Extracted out into a separate userscript in case users only want to add this
+  functionality
   */
-  var busy = false,
+  let busy = false,
+    mutationTimer;
 
-  icon = [
-    "<svg class='octicon' xmlns='http://www.w3.org/2000/svg' width='10' height='6.5' viewBox='0 0 10 6.5'>",
-      "<path d='M0 1.497L1.504 0l3.49 3.76L8.505.016 10 1.52 4.988 6.51 0 1.496z'/>",
-    "</svg>",
-  ].join(""),
+  const icon =
+    `<svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">
+      <path d="M0 1.5L1.5 0l3.5 3.7L8.5.0 10 1.5 5 6.5 0 1.5z"/>
+    </svg>`;
 
   // Add file diffs toggle
-  addFileToggle = function() {
+  function addFileToggle() {
     busy = true;
-    var el, button,
-      files = document.querySelectorAll("#files .file-actions"),
-      indx = files.length;
-    while (indx--) {
-      el = files[indx];
-      if (!el.querySelector(".ghd-file-toggle")) {
-        button = document.querySelector("button");
-        button.type = "button";
-        button.className = "ghd-file-toggle btn btn-sm tooltipped tooltipped-n";
-        button.setAttribute("aria-label", "Click to Expand or Collapse file");
-        button.setAttribute("tabindex", "-1");
-        button.innerHTML = icon;
-        el.appendChild(button);
+    const files = $$("#files .file-actions");
+    let button = document.createElement("button");
+    button.type = "button";
+    button.className = "ghd-file-toggle btn btn-sm tooltipped tooltipped-n";
+    button.setAttribute("aria-label", "Click to Expand or Collapse file");
+    button.setAttribute("tabindex", "-1");
+    button.innerHTML = icon;
+    files.forEach(el => {
+      if (!$(".ghd-file-toggle", el)) {
+        el.appendChild(button.cloneNode(true));
       }
-    }
+    });
     // start with all but first entry collapsed
     if (files.length) {
       if (/^t/.test(GM_getValue("accordion"))) {
         toggleFile({
-          target: document.querySelector(".ghd-file-toggle")
+          target: $(".ghd-file-toggle")
         }, true);
       }
     }
     busy = false;
-  },
+  }
 
-  matches = function(el, selector) {
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element/matches
-    var matches = document.querySelectorAll(selector),
-      i = matches.length;
-    while (--i >= 0 && matches.item(i) !== el) {}
-    return i > -1;
-  },
-
-  closest = function(el, selector) {
-    while (el && !matches(el, selector)) {
-      el = el.parentNode;
-    }
-    return matches(el, selector) ? el : null;
-  },
-
-  toggleSibs = function(target, state) {
+  function toggleSibs(target, state) {
     var el,
       isCollapsed = state || target.classList.contains("ghd-file-collapsed"),
-      toggles = document.querySelectorAll(".file"),
+      toggles = $$(".file"),
       indx = toggles.length;
     while (indx--) {
       el = toggles[indx];
       if (el !== target) {
-        el.classList[isCollapsed ? "add" : "remove"]("ghd-file-collapsed");
+        el.classList.toggle("ghd-file-collapsed", isCollapsed);
       }
     }
-  },
+  }
 
-  toggleFile = function(event, init) {
+  function toggleFile(event, init) {
     busy = true;
     var accordion = GM_getValue("accordion"),
       el = closest(event.target, ".file");
@@ -104,39 +89,60 @@
     }
     document.activeElement.blur();
     busy = false;
-  },
+  }
 
-  addBindings = function() {
-    document.querySelector("body").addEventListener("click", function(event) {
+  function addBindings() {
+    $("body").addEventListener("click", function(event) {
       var target = event.target;
       if (target && target.classList.contains("ghd-file-toggle")) {
         toggleFile(event);
         return false;
       }
     });
-  },
+  }
 
-  targets = document.querySelectorAll([
-    "#js-repo-pjax-container",
-    "#js-pjax-container",
-    ".js-preview-body"
-  ].join(","));
+  function $(str, el) {
+    return (el || document).querySelector(str);
+  }
+
+  function $$(str, el) {
+    return Array.from((el || document).querySelectorAll(str));
+  }
+
+  function closest(el, selector) {
+    while (el && el.nodeName !== "BODY" && !el.matches(selector)) {
+      el = el.parentNode;
+    }
+    return el && el.matches(selector) ? el : [];
+  }
 
   // Don't initialize if GitHub Dark Script is active
-  if (!document.querySelector("#ghd-menu")) {
-    GM_addStyle([
-      ".ghd-file-collapsed > :not(.file-header) { display: none !important; }",
-      // file collapsed icon
-      ".ghd-file-collapsed .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }",
-      ".ghd-file-toggle svg.octicon { pointer-events: none; vertical-align: middle; }"
-    ].join(""));
+  if (!$("#ghd-menu")) {
+    GM_addStyle(`
+      .ghd-file-collapsed > :not(.file-header) { display: none !important; }
+      .ghd-file-collapsed .ghd-file-toggle svg {
+        -webkit-transform:rotate(90deg); transform:rotate(90deg);
+      }
+      .ghd-file-toggle svg.octicon {
+        pointer-events: none;
+        vertical-align: middle;
+      }
+    `);
 
-    Array.prototype.forEach.call(targets, function(target) {
-      new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
+    $$(
+      `#js-repo-pjax-container,
+      #js-pjax-container,
+      .js-preview-body,
+      .js-diff-progressive-container`
+    ).forEach(target => {
+      new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
           // preform checks before adding code wrap to minimize function calls
           if (!busy && mutation.target === target) {
-            addFileToggle();
+            clearTimeout(mutationTimer);
+            mutationTimer = setTimeout(() => {
+              addFileToggle();
+            }, 400);
           }
         });
       }).observe(target, {
@@ -150,8 +156,8 @@
   }
 
   // Add GM options
-  GM_registerMenuCommand("GitHub Diff File Toggle", function() {
-    var result = "" + !GM_getValue("accordion"),
+  GM_registerMenuCommand("GitHub Diff File Toggle", () => {
+    var result = "" + GM_getValue("accordion"),
       val = prompt("Accordion Mode? (true/false):", result);
     if (val) {
       result = /^t/.test(val);
