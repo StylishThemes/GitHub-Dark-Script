@@ -44,7 +44,9 @@
       font   : 'Menlo',
       image  : 'url("data:image/png;base64,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")',
       tab    : 4,
-      theme  : 'Twilight',
+      theme  : 'Twilight', // GitHub
+      themeCm: 'Twilight', // CodeMirror
+      themeJp: 'Twilight', // Jupyter
       type   : 'tiled',
       wrap   : false,
 
@@ -58,47 +60,96 @@
       date         : 0,
       version      : 0,
       rawCss       : '',
-      themeCss     : '',
-      processedCss : '',
-      last         : {}
+      cssgithub    : '',
+      csscodemirror: '',
+      cssjupyter   : '',
+      processedCss : ''
     },
 
     // extract style & theme name
     regex = /\/\*! [^\*]+ \*\//,
-    // "themes/" prefix not included here
+    themesXref = {
+      github: {
+        placeholder: 'syntax-theme',
+        folder: 'themes/github/'
+      },
+      codemirror: {
+        placeholder: 'syntax-codemirror',
+        folder: 'themes/codemirror/'
+      },
+      jupyter: {
+        placeholder: 'syntax-jupyter',
+        folder: 'themes/jupyter/'
+      }
+    },
+    // available theme names
     themes = {
-      'Ambiance' : 'ambiance.min.css',
-      'Chaos' : 'chaos.min.css',
-      'Clouds Midnight' : 'clouds-midnight.min.css',
-      'Cobalt' : 'cobalt.min.css',
-      'GitHub Dark' : 'github-dark.min.css',
-      'Idle Fingers' : 'idle-fingers.min.css',
-      'Kr Theme' : 'kr-theme.min.css',
-      'Merbivore' : 'merbivore.min.css',
-      'Merbivore Soft' : 'merbivore-soft.min.css',
-      'Mono Industrial' : 'mono-industrial.min.css',
-      'Mono Industrial Clear' : 'mono-industrial-clear.min.css',
-      'Monokai' : 'monokai.min.css',
-      'Monokai Spacegray Eighties' : 'monokai-spacegray-eighties.min.css',
-      'Obsidian' : 'obsidian.min.css',
-      'Pastel on Dark' : 'pastel-on-dark.min.css',
-      'Solarized Dark' : 'solarized-dark.min.css',
-      'Terminal' : 'terminal.min.css',
-      'Tomorrow Night' : 'tomorrow-night.min.css',
-      'Tomorrow Night Blue' : 'tomorrow-night-blue.min.css',
-      'Tomorrow Night Bright' : 'tomorrow-night-bright.min.css',
-      'Tomorrow Night Eigthies' : 'tomorrow-night-eighties.min.css',
-      'Twilight' : 'twilight.min.css',
-      'Vibrant Ink' : 'vibrant-ink.min.css'
+      github: {
+        'Ambiance': 'ambiance',
+        'Chaos': 'chaos',
+        'Clouds Midnight': 'clouds-midnight',
+        'Cobalt': 'cobalt',
+        'GitHub Dark': 'github-dark',
+        'Idle Fingers': 'idle-fingers',
+        'Kr Theme': 'kr-theme',
+        'Merbivore': 'merbivore',
+        'Merbivore Soft': 'merbivore-soft',
+        'Mono Industrial': 'mono-industrial',
+        'Mono Industrial Clear': 'mono-industrial-clear',
+        'Monokai': 'monokai',
+        'Monokai Spacegray Eighties': 'monokai-spacegray-eighties',
+        'Obsidian': 'obsidian',
+        'Pastel on Dark': 'pastel-on-dark',
+        'Solarized Dark': 'solarized-dark',
+        'Terminal': 'terminal',
+        'Tomorrow Night': 'tomorrow-night',
+        'Tomorrow Night Blue': 'tomorrow-night-blue',
+        'Tomorrow Night Bright': 'tomorrow-night-bright',
+        'Tomorrow Night Eigthies': 'tomorrow-night-eighties',
+        'Twilight': 'twilight',
+        'Vibrant Ink': 'vibrant-ink'
+      },
+      // CodeMirror themes
+      codemirror: {
+        'Ambiance': 'ambiance',
+        'Base16 Ocean Dark': 'base16-ocean',
+        'Cobalt': 'cobalt',
+        'Dracula': 'dracula',
+        'Monokai': 'monokai',
+        'Monokai Spacegray Eighties': 'monokai-spacegray-eighties',
+        'Pastel on Dark': 'pastel-on-dark',
+        'Solarized Dark': 'solarized-dark',
+        'Tomorrow Night Bright': 'tomorrow-night-bright',
+        'Tomorrow Night Eigthies': 'tomorrow-night-eighties',
+        'Twilight': 'twilight',
+        'Vibrant Ink': 'vibrant-ink'
+      },
+      // Jupyter (pygments) themes
+      jupyter: {
+        'Base16 Ocean Dark': 'base16-ocean',
+        'Dracula': 'dracula',
+        'GitHub Dark': 'github-dark',
+        'Idle Fingers': 'idle-fingers',
+        'Monokai': 'monokai',
+        'Monokai Spacegray Eighties': 'monokai-spacegray-eighties',
+        'Obsidian': 'obsidian',
+        'Pastel on Dark': 'pastel-on-dark',
+        'Solarized Dark': 'solarized-dark',
+        'Tomorrow Night': 'tomorrow-night',
+        'Tomorrow Night Blue': 'tomorrow-night-blue',
+        'Tomorrow Night Bright': 'tomorrow-night-bright',
+        'Tomorrow Night Eigthies': 'tomorrow-night-eighties',
+        'Twilight': 'twilight'
+      }
     },
 
     type = {
-      tiled : `
+      tiled: `
         background-repeat: repeat !important;
         background-size: auto !important;
         background-position: left top !important;
       `,
-      fit : `
+      fit: `
         background-repeat: no-repeat !important;
         background-size: cover !important;
         background-position: center top !important;
@@ -106,13 +157,13 @@
     },
 
     wrapCss = {
-      wrapped : `
+      wrapped: `
         white-space: pre-wrap !important;
         word-break: break-all !important;
         overflow-wrap: break-word !important;
         display: block !important;
       `,
-      unwrap  : `
+      unwrap: `
         white-space: pre !important;
         word-break: normal !important;
         display: block !important;
@@ -177,6 +228,8 @@
     $('.ghd-image', panel).value = data.image || defaults.image;
     $('.ghd-tab', panel).value = data.tab || defaults.tab;
     $('.ghd-theme', panel).value = data.theme || defaults.theme;
+    $('.ghd-themecm', panel).value = data.themeCm || defaults.themeCm;
+    $('.ghd-themejp', panel).value = data.themeJp || defaults.themeJp;
     $('.ghd-type', panel).value = data.type || defaults.type;
 
     $('.ghd-enable', panel).checked = isBool('enable');
@@ -316,20 +369,19 @@
   }
 
   // load syntax highlighting theme
-  function fetchAndApplyTheme() {
+  function fetchAndApplyTheme(name, group) {
     if (!data.enable) {
       if (debug) {
         console.log('Disabled: stop theme processing');
       }
       return;
     }
-    if (data.lastTheme === data.theme && data.themeCss !== '') {
-      return applyTheme();
+    if (data['last' + group] === name && data['css' + group] !== '') {
+      return applyTheme(name, group);
     }
-    let name = data.theme || 'Twilight',
-      themeUrl = root + 'themes/' + themes[name];
+    let themeUrl = `${root}${themesXref[group].folder}${themes[group][name]}.min.css`;
     if (debug) {
-      console.log(`Fetching ${name} theme`, themeUrl);
+      console.log(`Fetching ${group} ${name} theme`, themeUrl);
     }
     GM_xmlhttpRequest({
       method : 'GET',
@@ -337,22 +389,32 @@
       onload : response => {
         let theme = response.responseText;
         if (response.status === 200 && theme) {
-          data.themeCss = theme;
-          data.lastTheme = name;
-          applyTheme();
+          data['css' + group] = theme;
+          data['last' + group] = name;
+          applyTheme(name, group);
         } else {
-          throw Error(`Failed to load theme file: "${theme}"`);
+console.log(`no load ${themeUrl}`);
+data['css' + group] = 'blerg';
+data['last' + group] = name;
+console.log(data);
+applyTheme(name, group);
+//          throw Error(`Failed to load ${group} theme file: "${name}"`);
         }
       }
     });
   }
 
-  function applyTheme() {
+  function applyTheme(name, group) {
+    let theme, css;
     if (debug) {
-      console.log('Adding syntax theme "' + (data.themeCss || '').match(regex) + '" to css');
+      theme = (data['css' + group] || '').match(regex);
+      console.log(`Adding syntax ${group} theme "${theme}" to css`);
     }
-    let css = data.processedCss || '';
-    css = css.replace('/*[[syntax-theme]]*/', data.themeCss || '');
+    css = data.processedCss || '';
+    css = css.replace(
+      `/*[[${themesXref[group].placeholder}]]*/`,
+      data['css' + group] || ''
+    );
     applyStyle(css);
     setStoredValues();
     isUpdating = false;
@@ -401,7 +463,9 @@
         .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, '');
     }
     data.processedCss = processed;
-    fetchAndApplyTheme();
+    fetchAndApplyTheme(data.theme, 'github');
+    fetchAndApplyTheme(data.themeCm, 'codemirror');
+    fetchAndApplyTheme(data.themeJp, 'jupyter');
   }
 
   function applyStyle(css) {
@@ -433,12 +497,14 @@
     // get hex value directly
     data.color = picker.toHEXString();
     data.enable = $('.ghd-enable', panel).checked;
-    data.font   = $('.ghd-font', panel).value;
-    data.image  = $('.ghd-image', panel).value;
-    data.tab    = $('.ghd-tab', panel).value;
-    data.theme  = $('.ghd-theme', panel).value;
-    data.type   = $('.ghd-type', panel).value;
-    data.wrap   = $('.ghd-wrap', panel).checked;
+    data.font = $('.ghd-font', panel).value;
+    data.image = $('.ghd-image', panel).value;
+    data.tab = $('.ghd-tab', panel).value;
+    data.theme = $('.ghd-theme', panel).value;
+    data.themeCm = $('.ghd-themecm', panel).value;
+    data.themeJp = $('.ghd-themejp', panel).value;
+    data.type = $('.ghd-type', panel).value;
+    data.wrap = $('.ghd-wrap', panel).checked;
 
     data.enableCodeWrap  = $('.ghd-codewrap-checkbox', panel).checked;
     data.enableMonospace = $('.ghd-monospace-checkbox', panel).checked;
@@ -468,7 +534,9 @@
     } else {
       // clear saved date
       data.version = 0;
-      data.themeCss = '';
+      data.cssgithub = '';
+      data.csscodemirror = '';
+      data.cssjupyter = '';
       GM_setValue('data', JSON.stringify(data));
       closePanel('forced');
     }
@@ -484,6 +552,14 @@
       ver.push(parseInt(parts[indx], 10));
     }
     return `Script v${version}\nCSS ${(ver.length ? 'v' + ver.join('.') : 'unknown')}`;
+  }
+
+  function buildOptions(group) {
+    let options = '';
+    Object.keys(themes[group]).forEach(theme => {
+      options += `<option value="${theme}">${theme}</option>`;
+    });
+    return options;
   }
 
   function buildSettings() {
@@ -538,15 +614,11 @@
       .ghd-file-collapsed .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }
     `);
 
-    let indx, theme, icon,
-      opts = '',
-      ver = getVersionTooltip(),
-      names = Object.keys(themes),
-      len = names.length;
-    for (indx = 0; indx < len; indx++) {
-      theme = names[indx];
-      opts += `<option value="${theme}">${theme}</option>`;
-    }
+    let icon,
+      opts = buildOptions('github'),
+      optscm = buildOptions('codemirror'),
+      optsjp = buildOptions('jupyter'),
+      ver = getVersionTooltip();
 
     // circle-question-mark icon
     icon = `
@@ -557,10 +629,10 @@
 
     // Settings panel markup
     make({
-      el : 'div',
+      el: 'div',
       appendTo: 'body',
-      attr : { id: 'ghd-settings' },
-      html : `
+      attr: { id: 'ghd-settings' },
+      html: `
         <div id="ghd-settings-inner" class="boxed-group">
           <h3>GitHub-Dark Settings
             <a href="https://github.com/StylishThemes/GitHub-Dark-Script/wiki" class="tooltipped tooltipped-e" aria-label="See documentation">${icon}</a>
@@ -598,7 +670,9 @@
                   </select>
                 </p>
                 <h4>Code</h4>
-                <p><label>Theme:</label> <select class="ghd-theme ghd-right form-select">${opts}</select></p>
+                <p><label>GitHub Theme:</label> <select class="ghd-theme ghd-right form-select">${opts}</select></p>
+                <p><label>CodeMirror Theme:</label> <select class="ghd-themecm ghd-right form-select">${optscm}</select></p>
+                <p><label>Jupyter Theme:</label> <select class="ghd-themejp ghd-right form-select">${optsjp}</select></p>
                 <p>
                   <label>Font Name:</label> <input class="ghd-font ghd-right" type="text">
                   <a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-e" aria-label="Add a system installed (monospaced) font name;&#10;this script will not load external fonts!">${icon}</a>
@@ -659,7 +733,7 @@
     let icon = make({
       el    : 'div',
       cl4ss : 'ghd-wrap-toggle tooltipped tooltipped-w',
-      attr  : { 'aria-label' : 'Toggle code wrap' },
+      attr  : { 'aria-label': 'Toggle code wrap' },
       html  : wrapIcon
     });
     $$('.blob-wrapper').forEach(el => {
@@ -678,9 +752,9 @@
       el    : 'button',
       cl4ss : 'ghd-monospace toolbar-item tooltipped tooltipped-n',
       attr  : {
-        'type' : 'button',
-        'aria-label' : 'Toggle monospaced font',
-        'tabindex' : '-1'
+        'type': 'button',
+        'aria-label': 'Toggle monospaced font',
+        'tabindex': '-1'
       },
       html  : monospaceIcon
     });
@@ -701,9 +775,9 @@
         el    : 'button',
         cl4ss : 'ghd-file-toggle btn btn-sm tooltipped tooltipped-n',
         attr  : {
-          'type' : 'button',
-          'aria-label' : 'Click to Expand or Collapse file',
-          'tabindex' : '-1'
+          'type': 'button',
+          'aria-label': 'Click to Expand or Collapse file',
+          'tabindex': '-1'
         },
         html  : fileIcon
       });
@@ -746,9 +820,9 @@
 
   function makeRow(vals, str) {
     return make({
-      el : 'tr',
+      el    : 'tr',
       cl4ss : 'ghd-shortcut',
-      html : `<td class="keys"><kbd>${vals[0]}</kbd> <kbd>${vals[1]}</kbd></td><td>${str}</td>`
+      html  : `<td class="keys"><kbd>${vals[0]}</kbd> <kbd>${vals[1]}</kbd></td><td>${str}</td>`
     });
   }
 
@@ -831,12 +905,12 @@
   function toggleFile(event, init) {
     isUpdating = true;
     let el = closest(event.target, '.file');
-    if (data.modeDiffToggle === '2') {
+    if (el && data.modeDiffToggle === '2') {
       if (!init) {
         el.classList.toggle('ghd-file-collapsed');
       }
       toggleSibs(el, true);
-    } else {
+    } else if (el) {
       el.classList.toggle('ghd-file-collapsed');
       // shift+click toggle all files!
       if (event.shiftKey) {
@@ -857,10 +931,10 @@
 
     // Create our menu entry
     menu = make({
-      el : 'a',
+      el    : 'a',
       cl4ss : 'dropdown-item',
-      html : 'GitHub Dark Settings',
-      attr : { id : 'ghd-menu' }
+      html  : 'GitHub Dark Settings',
+      attr  : { id: 'ghd-menu' }
     });
 
     el = $$('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]');
@@ -1061,7 +1135,9 @@
     getStoredValues(true);
 
     $style.disabled = !data.enable;
-    data.lastTheme = data.theme;
+    data.lastgithub = data.themeGH;
+    data.lastcodemirror = data.themeCM;
+    data.lastjupyter = data.themeJP;
     data.lastCW = data.enableCodeWrap;
     data.lastMS = data.enableMonospace;
     data.lastDT = data.modeDiffToggle;
@@ -1138,10 +1214,13 @@
     return null;
   }
   function closest(el, selector) {
-    while (el && el.nodeName !== 'BODY' && !el.matches(selector)) {
+    while (el && el.nodeType === 1) {
+      if (el.matches(selector)) {
+        return el;
+      }
       el = el.parentNode;
     }
-    return el && el.matches(selector) ? el : [];
+    return null;
   }
   function make(obj) {
     let key,
