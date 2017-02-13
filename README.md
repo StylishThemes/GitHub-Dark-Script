@@ -35,7 +35,7 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # Screenshot
 
-![github-dark script settings panel](https://cloud.githubusercontent.com/assets/136959/16171389/5666a2a0-3533-11e6-976d-09c038fee4c0.png)
+![github-dark script settings panel](https://cloud.githubusercontent.com/assets/136959/22908590/022f56d8-f215-11e6-954c-decc9ecbd259.png)
 
 # [Using the Script](https://github.com/StylishThemes/GitHub-Dark-Script/wiki)
 
