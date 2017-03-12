@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         GitHub Make Tooltips
-// @version      1.0.0
+// @version      1.0.1
 // @description  A userscript converts title tooltips into Github Tooltips
 // @license      https://creativecommons.org/licenses/by-sa/4.0/
 // @namespace    https://github.com/StylishThemes
@@ -20,12 +20,12 @@
   function init() {
 
     let indx = 0,
-      els = document.querySelectorAll("[title]"),
+      els = document.body.querySelectorAll("[title]"),
       len = els.length;
 
     // loop with delay to allow user interaction
     function loop() {
-      var el, txt,
+      var el, txt, direction,
         // max number of DOM modifications per loop
         max = 0;
       while ( max < 20 && indx < len ) {
@@ -35,7 +35,11 @@
         el = els[indx];
         if (el.nodeName !== "LINK" && !el.classList.contains("tooltipped")) {
           txt = el.title;
-          el.classList.add(...["tooltipped", "tooltipped-n"]);
+          // Change direction of star & fork tooltips - fixes #30
+          direction = el.classList.contains("btn-with-count") ?
+            "tooltipped-s" :
+            "tooltipped-n";
+          el.classList.add(...["tooltipped", direction]);
           if (txt.length > 45) {
             el.classList.add("tooltipped-multiline");
           }
