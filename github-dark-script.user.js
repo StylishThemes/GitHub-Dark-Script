@@ -393,12 +393,9 @@
           data['last' + group] = name;
           applyTheme(name, group);
         } else {
-console.log(`no load ${themeUrl}`);
-data['css' + group] = 'blerg';
-data['last' + group] = name;
-console.log(data);
-applyTheme(name, group);
-//          throw Error(`Failed to load ${group} theme file: "${name}"`);
+          theme = data['css' + group];
+          console.error(`Failed to load ${group} theme file: "${name}"`);
+          console.log(`Falling back to previous ${group} theme of ${theme.substring(0, theme.indexOf("*/") + 2)}`);
         }
       }
     });
