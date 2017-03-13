@@ -20,7 +20,7 @@
   function init() {
 
     let indx = 0,
-      els = document.body.querySelectorAll("[title]"),
+      els = document.querySelector("body").querySelectorAll("[title]"),
       len = els.length;
 
     // loop with delay to allow user interaction
@@ -34,7 +34,7 @@
         }
         el = els[indx];
         if (el.nodeName !== "LINK" && !el.classList.contains("tooltipped")) {
-          txt = el.title;
+          txt = el.title || "";
           // Change direction of star & fork tooltips - fixes #30
           direction = el.classList.contains("btn-with-count") ?
             "tooltipped-s" :
