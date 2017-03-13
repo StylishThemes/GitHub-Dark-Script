@@ -54,12 +54,12 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 * **These toggles are included with the GitHub Dark script**.
 * Learn how to use the toggle buttons from the [Toggles wiki page](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Toggles).
 * There is no need to install these toggle scripts separately unless you *do not* want to use the GitHub Dark Script; to install, click the link below:
-  * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18789-github-toggle-code-wrap)).
-  * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18787-github-monospace-font-toggle)).
-  * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18788-github-diff-file-toggle)).
+  * [Code wrap toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18789-github-toggle-code-wrap) or [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Toggle_Code_Wrap)).
+  * [Comment monospace font toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18787-github-monospace-font-toggle) or [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Monospace_Font_Toggle)).
+  * [Diff file collapse or expand toggle](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/18788-github-diff-file-toggle) or [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Diff_File_Toggle)).
 
 ### Additional Scripts
 
-* [GitHub-Make-Tooltips](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/22194)) - Convert browser default `title` attributes into GitHub styled tooltips.
-* [GitHub-Custom-Emojis](https://github.com/StylishThemes/GitHub-Custom-Emojis) ([GreasyFork](https://greasyfork.org/en/scripts/17618)) - Add custom emojis anywhere on GitHub.
-* [GitHub-userscripts](https://github.com/Mottie/GitHub-userscripts) ([GreasyFork](https://greasyfork.org/en/users/24847)) - Userscripts to add functionality to GitHub.
+* [GitHub-Make-Tooltips](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js) ([GreasyFork](https://greasyfork.org/en/scripts/22194) or [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Make_Tooltips)) - Convert browser default `title` attributes into GitHub styled tooltips.
+* [GitHub-Custom-Emojis](https://github.com/StylishThemes/GitHub-Custom-Emojis) ([GreasyFork](https://greasyfork.org/en/scripts/17618) or [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Custom_Emojis)) - Add custom emojis anywhere on GitHub.
+* [GitHub-userscripts](https://github.com/Mottie/GitHub-userscripts) ([GreasyFork](https://greasyfork.org/en/users/24847) or [OpenUserJS](https://openuserjs.org/users/Mottie/scripts)) - Userscripts to add functionality to GitHub.
