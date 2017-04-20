@@ -607,8 +607,7 @@
       /* monospace font toggle */
       .ghd-monospace-font { font-family:"${data.font}", Menlo, Inconsolata, "Droid Mono", monospace !important; font-size:1em !important; }
       /* file collapsed icon */
-      .ghd-file-collapsed > :not(.file-header) { display:none !important; }
-      .ghd-file-collapsed .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }
+      .Details--on .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }
     `);
 
     let icon,
@@ -780,6 +779,8 @@
       });
     $$('#files .file-actions').forEach(el => {
       if (!$('.ghd-file-toggle', el)) {
+        // hide GitHub toggle view button
+        el.querySelector(".js-details-target").style.display = "none";
         el.appendChild(button.cloneNode(true));
       }
     });
@@ -799,7 +800,7 @@
       buildCodeWrap();
     } else {
       removeAll('.ghd-wrap-toggle');
-      toggleClass($$('.ghd-file-collapsed'), 'ghd-file-collapsed', false);
+      toggleClass($$('.Details--on'), 'Details--on', false);
     }
     if (data.enableMonospace) {
       addMonospaceToggle();
@@ -811,7 +812,7 @@
       addFileToggle();
     } else {
       removeAll('.ghd-file-toggle');
-      toggleClass($$('.ghd-file-collapsed'), 'ghd-file-collapsed', false);
+      toggleClass($$('.Details--on'), 'Details--on', false);
     }
   }
 
@@ -875,7 +876,7 @@
   }
 
   function toggleMonospace(el) {
-    let tmp = closest(el, '.previewable-comment-form'),
+    let tmp = closest('.previewable-comment-form', el),
       // single comment
       textarea = $('.comment-form-textarea', tmp);
     if (textarea) {
@@ -887,34 +888,40 @@
   }
 
   function toggleSibs(target, state) {
+    // oddly, when a "Details--on" class is applied, the content is hidden
+    const isCollapsed = state || target.classList.contains('Details--on'),
+      toggles = $$('.file');
     let el,
-      isCollapsed = state || target.classList.contains('ghd-file-collapsed'),
-      toggles = document.querySelectorAll('.file'),
       indx = toggles.length;
     while (indx--) {
       el = toggles[indx];
       if (el !== target) {
-        el.classList[isCollapsed ? 'add' : 'remove']('ghd-file-collapsed');
+        el.classList.toggle('Details--on', isCollapsed);
       }
     }
   }
 
   function toggleFile(event, init) {
     isUpdating = true;
-    let el = closest(event.target, '.file');
+    let el = closest('.file', event.target);
     if (el && data.modeDiffToggle === '2') {
       if (!init) {
-        el.classList.toggle('ghd-file-collapsed');
+        el.classList.toggle('Details--on');
       }
       toggleSibs(el, true);
     } else if (el) {
-      el.classList.toggle('ghd-file-collapsed');
+      el.classList.toggle('Details--on');
       // shift+click toggle all files!
       if (event.shiftKey) {
         toggleSibs(el);
       }
     }
     isUpdating = false;
+    document.activeElement.blur();
+    // move current open panel to the top
+    if (!el.classList.contains('Details--on')) {
+      location.hash = el.id;
+    }
   }
 
   function bindEvents() {
@@ -1013,7 +1020,7 @@
       updateStyle();
     });
 
-    on($$('input[type="text"]', panel), 'focus', function() {
+    on($$('input[type="text"]', panel), 'focus', () => {
       // select all text when focused
       this.select();
     });
@@ -1029,7 +1036,7 @@
       forceUpdate();
     });
 
-    on($('.ghd-textarea-toggle', panel), 'click', function(event) {
+    on($('.ghd-textarea-toggle', panel), 'click', event => {
       event.preventDefault();
       let hidden, el;
       this.classList.remove('selected');
@@ -1126,7 +1133,9 @@
   }
 
   function init() {
-    if (!document.head) return;
+    if (!document.head) {
+      return;
+    }
 
     document.head.appendChild($style);
     getStoredValues(true);
@@ -1210,7 +1219,7 @@
     }
     return null;
   }
-  function closest(el, selector) {
+  function closest(selector, el) {
     while (el && el.nodeType === 1) {
       if (el.matches(selector)) {
         return el;
