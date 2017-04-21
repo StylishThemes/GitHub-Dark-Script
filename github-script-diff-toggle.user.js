@@ -16,7 +16,6 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
 // ==/UserScript==
-/* global GM_addStyle, GM_getValue, GM_setValue, GM_registerMenuCommand */
 /* jshint esnext:true, unused:true */
 (() => {
   "use strict";

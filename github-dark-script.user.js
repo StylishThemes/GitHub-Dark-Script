@@ -21,7 +21,7 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global GM_addStyle, GM_getValue, GM_setValue, GM_info, GM_xmlhttpRequest, GM_registerMenuCommand, jscolor */
+/* global jscolor */
 /* jshint esnext:true, unused:true */
 (() => {
   "use strict";
@@ -332,9 +332,9 @@
       console.log("Fetching package.json");
     }
     GM_xmlhttpRequest({
-      method : "GET",
-      url : root + "package.json",
-      onload : response => {
+      method: "GET",
+      url: root + "package.json",
+      onload: response => {
         let pkg = JSON.parse(response.responseText);
 
         // save last loaded date, so package.json is only loaded once a day
@@ -362,9 +362,9 @@
       console.log(`Fetching ${root}github-dark.css`);
     }
     GM_xmlhttpRequest({
-      method : "GET",
-      url : root + "github-dark.css",
-      onload : response => {
+      method: "GET",
+      url: root + "github-dark.css",
+      onload: response => {
         data.rawCss = response.responseText;
         processStyle();
       }
@@ -387,9 +387,9 @@
       console.log(`Fetching ${group} ${name} theme`, themeUrl);
     }
     GM_xmlhttpRequest({
-      method : "GET",
-      url : themeUrl,
-      onload : response => {
+      method: "GET",
+      url: themeUrl,
+      onload: response => {
         let theme = response.responseText;
         if (response.status === 200 && theme) {
           data["css" + group] = theme;
@@ -730,10 +730,10 @@
     // mutation events happen quick, so we still add an update flag
     isUpdating = true;
     let icon = make({
-      el    : "div",
-      cl4ss : "ghd-wrap-toggle tooltipped tooltipped-w",
-      attr  : { "aria-label": "Toggle code wrap" },
-      html  : wrapIcon
+      el: "div",
+      cl4ss: "ghd-wrap-toggle tooltipped tooltipped-w",
+      attr: { "aria-label": "Toggle code wrap" },
+      html: wrapIcon
     });
     $$(".blob-wrapper").forEach(el => {
       el.insertBefore(icon.cloneNode(true), el.childNodes[0]);
@@ -748,14 +748,14 @@
   function addMonospaceToggle() {
     isUpdating = true;
     let button = make({
-      el    : "button",
-      cl4ss : "ghd-monospace toolbar-item tooltipped tooltipped-n",
-      attr  : {
+      el: "button",
+      cl4ss: "ghd-monospace toolbar-item tooltipped tooltipped-n",
+      attr: {
         "type": "button",
         "aria-label": "Toggle monospaced font",
         "tabindex": "-1"
       },
-      html  : monospaceIcon
+      html: monospaceIcon
     });
     $$(".toolbar-commenting").forEach(el => {
       if (!$(".ghd-monospace", el)) {
@@ -771,14 +771,14 @@
     isUpdating = true;
     let firstButton,
       button = make({
-        el    : "button",
-        cl4ss : "ghd-file-toggle btn btn-sm tooltipped tooltipped-n",
-        attr  : {
+        el: "button",
+        cl4ss: "ghd-file-toggle btn btn-sm tooltipped tooltipped-n",
+        attr: {
           "type": "button",
           "aria-label": "Click to Expand or Collapse file",
           "tabindex": "-1"
         },
-        html  : fileIcon
+        html: fileIcon
       });
     $$("#files .file-actions").forEach(el => {
       if (!$(".ghd-file-toggle", el)) {
@@ -821,9 +821,9 @@
 
   function makeRow(vals, str) {
     return make({
-      el    : "tr",
-      cl4ss : "ghd-shortcut",
-      html  : `<td class="keys"><kbd>${vals[0]}</kbd> <kbd>${vals[1]}</kbd></td><td>${str}</td>`
+      el: "tr",
+      cl4ss: "ghd-shortcut",
+      html: `<td class="keys"><kbd>${vals[0]}</kbd> <kbd>${vals[1]}</kbd></td><td>${str}</td>`
     });
   }
 
@@ -938,10 +938,10 @@
 
     // Create our menu entry
     menu = make({
-      el    : "a",
-      cl4ss : "dropdown-item",
-      html  : "GitHub Dark Settings",
-      attr  : { id: "ghd-menu" }
+      el: "a",
+      cl4ss: "dropdown-item",
+      html: "GitHub Dark Settings",
+      attr: { id: "ghd-menu" }
     });
 
     el = $$(`

@@ -16,7 +16,6 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js
 // ==/UserScript==
-/* global GM_registerMenuCommand, GM_getValue, GM_setValue, GM_addStyle */
 /* jshint esnext:true, unused:true */
 (() => {
   "use strict";
