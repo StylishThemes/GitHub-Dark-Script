@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.2.0
+// @version     2.2.1
 // @description GitHub Dark in userscript form, with a settings panel
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
@@ -736,10 +736,14 @@
       html: wrapIcon
     });
     $$(".blob-wrapper").forEach(el => {
-      el.insertBefore(icon.cloneNode(true), el.childNodes[0]);
+      if (el && !$(".ghd-wrap-toggle", el)) {
+        el.insertBefore(icon.cloneNode(true), el.childNodes[0]);
+      }
     });
     $$(".markdown-body pre").forEach(el => {
-      el.parentNode.insertBefore(icon.cloneNode(true), el);
+      if (el && !$(".ghd-wrap-toggle", el)) {
+        el.parentNode.insertBefore(icon.cloneNode(true), el);
+      }
     });
     isUpdating = false;
   }
@@ -758,7 +762,7 @@
       html: monospaceIcon
     });
     $$(".toolbar-commenting").forEach(el => {
-      if (!$(".ghd-monospace", el)) {
+      if (el && !$(".ghd-monospace", el)) {
         // prepend
         el.insertBefore(button.cloneNode(true), el.childNodes[0]);
       }
@@ -781,7 +785,7 @@
         html: fileIcon
       });
     $$("#files .file-actions").forEach(el => {
-      if (!$(".ghd-file-toggle", el)) {
+      if (el && !$(".ghd-file-toggle", el)) {
         // hide GitHub toggle view button
         el.querySelector(".js-details-target").style.display = "none";
         el.appendChild(button.cloneNode(true));
@@ -799,24 +803,30 @@
 
   // Add toggle buttons after page updates
   function updateToggles() {
-    if (data.enableCodeWrap) {
-      buildCodeWrap();
-    } else {
-      removeAll(".ghd-wrap-toggle");
-      toggleClass($$(".Details--on"), "Details--on", false);
+    if (isUpdating) {
+      return;
     }
-    if (data.enableMonospace) {
-      addMonospaceToggle();
-    } else {
-      removeAll(".ghd-monospace");
-      toggleClass($$(".ghd-monospace-font"), "ghd-monospace-font", false);
-    }
-    if (data.modeDiffToggle !== "0") {
-      addFileToggle();
-    } else {
-      removeAll(".ghd-file-toggle");
-      toggleClass($$(".Details--on"), "Details--on", false);
-    }
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (data.enableCodeWrap) {
+        buildCodeWrap();
+      } else {
+        removeAll(".ghd-wrap-toggle");
+        toggleClass($$(".Details--on"), "Details--on", false);
+      }
+      if (data.enableMonospace) {
+        addMonospaceToggle();
+      } else {
+        removeAll(".ghd-monospace");
+        toggleClass($$(".ghd-monospace-font"), "ghd-monospace-font", false);
+      }
+      if (data.modeDiffToggle !== "0") {
+        addFileToggle();
+      } else {
+        removeAll(".ghd-file-toggle");
+        toggleClass($$(".Details--on"), "Details--on", false);
+      }
+    }, 200);
   }
 
   function makeRow(vals, str) {
@@ -1242,9 +1252,11 @@
   }
 
   function removeAll(selector) {
+    isUpdating = true;
     $$(selector).forEach(el => {
       el.parentNode.removeChild(el);
     });
+    isUpdating = false;
   }
 
   function on(els, name, callback) {

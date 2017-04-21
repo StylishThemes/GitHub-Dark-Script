@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Toggle Code Wrap
-// @version     1.1.0
+// @version     1.1.1
 // @description A userscript that adds a code wrap toggle button
 // @license     https://creativecommons.org/licenses/by-sa/4.0/
 // @author      StylishThemes
@@ -26,7 +26,8 @@
   to add this functionality
   */
   // set by GM popup menu
-  let globalWrap = GM_getValue("github-global-code-wrap", true);
+  let globalWrap = GM_getValue("github-global-code-wrap", true),
+    busy = false;
 
   const wrapIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768">
@@ -121,6 +122,10 @@
 
   // Add code wrap toggle
   function buildCodeWrap() {
+    if (busy) {
+      return;
+    }
+    busy = true;
     // add wrap code icons
     let tmp,
       wrapper = $$(".blob-wrapper"),
@@ -153,6 +158,7 @@
         );
       }
     }
+    busy = false;
   }
 
   function init() {
