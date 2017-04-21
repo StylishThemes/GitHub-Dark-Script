@@ -31,7 +31,10 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 # [Installation](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install)
 
 - Make sure to install a userscript engine like [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/), [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) or [compatible](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install).
-- [Install the script](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js).
+- Install the script:
+  - [GitHub](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js).
+  - [GreasyFork](https://greasyfork.org/en/scripts/15562-github-dark-script)
+  - [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Dark_Script)
 
 # Screenshot
 
