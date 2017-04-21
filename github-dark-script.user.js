@@ -1,27 +1,30 @@
 // ==UserScript==
-// @name         GitHub Dark Script
-// @version      2.1.3
-// @description  GitHub Dark in userscript form, with a settings panel
-// @namespace    https://github.com/StylishThemes
-// @include      /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
-// @include      https://*.githubusercontent.com/*
-// @grant        GM_addStyle
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @grant        GM_info
-// @grant        GM_xmlhttpRequest
-// @grant        GM_registerMenuCommand
-// @connect      githubusercontent.com
-// @connect      raw.githubusercontent.com
-// @run-at       document-start
-// @require      https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
-// @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
-// @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
+// @name        GitHub Dark Script
+// @version     2.2.0
+// @description GitHub Dark in userscript form, with a settings panel
+// @author      StylishThemes
+// @namespace   https://github.com/StylishThemes
+// @include     /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
+// @include     https://*.githubusercontent.com/*
+// @run-at      document-start
+// @grant       GM_addStyle
+// @grant       GM_getValue
+// @grant       GM_setValue
+// @grant       GM_info
+// @grant       GM_xmlhttpRequest
+// @grant       GM_registerMenuCommand
+// @connect     githubusercontent.com
+// @connect     raw.githubusercontent.com
+// @require     https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
+// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=188090
+// @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
+// @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
+// @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
 /* global GM_addStyle, GM_getValue, GM_setValue, GM_info, GM_xmlhttpRequest, GM_registerMenuCommand, jscolor */
 /* jshint esnext:true, unused:true */
 (() => {
-  'use strict';
+  "use strict";
 
   const version = GM_info.script.version,
 
@@ -29,117 +32,117 @@
     delay = 8.64e7, // 24 hours in milliseconds
 
     // Keyboard shortcut to open ghd panel (only a two key combo coded)
-    keyboardOpen = 'g+0',
-    keyboardToggle = 'g+-',
+    keyboardOpen = "g+0",
+    keyboardToggle = "g+-",
     // keyboard shortcut delay from first to second letter
     keyboardDelay = 1000,
 
     // base urls to fetch style and package.json
-    root = 'https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/',
+    root = "https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/",
 
     defaults = {
-      attach : 'scroll',
-      color  : '#4183C4',
+      attach : "scroll",
+      color  : "#4183C4",
       enable : true,
-      font   : 'Menlo',
-      image  : 'url("data:image/png;base64,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")',
+      font   : "Menlo",
+      image  : "url('data:image/png;base64,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')",
       tab    : 4,
-      theme  : 'Twilight', // GitHub
-      themeCm: 'Twilight', // CodeMirror
-      themeJp: 'Twilight', // Jupyter
-      type   : 'tiled',
+      theme  : "Twilight", // GitHub
+      themeCm: "Twilight", // CodeMirror
+      themeJp: "Twilight", // Jupyter
+      type   : "tiled",
       wrap   : false,
 
       // toggle buttons
       enableCodeWrap  : true,
       enableMonospace : true,
       // diff toggle + accordion mode
-      modeDiffToggle  : '1',
+      modeDiffToggle  : "1",
 
       // internal variables
       date         : 0,
       version      : 0,
-      rawCss       : '',
-      cssgithub    : '',
-      csscodemirror: '',
-      cssjupyter   : '',
-      processedCss : ''
+      rawCss       : "",
+      cssgithub    : "",
+      csscodemirror: "",
+      cssjupyter   : "",
+      processedCss : ""
     },
 
     // extract style & theme name
     regex = /\/\*! [^\*]+ \*\//,
     themesXref = {
       github: {
-        placeholder: 'syntax-theme',
-        folder: 'themes/github/'
+        placeholder: "syntax-theme",
+        folder: "themes/github/"
       },
       codemirror: {
-        placeholder: 'syntax-codemirror',
-        folder: 'themes/codemirror/'
+        placeholder: "syntax-codemirror",
+        folder: "themes/codemirror/"
       },
       jupyter: {
-        placeholder: 'syntax-jupyter',
-        folder: 'themes/jupyter/'
+        placeholder: "syntax-jupyter",
+        folder: "themes/jupyter/"
       }
     },
     // available theme names
     themes = {
       github: {
-        'Ambiance': 'ambiance',
-        'Chaos': 'chaos',
-        'Clouds Midnight': 'clouds-midnight',
-        'Cobalt': 'cobalt',
-        'GitHub Dark': 'github-dark',
-        'Idle Fingers': 'idle-fingers',
-        'Kr Theme': 'kr-theme',
-        'Merbivore': 'merbivore',
-        'Merbivore Soft': 'merbivore-soft',
-        'Mono Industrial': 'mono-industrial',
-        'Mono Industrial Clear': 'mono-industrial-clear',
-        'Monokai': 'monokai',
-        'Monokai Spacegray Eighties': 'monokai-spacegray-eighties',
-        'Obsidian': 'obsidian',
-        'Pastel on Dark': 'pastel-on-dark',
-        'Solarized Dark': 'solarized-dark',
-        'Terminal': 'terminal',
-        'Tomorrow Night': 'tomorrow-night',
-        'Tomorrow Night Blue': 'tomorrow-night-blue',
-        'Tomorrow Night Bright': 'tomorrow-night-bright',
-        'Tomorrow Night Eigthies': 'tomorrow-night-eighties',
-        'Twilight': 'twilight',
-        'Vibrant Ink': 'vibrant-ink'
+        "Ambiance": "ambiance",
+        "Chaos": "chaos",
+        "Clouds Midnight": "clouds-midnight",
+        "Cobalt": "cobalt",
+        "GitHub Dark": "github-dark",
+        "Idle Fingers": "idle-fingers",
+        "Kr Theme": "kr-theme",
+        "Merbivore": "merbivore",
+        "Merbivore Soft": "merbivore-soft",
+        "Mono Industrial": "mono-industrial",
+        "Mono Industrial Clear": "mono-industrial-clear",
+        "Monokai": "monokai",
+        "Monokai Spacegray Eighties": "monokai-spacegray-eighties",
+        "Obsidian": "obsidian",
+        "Pastel on Dark": "pastel-on-dark",
+        "Solarized Dark": "solarized-dark",
+        "Terminal": "terminal",
+        "Tomorrow Night": "tomorrow-night",
+        "Tomorrow Night Blue": "tomorrow-night-blue",
+        "Tomorrow Night Bright": "tomorrow-night-bright",
+        "Tomorrow Night Eigthies": "tomorrow-night-eighties",
+        "Twilight": "twilight",
+        "Vibrant Ink": "vibrant-ink"
       },
       // CodeMirror themes
       codemirror: {
-        'Ambiance': 'ambiance',
-        'Base16 Ocean Dark': 'base16-ocean',
-        'Cobalt': 'cobalt',
-        'Dracula': 'dracula',
-        'Monokai': 'monokai',
-        'Monokai Spacegray Eighties': 'monokai-spacegray-eighties',
-        'Pastel on Dark': 'pastel-on-dark',
-        'Solarized Dark': 'solarized-dark',
-        'Tomorrow Night Bright': 'tomorrow-night-bright',
-        'Tomorrow Night Eigthies': 'tomorrow-night-eighties',
-        'Twilight': 'twilight',
-        'Vibrant Ink': 'vibrant-ink'
+        "Ambiance": "ambiance",
+        "Base16 Ocean Dark": "base16-ocean",
+        "Cobalt": "cobalt",
+        "Dracula": "dracula",
+        "Monokai": "monokai",
+        "Monokai Spacegray Eighties": "monokai-spacegray-eighties",
+        "Pastel on Dark": "pastel-on-dark",
+        "Solarized Dark": "solarized-dark",
+        "Tomorrow Night Bright": "tomorrow-night-bright",
+        "Tomorrow Night Eigthies": "tomorrow-night-eighties",
+        "Twilight": "twilight",
+        "Vibrant Ink": "vibrant-ink"
       },
       // Jupyter (pygments) themes
       jupyter: {
-        'Base16 Ocean Dark': 'base16-ocean',
-        'Dracula': 'dracula',
-        'GitHub Dark': 'github-dark',
-        'Idle Fingers': 'idle-fingers',
-        'Monokai': 'monokai',
-        'Monokai Spacegray Eighties': 'monokai-spacegray-eighties',
-        'Obsidian': 'obsidian',
-        'Pastel on Dark': 'pastel-on-dark',
-        'Solarized Dark': 'solarized-dark',
-        'Tomorrow Night': 'tomorrow-night',
-        'Tomorrow Night Blue': 'tomorrow-night-blue',
-        'Tomorrow Night Bright': 'tomorrow-night-bright',
-        'Tomorrow Night Eigthies': 'tomorrow-night-eighties',
-        'Twilight': 'twilight'
+        "Base16 Ocean Dark": "base16-ocean",
+        "Dracula": "dracula",
+        "GitHub Dark": "github-dark",
+        "Idle Fingers": "idle-fingers",
+        "Monokai": "monokai",
+        "Monokai Spacegray Eighties": "monokai-spacegray-eighties",
+        "Obsidian": "obsidian",
+        "Pastel on Dark": "pastel-on-dark",
+        "Solarized Dark": "solarized-dark",
+        "Tomorrow Night": "tomorrow-night",
+        "Tomorrow Night Blue": "tomorrow-night-blue",
+        "Tomorrow Night Bright": "tomorrow-night-bright",
+        "Tomorrow Night Eigthies": "tomorrow-night-eighties",
+        "Twilight": "twilight"
       }
     },
 
@@ -173,12 +176,12 @@
     // https://github.com/StylishThemes/GitHub-code-wrap/blob/master/github-code-wrap.css
     wrapCodeCss = `
       /* GitHub: Enable wrapping of long code lines */
-        .blob-code-inner,
-        .markdown-body pre > code,
-        .markdown-body .highlight > pre { ${wrapCss.wrapped} }
-        td.blob-code-inner {
-          display: table-cell !important;
-        }
+      .blob-code-inner,
+      .markdown-body pre > code,
+      .markdown-body .highlight > pre { ${wrapCss.wrapped} }
+      td.blob-code-inner {
+        display: table-cell !important;
+      }
     `,
 
     wrapIcon = `
@@ -200,64 +203,64 @@
     `,
 
     $style = make({
-      el: 'style',
-      cl4ss: 'ghd-style'
+      el: "style",
+      cl4ss: "ghd-style"
     });
 
-  let timer, mutationTimer, picker, // jscolor picker
-    isInitialized = 'pending',
+  let timer, picker, // jscolor picker
+    isInitialized = "pending",
     // prevent mutationObserver from going nuts
     isUpdating = false,
     // set when css code to test is pasted into the settings panel
     testing = false,
     //
-    debug = GM_getValue('debug', false),
+    debug = GM_getValue("debug", false),
     data = {};
 
   function updatePanel() {
-    if (!isInitialized || !$('#ghd-settings-inner')) { return; }
+    if (!isInitialized || !$("#ghd-settings-inner")) { return; }
     // prevent multiple change events from processing
     isUpdating = true;
 
     let temp, el,
-      body = $('body'),
-      panel = $('#ghd-settings-inner');
+      body = $("body"),
+      panel = $("#ghd-settings-inner");
 
-    $('.ghd-attach', panel).value = data.attach || defaults.attach;
-    $('.ghd-font', panel).value = data.font || defaults.font;
-    $('.ghd-image', panel).value = data.image || defaults.image;
-    $('.ghd-tab', panel).value = data.tab || defaults.tab;
-    $('.ghd-theme', panel).value = data.theme || defaults.theme;
-    $('.ghd-themecm', panel).value = data.themeCm || defaults.themeCm;
-    $('.ghd-themejp', panel).value = data.themeJp || defaults.themeJp;
-    $('.ghd-type', panel).value = data.type || defaults.type;
+    $(".ghd-attach", panel).value = data.attach || defaults.attach;
+    $(".ghd-font", panel).value = data.font || defaults.font;
+    $(".ghd-image", panel).value = data.image || defaults.image;
+    $(".ghd-tab", panel).value = data.tab || defaults.tab;
+    $(".ghd-theme", panel).value = data.theme || defaults.theme;
+    $(".ghd-themecm", panel).value = data.themeCm || defaults.themeCm;
+    $(".ghd-themejp", panel).value = data.themeJp || defaults.themeJp;
+    $(".ghd-type", panel).value = data.type || defaults.type;
 
-    $('.ghd-enable', panel).checked = isBool('enable');
-    $('.ghd-wrap', panel).checked = isBool('wrap');
+    $(".ghd-enable", panel).checked = isBool("enable");
+    $(".ghd-wrap", panel).checked = isBool("wrap");
 
-    $('.ghd-codewrap-checkbox', panel).checked = isBool('enableCodeWrap');
-    $('.ghd-monospace-checkbox', panel).checked = isBool('enableMonospace');
+    $(".ghd-codewrap-checkbox", panel).checked = isBool("enableCodeWrap");
+    $(".ghd-monospace-checkbox", panel).checked = isBool("enableMonospace");
 
-    el = $('.ghd-diff-select', panel);
-    temp = '' + (data.modeDiffToggle || defaults.modeDiffToggle);
+    el = $(".ghd-diff-select", panel);
+    temp = "" + (data.modeDiffToggle || defaults.modeDiffToggle);
     el.value = temp;
-    toggleClass(el, 'enabled', temp !== '0');
+    toggleClass(el, "enabled", temp !== "0");
 
     // update version tooltip
-    $('.ghd-versions', panel).setAttribute('aria-label', getVersionTooltip());
+    $(".ghd-versions", panel).setAttribute("aria-label", getVersionTooltip());
 
     temp = data.color || defaults.color;
-    $('.ghd-color').value = temp;
+    $(".ghd-color").value = temp;
     // update swatch color & color picker value
-    $('#ghd-swatch').style.backgroundColor = temp;
+    $("#ghd-swatch").style.backgroundColor = temp;
 
     if (picker) {
       picker.fromString(temp);
     }
     $style.disabled = !data.enable;
 
-    toggleClass(body, 'ghd-disabled', !data.enable);
-    toggleClass(body, 'nowrap', !data.wrap);
+    toggleClass(body, "ghd-disabled", !data.enable);
+    toggleClass(body, "nowrap", !data.wrap);
 
     if (data.enableCodeWrap !== data.lastCW ||
       data.enableMonospace !== data.lastMS ||
@@ -273,29 +276,29 @@
   }
 
   function getStoredValues(init) {
-    data = GM_getValue('data', defaults);
+    data = GM_getValue("data", defaults);
     try {
       data = JSON.parse(data);
       if (!Object.keys(data).length || ({}).toString.call(data) !== "[object Object]") {
         throw new Error();
       }
     } catch(err) { // compat
-      data = GM_getValue('data', defaults);
+      data = GM_getValue("data", defaults);
     }
     if (debug) {
       if (init) {
-        console.log('GitHub-Dark Script initializing!');
+        console.log("GitHub-Dark Script initializing!");
       }
-      console.log('Retrieved stored values', data);
+      console.log("Retrieved stored values", data);
     }
   }
 
   function setStoredValues(reset) {
     data.processedCss = $style.textContent;
-    GM_setValue('data', JSON.stringify(reset ? defaults : data));
+    GM_setValue("data", JSON.stringify(reset ? defaults : data));
     updatePanel();
     if (debug) {
-      console.log((reset ? 'Resetting' : 'Saving') + ' current values', data);
+      console.log((reset ? "Resetting" : "Saving") + " current values", data);
     }
   }
 
@@ -312,11 +315,11 @@
   // convert version "1.2.3" into "001002003" for easier comparison
   function convertVersion(val) {
     let index,
-      parts = val ? val.split('.') : '',
-      str = '',
+      parts = val ? val.split(".") : "",
+      str = "",
       len = parts.length;
     for (index = 0; index < len; index++) {
-      str += ('000' + parts[index]).slice(-3);
+      str += ("000" + parts[index]).slice(-3);
     }
     if (debug) {
       console.log(`Converted version "${val}" to "${str}" for easy comparison`);
@@ -326,11 +329,11 @@
 
   function checkVersion() {
     if (debug) {
-      console.log('Fetching package.json');
+      console.log("Fetching package.json");
     }
     GM_xmlhttpRequest({
-      method : 'GET',
-      url : root + 'package.json',
+      method : "GET",
+      url : root + "package.json",
       onload : response => {
         let pkg = JSON.parse(response.responseText);
 
@@ -341,7 +344,7 @@
         // if new available, load it & parse
         if (ver > data.version) {
           if (data.version !== 0 && debug) {
-            console.log('Updating from ${data.version} to ${ver}');
+            console.log(`Updating from ${data.version} to ${ver}`);
           }
           data.version = ver;
           fetchAndApplyStyle();
@@ -349,7 +352,7 @@
           addSavedStyle();
         }
         // save new date/version
-        GM_setValue('data', JSON.stringify(data));
+        GM_setValue("data", JSON.stringify(data));
       }
     });
   }
@@ -359,8 +362,8 @@
       console.log(`Fetching ${root}github-dark.css`);
     }
     GM_xmlhttpRequest({
-      method : 'GET',
-      url : root + 'github-dark.css',
+      method : "GET",
+      url : root + "github-dark.css",
       onload : response => {
         data.rawCss = response.responseText;
         processStyle();
@@ -372,11 +375,11 @@
   function fetchAndApplyTheme(name, group) {
     if (!data.enable) {
       if (debug) {
-        console.log('Disabled: stop theme processing');
+        console.log("Disabled: stop theme processing");
       }
       return;
     }
-    if (data['last' + group] === name && data['css' + group] !== '') {
+    if (data["last" + group] === name && data["css" + group] !== "") {
       return applyTheme(name, group);
     }
     let themeUrl = `${root}${themesXref[group].folder}${themes[group][name]}.min.css`;
@@ -384,16 +387,16 @@
       console.log(`Fetching ${group} ${name} theme`, themeUrl);
     }
     GM_xmlhttpRequest({
-      method : 'GET',
+      method : "GET",
       url : themeUrl,
       onload : response => {
         let theme = response.responseText;
         if (response.status === 200 && theme) {
-          data['css' + group] = theme;
-          data['last' + group] = name;
+          data["css" + group] = theme;
+          data["last" + group] = name;
           applyTheme(name, group);
         } else {
-          theme = data['css' + group];
+          theme = data["css" + group];
           console.error(`Failed to load ${group} theme file: "${name}"`);
           console.log(`Falling back to previous ${group} theme of ${theme.substring(0, theme.indexOf("*/") + 2)}`);
         }
@@ -404,13 +407,13 @@
   function applyTheme(name, group) {
     let theme, css;
     if (debug) {
-      theme = (data['css' + group] || '').match(regex);
+      theme = (data["css" + group] || "").match(regex);
       console.log(`Adding syntax ${group} theme "${theme}" to css`);
     }
-    css = data.processedCss || '';
+    css = data.processedCss || "";
     css = css.replace(
       `/*[[${themesXref[group].placeholder}]]*/`,
-      data['css' + group] || ''
+      data["css" + group] || ""
     );
     applyStyle(css);
     setStoredValues();
@@ -418,63 +421,63 @@
   }
 
   function processStyle() {
-    let url = /^url/.test(data.image || '') ? data.image :
-      (data.image === 'none' ? 'none' : 'url("' + data.image + '")');
+    let url = /^url/.test(data.image || "") ? data.image :
+      (data.image === "none" ? "none" : "url('" + data.image + "')");
     if (!data.enable) {
       if (debug) {
-        console.log('Disabled: stop processing');
+        console.log("Disabled: stop processing");
       }
       return;
     }
     if (debug) {
-      console.log('Processing set styles');
+      console.log("Processing set styles");
     }
 
-    let processed = (data.rawCss || '')
+    let processed = (data.rawCss || "")
       // remove moz-document wrapper
-      .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, '')
-      // replace background image; if no 'url' at start, then use 'none'
+      .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, "")
+      // replace background image; if no "url" at start, then use "none"
       .replace(/\/\*\[\[bg-choice\]\]\*\/ url\(.*\)/, url)
       // Add tiled or fit window size css
-      .replace('/*[[bg-options]]*/', type[data.type || 'tiled'])
+      .replace("/*[[bg-options]]*/", type[data.type || "tiled"])
       // set scroll or fixed background image
-      .replace('/*[[bg-attachment]]*/ fixed', data.attach || 'scroll')
+      .replace("/*[[bg-attachment]]*/ fixed", data.attach || "scroll")
       // replace base-color
-      .replace(/\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || '#4183C4')
+      .replace(/\/\*\[\[base-color\]\]\*\/ #\w{3,6}/g, data.color || "#4183C4")
       // replace base-color-rgb
-      .replace(/\/\*\[\[base-color-rgb\]\]\*\//g, hexToRgb(data.color || '#4183c4'))
+      .replace(/\/\*\[\[base-color-rgb\]\]\*\//g, hexToRgb(data.color || "#4183c4"))
       // add font choice
-      .replace('/*[[font-choice]]*/', data.font || 'Menlo')
+      .replace("/*[[font-choice]]*/", data.font || "Menlo")
       // add tab size
       .replace(/\/\*\[\[tab-size\]\]\*\/ \d+/g, data.tab || 4)
       // code wrap css
-      .replace('/*[[code-wrap]]*/', data.wrap ? wrapCodeCss : '')
+      .replace("/*[[code-wrap]]*/", data.wrap ? wrapCodeCss : "")
       // remove default syntax
-      .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, '');
+      .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, "");
 
     // see https://github.com/StylishThemes/GitHub-Dark/issues/275
     if (/firefox/i.test(navigator.userAgent)) {
       processed = processed
         // line in github-dark.css = "select, input:not(.btn-link), textarea"
-        .replace('select, input:not(.btn-link)', 'input { color:#eee !important; } select')
-        .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, '');
+        .replace("select, input:not(.btn-link)", "input { color:#eee !important; } select")
+        .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, "");
     }
     data.processedCss = processed;
-    fetchAndApplyTheme(data.theme, 'github');
-    fetchAndApplyTheme(data.themeCm, 'codemirror');
-    fetchAndApplyTheme(data.themeJp, 'jupyter');
+    fetchAndApplyTheme(data.theme, "github");
+    fetchAndApplyTheme(data.themeCm, "codemirror");
+    fetchAndApplyTheme(data.themeJp, "jupyter");
   }
 
   function applyStyle(css) {
     if (debug) {
-      console.log('Applying style', '"' + (css || '').match(regex) + '"');
+      console.log("Applying style", `"${(css || "").match(regex)}"`);
     }
-    $style.textContent = css || '';
+    $style.textContent = css || "";
   }
 
   function addSavedStyle() {
     if (debug) {
-      console.log('Adding previously saved style');
+      console.log("Adding previously saved style");
     }
     // apply already processed css to prevent FOUC
     $style.textContent = data.processedCss;
@@ -484,34 +487,34 @@
     isUpdating = true;
 
     if (debug) {
-      console.log('Updating user settings');
+      console.log("Updating user settings");
     }
 
-    let body = $('body'),
-      panel = $('#ghd-settings-inner');
+    let body = $("body"),
+      panel = $("#ghd-settings-inner");
 
-    data.attach = $('.ghd-attach', panel).value;
+    data.attach = $(".ghd-attach", panel).value;
     // get hex value directly
     data.color = picker.toHEXString();
-    data.enable = $('.ghd-enable', panel).checked;
-    data.font = $('.ghd-font', panel).value;
-    data.image = $('.ghd-image', panel).value;
-    data.tab = $('.ghd-tab', panel).value;
-    data.theme = $('.ghd-theme', panel).value;
-    data.themeCm = $('.ghd-themecm', panel).value;
-    data.themeJp = $('.ghd-themejp', panel).value;
-    data.type = $('.ghd-type', panel).value;
-    data.wrap = $('.ghd-wrap', panel).checked;
+    data.enable = $(".ghd-enable", panel).checked;
+    data.font = $(".ghd-font", panel).value;
+    data.image = $(".ghd-image", panel).value;
+    data.tab = $(".ghd-tab", panel).value;
+    data.theme = $(".ghd-theme", panel).value;
+    data.themeCm = $(".ghd-themecm", panel).value;
+    data.themeJp = $(".ghd-themejp", panel).value;
+    data.type = $(".ghd-type", panel).value;
+    data.wrap = $(".ghd-wrap", panel).checked;
 
-    data.enableCodeWrap  = $('.ghd-codewrap-checkbox', panel).checked;
-    data.enableMonospace = $('.ghd-monospace-checkbox', panel).checked;
+    data.enableCodeWrap  = $(".ghd-codewrap-checkbox", panel).checked;
+    data.enableMonospace = $(".ghd-monospace-checkbox", panel).checked;
 
-    data.modeDiffToggle  = $('.ghd-diff-select', panel).value;
+    data.modeDiffToggle  = $(".ghd-diff-select", panel).value;
 
     $style.disabled = !data.enable;
 
-    toggleClass(body, 'ghd-disabled', !data.enable);
-    toggleClass(body, 'nowrap', !data.wrap);
+    toggleClass(body, "ghd-disabled", !data.enable);
+    toggleClass(body, "nowrap", !data.wrap);
 
     if (testing) {
       processStyle();
@@ -531,11 +534,11 @@
     } else {
       // clear saved date
       data.version = 0;
-      data.cssgithub = '';
-      data.csscodemirror = '';
-      data.cssjupyter = '';
-      GM_setValue('data', JSON.stringify(data));
-      closePanel('forced');
+      data.cssgithub = "";
+      data.csscodemirror = "";
+      data.cssjupyter = "";
+      GM_setValue("data", JSON.stringify(data));
+      closePanel("forced");
     }
   }
 
@@ -548,11 +551,11 @@
     for (indx = 0; indx < len; indx++) {
       ver.push(parseInt(parts[indx], 10));
     }
-    return `Script v${version}\nCSS ${(ver.length ? 'v' + ver.join('.') : 'unknown')}`;
+    return `Script v${version}\nCSS ${(ver.length ? "v" + ver.join(".") : "unknown")}`;
   }
 
   function buildOptions(group) {
-    let options = '';
+    let options = "";
     Object.keys(themes[group]).forEach(theme => {
       options += `<option value="${theme}">${theme}</option>`;
     });
@@ -561,7 +564,7 @@
 
   function buildSettings() {
     if (debug) {
-      console.log('Adding settings panel & GitHub Dark link to profile dropdown');
+      console.log("Adding settings panel & GitHub Dark link to profile dropdown");
     }
     // Script-specific CSS
     GM_addStyle(`
@@ -611,9 +614,9 @@
     `);
 
     let icon,
-      opts = buildOptions('github'),
-      optscm = buildOptions('codemirror'),
-      optsjp = buildOptions('jupyter'),
+      opts = buildOptions("github"),
+      optscm = buildOptions("codemirror"),
+      optsjp = buildOptions("jupyter"),
       ver = getVersionTooltip();
 
     // circle-question-mark icon
@@ -625,9 +628,9 @@
 
     // Settings panel markup
     make({
-      el: 'div',
-      appendTo: 'body',
-      attr: { id: 'ghd-settings' },
+      el: "div",
+      appendTo: "body",
+      attr: { id: "ghd-settings" },
       html: `
         <div id="ghd-settings-inner" class="boxed-group">
           <h3>GitHub-Dark Settings
@@ -727,15 +730,15 @@
     // mutation events happen quick, so we still add an update flag
     isUpdating = true;
     let icon = make({
-      el    : 'div',
-      cl4ss : 'ghd-wrap-toggle tooltipped tooltipped-w',
-      attr  : { 'aria-label': 'Toggle code wrap' },
+      el    : "div",
+      cl4ss : "ghd-wrap-toggle tooltipped tooltipped-w",
+      attr  : { "aria-label": "Toggle code wrap" },
       html  : wrapIcon
     });
-    $$('.blob-wrapper').forEach(el => {
+    $$(".blob-wrapper").forEach(el => {
       el.insertBefore(icon.cloneNode(true), el.childNodes[0]);
     });
-    $$('.markdown-body pre').forEach(el => {
+    $$(".markdown-body pre").forEach(el => {
       el.parentNode.insertBefore(icon.cloneNode(true), el);
     });
     isUpdating = false;
@@ -745,17 +748,17 @@
   function addMonospaceToggle() {
     isUpdating = true;
     let button = make({
-      el    : 'button',
-      cl4ss : 'ghd-monospace toolbar-item tooltipped tooltipped-n',
+      el    : "button",
+      cl4ss : "ghd-monospace toolbar-item tooltipped tooltipped-n",
       attr  : {
-        'type': 'button',
-        'aria-label': 'Toggle monospaced font',
-        'tabindex': '-1'
+        "type": "button",
+        "aria-label": "Toggle monospaced font",
+        "tabindex": "-1"
       },
       html  : monospaceIcon
     });
-    $$('.toolbar-commenting').forEach(el => {
-      if (!$('.ghd-monospace', el)) {
+    $$(".toolbar-commenting").forEach(el => {
+      if (!$(".ghd-monospace", el)) {
         // prepend
         el.insertBefore(button.cloneNode(true), el.childNodes[0]);
       }
@@ -768,25 +771,25 @@
     isUpdating = true;
     let firstButton,
       button = make({
-        el    : 'button',
-        cl4ss : 'ghd-file-toggle btn btn-sm tooltipped tooltipped-n',
+        el    : "button",
+        cl4ss : "ghd-file-toggle btn btn-sm tooltipped tooltipped-n",
         attr  : {
-          'type': 'button',
-          'aria-label': 'Click to Expand or Collapse file',
-          'tabindex': '-1'
+          "type": "button",
+          "aria-label": "Click to Expand or Collapse file",
+          "tabindex": "-1"
         },
         html  : fileIcon
       });
-    $$('#files .file-actions').forEach(el => {
-      if (!$('.ghd-file-toggle', el)) {
+    $$("#files .file-actions").forEach(el => {
+      if (!$(".ghd-file-toggle", el)) {
         // hide GitHub toggle view button
         el.querySelector(".js-details-target").style.display = "none";
         el.appendChild(button.cloneNode(true));
       }
     });
-    firstButton = $('.ghd-file-toggle');
+    firstButton = $(".ghd-file-toggle");
     // accordion mode = start with all but first entry collapsed
-    if (firstButton && data.modeDiffToggle === '2') {
+    if (firstButton && data.modeDiffToggle === "2") {
       toggleFile({
         target: firstButton
       }, true);
@@ -799,27 +802,27 @@
     if (data.enableCodeWrap) {
       buildCodeWrap();
     } else {
-      removeAll('.ghd-wrap-toggle');
-      toggleClass($$('.Details--on'), 'Details--on', false);
+      removeAll(".ghd-wrap-toggle");
+      toggleClass($$(".Details--on"), "Details--on", false);
     }
     if (data.enableMonospace) {
       addMonospaceToggle();
     } else {
-      removeAll('.ghd-monospace');
-      toggleClass($$('.ghd-monospace-font'), 'ghd-monospace-font', false);
+      removeAll(".ghd-monospace");
+      toggleClass($$(".ghd-monospace-font"), "ghd-monospace-font", false);
     }
-    if (data.modeDiffToggle !== '0') {
+    if (data.modeDiffToggle !== "0") {
       addFileToggle();
     } else {
-      removeAll('.ghd-file-toggle');
-      toggleClass($$('.Details--on'), 'Details--on', false);
+      removeAll(".ghd-file-toggle");
+      toggleClass($$(".Details--on"), "Details--on", false);
     }
   }
 
   function makeRow(vals, str) {
     return make({
-      el    : 'tr',
-      cl4ss : 'ghd-shortcut',
+      el    : "tr",
+      cl4ss : "ghd-shortcut",
       html  : `<td class="keys"><kbd>${vals[0]}</kbd> <kbd>${vals[1]}</kbd></td><td>${str}</td>`
     });
   }
@@ -827,11 +830,11 @@
   // add keyboard shortcut to help menu (press "?")
   function buildShortcut() {
     let row,
-      el = $('.keyboard-mappings tbody');
-    if (el && !$('.ghd-shortcut')) {
-      row = makeRow(keyboardOpen.split('+'), 'GitHub-Dark: open settings');
+      el = $(".keyboard-mappings tbody");
+    if (el && !$(".ghd-shortcut")) {
+      row = makeRow(keyboardOpen.split("+"), "GitHub-Dark: open settings");
       el.appendChild(row);
-      row = makeRow(keyboardToggle.split('+'), 'GitHub-Dark: toggle style');
+      row = makeRow(keyboardToggle.split("+"), "GitHub-Dark: toggle style");
       el.appendChild(row);
     }
   }
@@ -839,78 +842,78 @@
   function toggleCodeWrap(el) {
     let css,
       overallWrap = data.wrap,
-      code = next(el, '.highlight, .diff-table, code, pre'),
-      tmp = code ? $('code', code) : '';
+      code = next(el, ".highlight, .diff-table, code, pre"),
+      tmp = code ? $("code", code) : "";
     if (tmp) {
       // find code element
       code = tmp;
     }
     if (!code) {
       if (debug) {
-        console.log('Code wrap icon associated code not found', el);
+        console.log("Code wrap icon associated code not found", el);
       }
       return;
     }
     // code with line numbers
-    if (code.nodeName === 'TABLE') {
-      if (code.className.indexOf('ghd-') < 0) {
+    if (code.nodeName === "TABLE") {
+      if (code.className.indexOf("ghd-") < 0) {
         css = !overallWrap;
       } else {
-        css = code.classList.contains('ghd-unwrap-table');
+        css = code.classList.contains("ghd-unwrap-table");
       }
-      toggleClass(code, 'ghd-wrap-table', css);
-      toggleClass(code, 'ghd-unwrap-table', !css);
-      toggleClass(el, 'wrapped', css);
-      toggleClass(el, 'unwrap', !css);
+      toggleClass(code, "ghd-wrap-table", css);
+      toggleClass(code, "ghd-unwrap-table", !css);
+      toggleClass(el, "wrapped", css);
+      toggleClass(el, "unwrap", !css);
     } else {
-      css = code.getAttribute('style') || '';
-      if (css === '') {
-        css = wrapCss[overallWrap ? 'unwrap' : 'wrapped'];
+      css = code.getAttribute("style") || "";
+      if (css === "") {
+        css = wrapCss[overallWrap ? "unwrap" : "wrapped"];
       } else {
-        css = wrapCss[css === wrapCss.wrapped ? 'unwrap' : 'wrapped'];
+        css = wrapCss[css === wrapCss.wrapped ? "unwrap" : "wrapped"];
       }
-      code.setAttribute('style', css);
-      toggleClass(el, 'wrapped', css === wrapCss.wrapped);
-      toggleClass(el, 'unwrap', css === wrapCss.unwrap);
+      code.setAttribute("style", css);
+      toggleClass(el, "wrapped", css === wrapCss.wrapped);
+      toggleClass(el, "unwrap", css === wrapCss.unwrap);
     }
   }
 
   function toggleMonospace(el) {
-    let tmp = closest('.previewable-comment-form', el),
+    let tmp = closest(".previewable-comment-form", el),
       // single comment
-      textarea = $('.comment-form-textarea', tmp);
+      textarea = $(".comment-form-textarea", tmp);
     if (textarea) {
-      toggleClass(textarea, 'ghd-monospace-font');
+      toggleClass(textarea, "ghd-monospace-font");
       textarea.focus();
-      tmp = textarea.classList.contains('ghd-monospace-font');
-      toggleClass(el, 'ghd-icon-active', tmp);
+      tmp = textarea.classList.contains("ghd-monospace-font");
+      toggleClass(el, "ghd-icon-active", tmp);
     }
   }
 
   function toggleSibs(target, state) {
     // oddly, when a "Details--on" class is applied, the content is hidden
-    const isCollapsed = state || target.classList.contains('Details--on'),
-      toggles = $$('.file');
+    const isCollapsed = state || target.classList.contains("Details--on"),
+      toggles = $$(".file");
     let el,
       indx = toggles.length;
     while (indx--) {
       el = toggles[indx];
       if (el !== target) {
-        el.classList.toggle('Details--on', isCollapsed);
+        el.classList.toggle("Details--on", isCollapsed);
       }
     }
   }
 
   function toggleFile(event, init) {
     isUpdating = true;
-    let el = closest('.file', event.target);
-    if (el && data.modeDiffToggle === '2') {
+    let el = closest(".file", event.target);
+    if (el && data.modeDiffToggle === "2") {
       if (!init) {
-        el.classList.toggle('Details--on');
+        el.classList.toggle("Details--on");
       }
       toggleSibs(el, true);
     } else if (el) {
-      el.classList.toggle('Details--on');
+      el.classList.toggle("Details--on");
       // shift+click toggle all files!
       if (event.shiftKey) {
         toggleSibs(el);
@@ -919,46 +922,50 @@
     isUpdating = false;
     document.activeElement.blur();
     // move current open panel to the top
-    if (!el.classList.contains('Details--on')) {
+    if (!el.classList.contains("Details--on")) {
       location.hash = el.id;
     }
   }
 
   function bindEvents() {
     let el, menu, lastKey,
-      panel = $('#ghd-settings-inner'),
-      swatch = $('#ghd-swatch', panel);
+      panel = $("#ghd-settings-inner"),
+      swatch = $("#ghd-swatch", panel);
 
     // finish initialization
-    $('#ghd-settings-inner .ghd-enable').checked = data.enable;
-    toggleClass($('body'), 'ghd-disabled', !data.enable);
+    $("#ghd-settings-inner .ghd-enable").checked = data.enable;
+    toggleClass($("body"), "ghd-disabled", !data.enable);
 
     // Create our menu entry
     menu = make({
-      el    : 'a',
-      cl4ss : 'dropdown-item',
-      html  : 'GitHub Dark Settings',
-      attr  : { id: 'ghd-menu' }
+      el    : "a",
+      cl4ss : "dropdown-item",
+      html  : "GitHub Dark Settings",
+      attr  : { id: "ghd-menu" }
     });
 
-    el = $$('.header .dropdown-item[href="/settings/profile"], .header .dropdown-item[data-ga-click*="go to profile"]');
-    // get last found item - gists only have the "go to profile" item; GitHub has both
+    el = $$(`
+      .header .dropdown-item[href="/settings/profile"],
+      .header .dropdown-item[data-ga-click*="go to profile"]`
+    );
+    // get last found item - gists only have the "go to profile" item;
+    // GitHub has both
     el = el[el.length - 1];
     if (el) {
       // insert after
       el.parentNode.insertBefore(menu, el.nextSibling);
-      on($('#ghd-menu'), 'click', () => {
+      on($("#ghd-menu"), "click", () => {
         openPanel();
       });
     }
 
-    on(document, 'keypress keydown', event => {
+    on(document, "keypress keydown", event => {
       clearTimeout(timer);
       // use "g+o" to open up ghd options panel
-      let openKeys = keyboardOpen.split('+'),
-        toggleKeys = keyboardToggle.split('+'),
+      let openKeys = keyboardOpen.split("+"),
+        toggleKeys = keyboardToggle.split("+"),
         key = String.fromCharCode(event.which).toLowerCase(),
-        panelVisible = $('#ghd-settings').classList.contains('in');
+        panelVisible = $("#ghd-settings").classList.contains("in");
 
       // press escape to close the panel
       if (event.which === 27 && panelVisible) {
@@ -967,7 +974,7 @@
       }
       // use event.which from keypress for shortcuts
       // prevent opening panel while typing "go" in comments
-      if (event.type === 'keydown' || /(input|textarea)/i.test(document.activeElement.nodeName)) {
+      if (event.type === "keydown" || /(input|textarea)/i.test(document.activeElement.nodeName)) {
         return;
       }
       if (lastKey === openKeys[0] && key === openKeys[1]) {
@@ -986,7 +993,7 @@
       }, keyboardDelay);
 
       // add shortcut to help menu
-      if (key === '?') {
+      if (key === "?") {
         // table doesn't exist until user presses "?"
         setTimeout(() => {
           buildShortcut();
@@ -995,19 +1002,19 @@
     });
 
     // add ghd-settings panel bindings
-    on($$('#ghd-settings, #ghd-settings-close'), 'click keyup', event => {
+    on($$("#ghd-settings, #ghd-settings-close"), "click keyup", event => {
       // press escape to close settings
-      if (event.type === 'keyup' && event.which !== 27) {
+      if (event.type === "keyup" && event.which !== 27) {
         return;
       }
       closePanel();
     });
 
-    on(panel, 'click', event => {
+    on(panel, "click", event => {
       event.stopPropagation();
     });
 
-    on($('.ghd-reset', panel), 'click', event => {
+    on($(".ghd-reset", panel), "click", event => {
       event.preventDefault();
       isUpdating = true;
       // pass true to reset values
@@ -1020,33 +1027,33 @@
       updateStyle();
     });
 
-    on($$('input[type="text"]', panel), 'focus', () => {
+    on($$("input[type='text']", panel), "focus", function() {
       // select all text when focused
       this.select();
     });
 
-    on($$('select, input', panel), 'change', () => {
+    on($$("select, input", panel), "change", () => {
       if (!isUpdating) {
         updateStyle();
       }
     });
 
-    on($('.ghd-update', panel), 'click', event => {
+    on($(".ghd-update", panel), "click", event => {
       event.preventDefault();
       forceUpdate();
     });
 
-    on($('.ghd-textarea-toggle', panel), 'click', event => {
+    on($(".ghd-textarea-toggle", panel), "click", function(event) {
       event.preventDefault();
       let hidden, el;
-      this.classList.remove('selected');
-      el = next(this, '.ghd-paste-area-content');
+      this.classList.remove("selected");
+      el = next(this, ".ghd-paste-area-content");
       if (el) {
-        hidden = el.style.display === 'none';
-        el.style.display = hidden ? '' : 'none';
-        if (el.style.display !== 'none') {
-          el.classList.add('selected');
-          el = $('textarea', el);
+        hidden = el.style.display === "none";
+        el.style.display = hidden ? "" : "none";
+        if (el.style.display !== "none") {
+          el.classList.add("selected");
+          el = $("textarea", el);
           el.focus();
           el.select();
         }
@@ -1054,30 +1061,30 @@
       return false;
     });
 
-    on($('.ghd-paste-area-content', panel), 'paste', event => {
-      let toggle = $('.ghd-textarea-toggle', panel),
+    on($(".ghd-paste-area-content", panel), "paste", event => {
+      let toggle = $(".ghd-textarea-toggle", panel),
         textarea = event.target;
       setTimeout(() => {
-        textarea.parentNode.style.display = 'none';
-        toggle.classList.remove('selected');
+        textarea.parentNode.style.display = "none";
+        toggle.classList.remove("selected");
         testing = true;
         forceUpdate(textarea.value);
       }, 200);
     });
 
     // Toggles
-    on($('body'), 'click', event => {
+    on($("body"), "click", event => {
       let target = event.target;
-      if (data.enableCodeWrap && target.classList.contains('ghd-wrap-toggle')) {
+      if (data.enableCodeWrap && target.classList.contains("ghd-wrap-toggle")) {
         // **** CODE WRAP TOGGLE ****
         event.stopPropagation();
         toggleCodeWrap(target);
-      } else if (data.enableMonospace && target.classList.contains('ghd-monospace')) {
+      } else if (data.enableMonospace && target.classList.contains("ghd-monospace")) {
         // **** MONOSPACE FONT TOGGLE ****
         event.stopPropagation();
         toggleMonospace(target);
         return false;
-      } else if (data.modeDiffToggle !== '0' && target.classList.contains('ghd-file-toggle')) {
+      } else if (data.modeDiffToggle !== "0" && target.classList.contains("ghd-file-toggle")) {
         // **** CODE DIFF COLLAPSE TOGGLE ****
         event.stopPropagation();
         toggleFile(event);
@@ -1085,29 +1092,29 @@
     });
 
     // style color picker
-    picker = new jscolor($('.ghd-color', panel));
+    picker = new jscolor($(".ghd-color", panel));
     picker.zIndex = 65536;
     picker.hash = true;
-    picker.backgroundColor = '#333';
+    picker.backgroundColor = "#333";
     picker.padding = 0;
     picker.borderWidth = 0;
-    picker.borderColor = '#444';
+    picker.borderColor = "#444";
     picker.onFineChange = () => {
-      swatch.style.backgroundColor = '#' + picker;
+      swatch.style.backgroundColor = "#" + picker;
     };
   }
 
   function openPanel() {
-    $('.modal-backdrop').click();
+    $(".modal-backdrop").click();
     updatePanel();
-    $('#ghd-settings').classList.add('in');
+    $("#ghd-settings").classList.add("in");
   }
 
   function closePanel(flag) {
-    $('#ghd-settings').classList.remove('in');
+    $("#ghd-settings").classList.remove("in");
     picker.hide();
 
-    if (flag === 'forced') {
+    if (flag === "forced") {
       // forced update; partial re-initialization
       init();
     } else {
@@ -1119,7 +1126,7 @@
   function toggleStyle() {
     let isEnabled = !data.enable;
     data.enable = isEnabled;
-    $('#ghd-settings-inner .ghd-enable').checked = isEnabled;
+    $("#ghd-settings-inner .ghd-enable").checked = isEnabled;
     // add processedCss back into style (emptied when disabled)
     if (isEnabled) {
       // data.processedCss is empty when ghd is disabled on init
@@ -1162,39 +1169,22 @@
   // add style at document-start
   init();
 
-  on(document, 'DOMContentLoaded', () => {
-    if (isInitialized === 'pending') {
+  on(document, "DOMContentLoaded", () => {
+    if (isInitialized === "pending") {
       // init after DOM loaded on .atom pages
       init();
     }
-    // add panel even if you're not logged in - open panel using keyboard shortcut
-    // just not on githubusercontent pages (no settings panel needed)
-    if (window.location.host.indexOf('githubusercontent.com') < 0) {
+    // add panel even if you're not logged in - open panel using keyboard
+    // shortcut just not on githubusercontent pages (no settings panel needed)
+    if (window.location.host.indexOf("githubusercontent.com") < 0) {
       buildSettings();
       // add event binding on document ready
       bindEvents();
 
-      $$(
-        `#js-repo-pjax-container,
-        #js-pjax-container,
-        .js-contribution-activity,
-        .js-diff-progressive-container`
-      ).forEach(target => {
-        new MutationObserver(mutations => {
-          mutations.forEach(mutation => {
-            // preform checks before adding code wrap to minimize function calls
-            if (!isUpdating && mutation.target === target) {
-              clearTimeout(mutationTimer);
-              mutationTimer = setTimeout(() => {
-                updateToggles();
-              }, 400);
-            }
-          });
-        }).observe(target, {
-          childList: true,
-          subtree: true
-        });
-      });
+      document.addEventListener("ghmo:container", updateToggles);
+      document.addEventListener("ghmo:comments", updateToggles);
+      document.addEventListener("ghmo:diff", updateToggles);
+      document.addEventListener("ghmo:preview", updateToggles);
     }
 
     isInitialized = true;
@@ -1203,14 +1193,17 @@
   /* utility functions */
   function isBool(name) {
     let val = data[name];
-    return typeof val === 'boolean' ? val : defaults[name];
+    return typeof val === "boolean" ? val : defaults[name];
   }
+
   function $(str, el) {
     return (el || document).querySelector(str);
   }
+
   function $$(str, el) {
     return Array.from((el || document).querySelectorAll(str));
   }
+
   function next(el, selector) {
     while ((el = el.nextElementSibling)) {
       if (el && el.matches(selector)) {
@@ -1219,6 +1212,7 @@
     }
     return null;
   }
+
   function closest(selector, el) {
     while (el && el.nodeType === 1) {
       if (el.matches(selector)) {
@@ -1228,6 +1222,7 @@
     }
     return null;
   }
+
   function make(obj) {
     let key,
       el = document.createElement(obj.el);
@@ -1245,11 +1240,13 @@
     }
     return el;
   }
+
   function removeAll(selector) {
     $$(selector).forEach(el => {
       el.parentNode.removeChild(el);
     });
   }
+
   function on(els, name, callback) {
     els = Array.isArray(els) ? els : [els];
     let events = name.split(/\s+/);
@@ -1259,28 +1256,28 @@
       });
     });
   }
+
   function toggleClass(els, cl4ss, flag) {
     els = Array.isArray(els) ? els : [els];
     els.forEach(el => {
       if (el) {
-        if (typeof flag === 'undefined') {
+        if (typeof flag === "undefined") {
           flag = !el.classList.contains(cl4ss);
         }
-        if (flag) {
-          el.classList.add(cl4ss);
-        } else {
-          el.classList.remove(cl4ss);
-        }
+        el.classList.toggle(cl4ss, flag);
       }
     });
   }
 
   // Add GM options
   GM_registerMenuCommand("GitHub Dark Script debug logging", () => {
-    let val = prompt('Toggle GitHub Dark Script debug log (true/false):', !debug);
+    let val = prompt(
+      "Toggle GitHub Dark Script debug log (true/false):",
+      "" + debug
+    );
     if (val) {
       debug = /^t/.test(val);
-      GM_setValue('debug', debug);
+      GM_setValue("debug", debug);
     }
   });
 
