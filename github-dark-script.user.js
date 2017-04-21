@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.2.1
+// @version     2.2.2
 // @description GitHub Dark in userscript form, with a settings panel
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
@@ -16,7 +16,7 @@
 // @connect     githubusercontent.com
 // @connect     raw.githubusercontent.com
 // @require     https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
-// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=188090
+// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=189706
 // @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
@@ -932,7 +932,7 @@
     isUpdating = false;
     document.activeElement.blur();
     // move current open panel to the top
-    if (!el.classList.contains("Details--on")) {
+    if (el && !el.classList.contains("Details--on")) {
       location.hash = el.id;
     }
   }

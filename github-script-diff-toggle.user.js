@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Diff File Toggle
-// @version     1.2.0
+// @version     1.2.1
 // @description A userscript that adds a toggle to show or hide diff files
 // @license     https://creativecommons.org/licenses/by-sa/4.0/
 // @author      StylishThemes
@@ -11,7 +11,7 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_registerMenuCommand
-// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=188090
+// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=189706
 // @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
