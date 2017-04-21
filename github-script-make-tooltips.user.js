@@ -1,18 +1,19 @@
 // ==UserScript==
-// @name         GitHub Make Tooltips
-// @version      1.0.2
-// @description  A userscript converts title tooltips into Github Tooltips
-// @license      https://creativecommons.org/licenses/by-sa/4.0/
-// @namespace    https://github.com/StylishThemes
-// @include      https://github.com/*
-// @run-at       document-idle
-// @grant        GM_addStyle
-// @author       StylishThemes
-// @updateURL    https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js
-// @downloadURL  https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js
+// @name        GitHub Make Tooltips
+// @version     1.0.3
+// @description A userscript converts title tooltips into Github Tooltips
+// @license     https://creativecommons.org/licenses/by-sa/4.0/
+// @author      StylishThemes
+// @namespace   https://github.com/StylishThemes
+// @include     https://github.com/*
+// @run-at      document-idle
+// @grant       GM_addStyle
+// @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
+// @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js
+// @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js
 // ==/UserScript==
 /* jshint esnext:true, unused:true */
-(function() {
+(() => {
   "use strict";
 
   GM_addStyle(".news .alert, .news .alert .body { overflow: visible !important; }");
@@ -45,7 +46,7 @@
             el.classList.add("tooltipped-multiline");
           }
           el.setAttribute("aria-label", txt);
-          el.removeAttribute('title');
+          el.removeAttribute("title");
           max++;
         }
         indx++;
