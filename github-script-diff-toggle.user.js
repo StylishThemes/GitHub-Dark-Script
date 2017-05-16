@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        GitHub Diff File Toggle
-// @version     1.2.1
+// @version     1.2.2
 // @description A userscript that adds a toggle to show or hide diff files
-// @license     https://creativecommons.org/licenses/by-sa/4.0/
+// @license     MIT
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     https://github.com/*

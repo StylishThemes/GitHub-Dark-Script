@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        GitHub Make Tooltips
-// @version     1.0.3
+// @version     1.0.4
 // @description A userscript converts title tooltips into Github Tooltips
-// @license     https://creativecommons.org/licenses/by-sa/4.0/
+// @license     MIT
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     https://github.com/*
@@ -27,7 +27,7 @@
 
     // loop with delay to allow user interaction
     function loop() {
-      var el, txt, direction,
+      let el, txt, direction,
         // max number of DOM modifications per loop
         max = 0;
       while ( max < 20 && indx < len ) {

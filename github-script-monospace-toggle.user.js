@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        GitHub Monospace Font Toggle
-// @version     1.2.1
+// @version     1.2.2
 // @description A userscript that adds monospace font toggle to comments
-// @license     https://creativecommons.org/licenses/by-sa/4.0/
+// @license     MIT
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     https://github.com/*

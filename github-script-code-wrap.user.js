@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name        GitHub Toggle Code Wrap
-// @version     1.1.2
+// @version     1.1.3
 // @description A userscript that adds a code wrap toggle button
-// @license     https://creativecommons.org/licenses/by-sa/4.0/
+// @license     MIT
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     https://github.com/*
