@@ -1,8 +1,8 @@
 {
   "name": "github-dark-script",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "GitHub Dark in userscript form, with an options panel",
-  "license": "CC-BY-SA-4.0",
+  "license": "MIT",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
     "eslint": "^3.19.0"
