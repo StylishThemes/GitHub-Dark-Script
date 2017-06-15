@@ -71,7 +71,7 @@
     },
 
     // extract style & theme name
-    regex = /\/\*! [^\*]+ \*\//,
+    regex = /\/\*! [^*]+ \*\//,
     themesXref = {
       github: {
         placeholder: "syntax-theme",
@@ -461,7 +461,7 @@
       processed = processed
         // line in github-dark.css = "select, input:not(.btn-link), textarea"
         .replace("select, input:not(.btn-link)", "input { color:#eee !important; } select")
-        .replace(/input\[type=\"checkbox\"\][\s\S]+?}/gm, "");
+        .replace(/input\[type="checkbox"\][\s\S]+?}/gm, "");
     }
     data.processedCss = processed;
     fetchAndApplyTheme(data.theme, "github");
@@ -653,7 +653,7 @@
                 <p>
                   <label>Image:</label>
                   <input class="ghd-image ghd-right" type="text">
-                  <a href="https://github.com/StylishThemes/GitHub-Dark/wiki/Image" class="tooltipped tooltipped-e" aria-label="Click to learn about GitHub\'s Content Security&#10;Policy and how to add a custom image">${icon}</a>
+                  <a href="https://github.com/StylishThemes/GitHub-Dark/wiki/Image" class="tooltipped tooltipped-e" aria-label="Click to learn about GitHub's Content Security&#10;Policy and how to add a custom image">${icon}</a>
                 </p>
                 <p>
                   <label>Image type:</label>
