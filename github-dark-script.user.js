@@ -1155,7 +1155,7 @@
       return;
     }
 
-    document.head.appendChild($style);
+    document.head.parentNode.insertBefore($style, document.head.nextSibling);
     getStoredValues(true);
 
     $style.disabled = !data.enable;
