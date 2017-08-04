@@ -6,7 +6,7 @@
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
-// @include     https://*.githubusercontent.com/*
+// @include     /^https://*.githubusercontent.com/*$/
 // @run-at      document-start
 // @grant       GM_addStyle
 // @grant       GM_getValue
