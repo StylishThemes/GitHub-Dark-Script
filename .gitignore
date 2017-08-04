@@ -3,6 +3,10 @@ build.json
 *.build.css
 *.build.min.css
 
+# lockfiles
+package-lock.json
+yarn.lock
+
 #################
 ## Eclipse
 #################
