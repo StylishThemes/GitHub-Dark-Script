@@ -955,9 +955,12 @@
       attr: { id: "ghd-menu" }
     });
 
+    // .header changed to .Header 22 Aug 2017
     el = $$(`
       .header .dropdown-item[href="/settings/profile"],
-      .header .dropdown-item[data-ga-click*="go to profile"]`
+      .header .dropdown-item[data-ga-click*="go to profile"],
+      .Header .dropdown-item[href="/settings/profile"],
+      .Header .dropdown-item[data-ga-click*="go to profile"]`
     );
     // get last found item - gists only have the "go to profile" item;
     // GitHub has both
