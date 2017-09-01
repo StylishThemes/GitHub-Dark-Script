@@ -607,7 +607,7 @@
       .ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }
       /* wrap enabled (green) */
       body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }
-      .blob-wrapper, .markdown-body pre, .markdown-body .highlight { position:relative; }
+      .markdown-body pre, .markdown-body .highlight { position:relative; }
       /* monospace font toggle */
       .ghd-monospace-font { font-family:"${data.font}", Menlo, Inconsolata, "Droid Mono", monospace !important; font-size:1em !important; }
       /* file collapsed icon */
