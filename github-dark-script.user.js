@@ -978,11 +978,11 @@
       // use "g+o" to open up ghd options panel
       let openKeys = keyboardOpen.split("+"),
         toggleKeys = keyboardToggle.split("+"),
-        key = String.fromCharCode(event.which).toLowerCase(),
+        key = event.key.toLowerCase(),
         panelVisible = $("#ghd-settings").classList.contains("in");
 
       // press escape to close the panel
-      if (event.which === 27 && panelVisible) {
+      if (key === "escape" && panelVisible) {
         closePanel();
         return;
       }
