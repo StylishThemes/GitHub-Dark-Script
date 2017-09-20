@@ -1119,9 +1119,12 @@
   }
 
   function openPanel() {
-    $(".modal-backdrop").click();
-    updatePanel();
-    $("#ghd-settings").classList.add("in");
+    // Don't show options panel on page that's missing main styles (e.g. help)
+    if ($(".modal-backdrop")) {
+      $(".modal-backdrop").click();
+      updatePanel();
+      $("#ghd-settings").classList.add("in");
+    }
   }
 
   function closePanel(flag) {
