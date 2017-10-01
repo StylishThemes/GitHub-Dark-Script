@@ -119,6 +119,7 @@
         "Base16 Ocean Dark": "base16-ocean",
         "Cobalt": "cobalt",
         "Dracula": "dracula",
+        "Material": "material",
         "Monokai": "monokai",
         "Monokai Spacegray Eighties": "monokai-spacegray-eighties",
         "Pastel on Dark": "pastel-on-dark",
