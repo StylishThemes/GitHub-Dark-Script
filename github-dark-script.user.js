@@ -116,7 +116,7 @@
       // CodeMirror themes
       codemirror: {
         "Ambiance": "ambiance",
-        "Base16 Ocean Dark": "base16-ocean",
+        "Base16 Ocean Dark": "base16-ocean-dark",
         "Cobalt": "cobalt",
         "Dracula": "dracula",
         "Material": "material",
