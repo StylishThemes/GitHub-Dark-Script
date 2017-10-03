@@ -689,7 +689,7 @@
                 </p>
                 <p>
                   <label>Tab Size:</label>
-                  <select class="ghd-tab ghd-right">
+                  <select class="ghd-tab ghd-right form-select">
                     <option value="0">disable</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
