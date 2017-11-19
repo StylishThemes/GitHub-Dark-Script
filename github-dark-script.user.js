@@ -5,29 +5,37 @@
 // @license     MIT
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
-// @include     /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com((?!generated_pages\/preview).)*$/
+// @include     /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com/((?!generated_pages\/preview).)*$/
 // @include     /^https://*.githubusercontent.com/*$/
+// @include     /^https://*graphql-explorer.githubapp.com/*$/
 // @run-at      document-start
+// @grant       GM.addStyle
 // @grant       GM_addStyle
+// @grant       GM.getValue
 // @grant       GM_getValue
+// @grant       GM.setValue
 // @grant       GM_setValue
+// @grant       GM.info
 // @grant       GM_info
+// @grant       GM.xmlHttpRequest
 // @grant       GM_xmlhttpRequest
+// @grant       GM.registerMenuCommand
 // @grant       GM_registerMenuCommand
 // @connect     githubusercontent.com
 // @connect     raw.githubusercontent.com
+// @require     https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
 // @require     https://greasyfork.org/scripts/15563-jscolor/code/jscolor.js?version=106439
 // @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=189706
 // @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global jscolor */
+/* global GM, jscolor */
 /* jshint esnext:true, unused:true */
-(() => {
+(async () => {
   "use strict";
 
-  const version = GM_info.script.version,
+  const version = GM.info.script.version,
 
     // delay until package.json allowed to load
     delay = 8.64e7, // 24 hours in milliseconds
@@ -216,7 +224,7 @@
     // set when css code to test is pasted into the settings panel
     testing = false,
     //
-    debug = GM_getValue("debug", false),
+    debug = true,
     data = {};
 
   function updatePanel() {
@@ -277,15 +285,15 @@
     isUpdating = false;
   }
 
-  function getStoredValues(init) {
-    data = GM_getValue("data", defaults);
+  async function getStoredValues(init) {
+    data = await GM.getValue("data", defaults);
     try {
       data = JSON.parse(data);
       if (!Object.keys(data).length || ({}).toString.call(data) !== "[object Object]") {
         throw new Error();
       }
     } catch(err) { // compat
-      data = GM_getValue("data", defaults);
+      data = await GM.getValue("data", defaults);
     }
     if (debug) {
       if (init) {
@@ -295,9 +303,9 @@
     }
   }
 
-  function setStoredValues(reset) {
+  async function setStoredValues(reset) {
     data.processedCss = $style.textContent;
-    GM_setValue("data", JSON.stringify(reset ? defaults : data));
+    await GM.setValue("data", JSON.stringify(reset ? defaults : data));
     updatePanel();
     if (debug) {
       console.log((reset ? "Resetting" : "Saving") + " current values", data);
@@ -333,7 +341,7 @@
     if (debug) {
       console.log("Fetching package.json");
     }
-    GM_xmlhttpRequest({
+    GM.xmlHttpRequest({
       method: "GET",
       url: root + "package.json",
       onload: response => {
@@ -354,7 +362,7 @@
           addSavedStyle();
         }
         // save new date/version
-        GM_setValue("data", JSON.stringify(data));
+        GM.setValue("data", JSON.stringify(data));
       }
     });
   }
@@ -363,7 +371,7 @@
     if (debug) {
       console.log(`Fetching ${root}github-dark.css`);
     }
-    GM_xmlhttpRequest({
+    GM.xmlHttpRequest({
       method: "GET",
       url: root + "github-dark.css",
       onload: response => {
@@ -388,7 +396,7 @@
     if (debug) {
       console.log(`Fetching ${group} ${name} theme`, themeUrl);
     }
-    GM_xmlhttpRequest({
+    GM.xmlHttpRequest({
       method: "GET",
       url: themeUrl,
       onload: response => {
@@ -406,7 +414,7 @@
     });
   }
 
-  function applyTheme(name, group) {
+  async function applyTheme(name, group) {
     let theme, css;
     if (debug) {
       theme = (data["css" + group] || "").match(regex);
@@ -418,7 +426,7 @@
       data["css" + group] || ""
     );
     applyStyle(css);
-    setStoredValues();
+    await setStoredValues();
     isUpdating = false;
   }
 
@@ -490,6 +498,7 @@
     if (debug) {
       console.log("Adding previously saved style");
     }
+
     // apply already processed css to prevent FOUC
     $style.textContent = data.processedCss;
   }
@@ -537,7 +546,7 @@
   }
 
   // user can force GitHub-dark update
-  function forceUpdate(css) {
+  async function forceUpdate(css) {
     if (css) {
       // add raw css directly for style testing
       data.rawCss = css;
@@ -548,7 +557,7 @@
       data.cssgithub = "";
       data.csscodemirror = "";
       data.cssjupyter = "";
-      GM_setValue("data", JSON.stringify(data));
+      await GM.setValue("data", JSON.stringify(data));
       closePanel("forced");
     }
   }
@@ -573,12 +582,12 @@
     return options;
   }
 
-  function buildSettings() {
+  async function buildSettings() {
     if (debug) {
       console.log("Adding settings panel & GitHub Dark link to profile dropdown");
     }
     // Script-specific CSS
-    GM_addStyle(`
+    GM.addStyle(`
       #ghd-menu:hover { cursor:pointer }
       #ghd-settings { position:fixed; z-index:65535; top:0; bottom:0; left:0; right:0; opacity:0; visibility:hidden; }
       #ghd-settings.in { opacity:1; visibility:visible; background:rgba(0,0,0,.5); }
@@ -596,7 +605,7 @@
       #ghd-settings .boxed-group-inner { padding:0; }
       #ghd-settings .ghd-footer { padding:10px; border-top:#555 solid 1px; }
       #ghd-settings .ghd-settings-wrapper { max-height:60vh; overflow-y:auto; padding:4px 10px; }
-      #ghd-settings .ghd-tab { width:5em; }
+      #ghd-settings .ghd-tab { width:6em; }
       #ghd-settings .octicon { vertical-align:text-bottom !important; }
       #ghd-settings .ghd-paste-area { position:absolute; bottom:50px; top:37px; left:2px; right:2px; width:396px !important; height:-moz-calc(100% - 85px);
         resize:none !important; border-style:solid; z-index:0; }
@@ -1049,13 +1058,13 @@
       event.stopPropagation();
     });
 
-    on($(".ghd-reset", panel), "click", event => {
+    on($(".ghd-reset", panel), "click", async event => {
       event.preventDefault();
       isUpdating = true;
       // pass true to reset values
-      setStoredValues(true);
+      await setStoredValues(true);
       // add reset values back to data
-      getStoredValues();
+      await getStoredValues();
       // add reset values to panel
       updatePanel();
       // update style
@@ -1073,9 +1082,9 @@
       }
     });
 
-    on($(".ghd-update", panel), "click", event => {
+    on($(".ghd-update", panel), "click", async event => {
       event.preventDefault();
-      forceUpdate();
+      await forceUpdate();
     });
 
     on($(".ghd-textarea-toggle", panel), "click", function(event) {
@@ -1096,14 +1105,14 @@
       return false;
     });
 
-    on($(".ghd-paste-area-content", panel), "paste", event => {
+    on($(".ghd-paste-area-content", panel), "paste", async event => {
       let toggle = $(".ghd-textarea-toggle", panel),
         textarea = event.target;
-      setTimeout(() => {
+      setTimeout(async () => {
         textarea.parentNode.style.display = "none";
         toggle.classList.remove("selected");
         testing = true;
-        forceUpdate(textarea.value);
+        await forceUpdate(textarea.value);
       }, 200);
     });
 
@@ -1177,13 +1186,13 @@
     $style.disabled = !isEnabled;
   }
 
-  function init() {
+  async function init() {
     if (!document.head) {
       return;
     }
 
     document.head.parentNode.insertBefore($style, document.head.nextSibling);
-    getStoredValues(true);
+    await getStoredValues(true);
 
     $style.disabled = !data.enable;
     data.lastgithub = data.themeGH;
@@ -1193,24 +1202,28 @@
     data.lastMS = data.enableMonospace;
     data.lastDT = data.modeDiffToggle;
 
-    // only load package.json once a day, or after a forced update
-    if ((new Date().getTime() > data.date + delay) || data.version === 0) {
-      // get package.json from GitHub-Dark & compare versions
-      // load new script if a newer one is available
-      checkVersion();
+    if (!data.processedCss) {
+      fetchAndApplyStyle();
     } else {
-      addSavedStyle();
+      // only load package.json once a day, or after a forced update
+      if ((new Date().getTime() > data.date + delay) || data.version === 0) {
+        // get package.json from GitHub-Dark & compare versions
+        // load new script if a newer one is available
+        checkVersion();
+      } else {
+        addSavedStyle();
+      }
     }
     isInitialized = false;
   }
 
   // add style at document-start
-  init();
+  await init();
 
-  on(document, "DOMContentLoaded", () => {
+  on(document, "DOMContentLoaded", async () => {
     if (isInitialized === "pending") {
       // init after DOM loaded on .atom pages
-      init();
+      await init();
     }
     // add panel even if you're not logged in - open panel using keyboard
     // shortcut just not on githubusercontent pages (no settings panel needed)
@@ -1310,15 +1323,15 @@
   }
 
   // Add GM options
-  GM_registerMenuCommand("GitHub Dark Script debug logging", () => {
-    let val = prompt(
-      "Toggle GitHub Dark Script debug log (true/false):",
-      "" + debug
-    );
-    if (val) {
-      debug = /^t/.test(val);
-      GM_setValue("debug", debug);
-    }
-  });
+  // await GM.registerMenuCommand("GitHub Dark Script debug logging", async () => {
+  //   let val = prompt(
+  //     "Toggle GitHub Dark Script debug log (true/false):",
+  //     "" + debug
+  //   );
+  //   if (val) {
+  //     debug = /^t/.test(val);
+  //     await GM.setValue("debug", debug);
+  //   }
+  // });
 
 })();

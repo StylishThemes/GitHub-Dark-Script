@@ -20,5 +20,8 @@ module.exports = {
     "browser": true,
     "greasemonkey": true
   },
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
   "extends": "eslint:recommended"
 };
