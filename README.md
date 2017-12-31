@@ -2,7 +2,7 @@
   <img alt="githubdark-script-logo" src="https://rawgit.com/StylishThemes/logos/master/github.dark/githubdark-script-mini.svg" width="580">
   <br>
   <a href="https://github.com/StylishThemes/GitHub-Dark-Script/tags">
-    <img src="https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Script.svg?label=%20tag%20" alt="Tag">
+    <img src="https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Script.svg?label=tag" alt="Tag">
   </a>
   <a href="https://github.com/StylishThemes/GitHub-Dark-Script/stargazers">
     <img src="http://github-svg-buttons.herokuapp.com/star.svg?user=StylishThemes&repo=GitHub-Dark-Script&style=flat&background=007ec6" alt="Star">
