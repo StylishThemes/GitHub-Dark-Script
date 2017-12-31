@@ -922,7 +922,7 @@
   }
 
   function toggleMonospace(el) {
-    let tmp = closest(".previewable-comment-form", el),
+    let tmp = el.closest(".previewable-comment-form"),
       // single comment
       textarea = $(".comment-form-textarea", tmp);
     if (textarea) {
@@ -949,7 +949,7 @@
 
   function toggleFile(event, init) {
     isUpdating = true;
-    let el = closest(".file", event.target);
+    let el = event.target.closest(".file");
     if (el && data.modeDiffToggle === "2") {
       if (!init) {
         el.classList.toggle("Details--on");
@@ -1262,16 +1262,6 @@
       if (el && el.matches(selector)) {
         return el;
       }
-    }
-    return null;
-  }
-
-  function closest(selector, el) {
-    while (el && el.nodeType === 1) {
-      if (el.matches(selector)) {
-        return el;
-      }
-      el = el.parentNode;
     }
     return null;
   }
