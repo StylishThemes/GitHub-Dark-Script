@@ -1244,7 +1244,7 @@
   }
 
 	if (document.readyState === "loading") {
-		on(document, "DOMContentLoaded", async () => buildOnLoad);
+		on(document, "DOMContentLoaded", buildOnLoad);
 	} else {
 		buildOnLoad();
 	}
