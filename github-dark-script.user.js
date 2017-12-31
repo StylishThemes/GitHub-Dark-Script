@@ -1222,7 +1222,7 @@
   // add style at document-start
   await init();
 
-  on(document, "DOMContentLoaded", async () => {
+  async function buildOnLoad() {
     if (isInitialized === "pending") {
       // init after DOM loaded on .atom pages
       await init();
@@ -1234,14 +1234,20 @@
       // add event binding on document ready
       bindEvents();
 
-      document.addEventListener("ghmo:container", updateToggles);
-      document.addEventListener("ghmo:comments", updateToggles);
-      document.addEventListener("ghmo:diff", updateToggles);
-      document.addEventListener("ghmo:preview", updateToggles);
+      on(document, "ghmo:container", updateToggles);
+      on(document, "ghmo:comments", updateToggles);
+      on(document, "ghmo:diff", updateToggles);
+      on(document, "ghmo:preview", updateToggles);
     }
 
     isInitialized = true;
-  });
+  }
+
+	if (document.readyState === "loading") {
+		on(document, "DOMContentLoaded", async () => buildOnLoad);
+	} else {
+		buildOnLoad();
+	}
 
   /* utility functions */
   function isBool(name) {
