@@ -614,20 +614,19 @@
 
       /* code wrap toggle: https://gist.github.com/silverwind/6c1701f56e62204cc42b
       icons next to a pre */
-      .ghd-wrap-toggle { position:absolute; right:1.4em; margin-top:.2em; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:20; }
+      .ghd-wrap-toggle { padding: 3px 5px; position:absolute; right:3px; top:3px; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:20; }
+      .ghd-code-wrapper:not(:hover) .ghd-wrap-toggle { border-color:transparent !important; background:transparent !important; }
       /* file & diff code tables */
       .ghd-wrap-table .blob-code-inner { white-space:pre-wrap !important; word-break:break-all !important; }
       .ghd-unwrap-table .blob-code-inner { white-space:pre !important; word-break:normal !important; }
       .ghd-wrap-toggle > *, .ghd-monospace > *, .ghd-file-toggle > * { pointer-events:none; vertical-align:middle !important; }
-      /* icons inside a wrapper immediatly around a pre */
-      .highlight > .ghd-wrap-toggle { right:.5em; top:.5em; margin-top:0; }
       /* icons for non-syntax highlighted code blocks; see https://github.com/gjtorikian/html-proofer/blob/master/README.md */
       .markdown-body:not(.comment-body) .ghd-wrap-toggle:not(:first-child) { right:3.4em; }
-      .ghd-wrap-toggle svg { height:1.25em; width:1.25em; fill:rgba(110,110,110,.4); }
+      .ghd-wrap-toggle svg { height:14px; width:14px; fill:rgba(110,110,110,.4); vertical-align:text-bottom; }
       /* wrap disabled (red) */
-      .ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg { fill:#8b0000; }
+      .ghd-code-wrapper:hover .ghd-wrap-toggle.unwrap svg, .ghd-code-wrapper:hover .ghd-wrap-toggle svg { fill:#8b0000; }
       /* wrap enabled (green) */
-      body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg, .ghd-wrap-toggle.wrapped:hover svg { fill:#006400; }
+      body:not(.nowrap) .ghd-code-wrapper:hover .ghd-wrap-toggle:not(.unwrap) svg, .ghd-code-wrapper:hover .ghd-wrap-toggle.wrapped svg { fill:#006400; }
       .markdown-body pre, .markdown-body .highlight { position:relative; }
       /* monospace font toggle */
       .ghd-monospace-font { font-family:"${data.font}", Menlo, Inconsolata, "Droid Mono", monospace !important; font-size:1em !important; }
@@ -758,24 +757,37 @@
     updateToggles();
   }
 
+  function addCodeWrapButton(button, target) {
+    target.insertBefore(button.cloneNode(true), target.childNodes[0]);
+    target.classList.add("ghd-code-wrapper");
+  }
+
   // Add code wrap toggle
   function buildCodeWrap() {
     // mutation events happen quick, so we still add an update flag
     isUpdating = true;
     let icon = make({
-      el: "div",
-      cl4ss: "ghd-wrap-toggle tooltipped tooltipped-w",
+      el: "button",
+      cl4ss: "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
+        (data.wrap ? "" : " unwrap"),
       attr: { "aria-label": "Toggle code wrap" },
       html: wrapIcon
     });
     $$(".blob-wrapper").forEach(el => {
       if (el && !$(".ghd-wrap-toggle", el)) {
-        el.insertBefore(icon.cloneNode(true), el.childNodes[0]);
+        addCodeWrapButton(icon, el);
       }
     });
-    $$(".markdown-body pre").forEach(el => {
-      if (el && !$(".ghd-wrap-toggle", el)) {
-        el.parentNode.insertBefore(icon.cloneNode(true), el);
+    $$(`
+      .markdown-body pre:not(.ghd-code-wrapper),
+      .markdown-format pre:not(.ghd-code-wrapper)`
+    ).forEach(pre => {
+      const code = $("code", pre);
+      const wrap = pre.parentNode;
+      if (code) {
+        addCodeWrapButton(icon, pre);
+      } else if (wrap.classList.contains("highlight")) {
+        addCodeWrapButton(icon, wrap);
       }
     });
     isUpdating = false;
@@ -882,40 +894,45 @@
     }
   }
 
+  function findSibling(node, selector) {
+    node = node.parentNode.firstElementChild;
+    while ((node = node.nextElementSibling)) {
+      if (node.matches(selector)) {
+        return node;
+      }
+    }
+    return null;
+  }
+
   function toggleCodeWrap(el) {
     let css,
       overallWrap = data.wrap,
-      code = next(el, ".highlight, .diff-table, code, pre"),
-      tmp = code ? $("code", code) : "";
-    if (tmp) {
-      // find code element
-      code = tmp;
-    }
-    if (!code) {
+      target = findSibling(el, ".highlight, .diff-table, code, pre");
+    if (!target) {
       if (debug) {
         console.log("Code wrap icon associated code not found", el);
       }
       return;
     }
     // code with line numbers
-    if (code.nodeName === "TABLE") {
-      if (code.className.indexOf("ghd-") < 0) {
+    if (target.nodeName === "TABLE") {
+      if (target.className.indexOf("wrap-table") < 0) {
         css = !overallWrap;
       } else {
-        css = code.classList.contains("ghd-unwrap-table");
+        css = target.classList.contains("ghd-unwrap-table");
       }
-      toggleClass(code, "ghd-wrap-table", css);
-      toggleClass(code, "ghd-unwrap-table", !css);
+      toggleClass(target, "ghd-wrap-table", css);
+      toggleClass(target, "ghd-unwrap-table", !css);
       toggleClass(el, "wrapped", css);
       toggleClass(el, "unwrap", !css);
     } else {
-      css = code.getAttribute("style") || "";
+      css = target.getAttribute("style") || "";
       if (css === "") {
         css = wrapCss[overallWrap ? "unwrap" : "wrapped"];
       } else {
         css = wrapCss[css === wrapCss.wrapped ? "unwrap" : "wrapped"];
       }
-      code.setAttribute("style", css);
+      target.setAttribute("style", css);
       toggleClass(el, "wrapped", css === wrapCss.wrapped);
       toggleClass(el, "unwrap", css === wrapCss.unwrap);
     }

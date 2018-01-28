@@ -6,6 +6,7 @@
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     https://github.com/*
+// @include     https://gist.github.com/*
 // @run-at      document-idle
 // @grant       GM_registerMenuCommand
 // @grant       GM_getValue
@@ -30,7 +31,7 @@
     busy = false;
 
   const wrapIcon = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" viewBox="0 0 768 768">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 768 768">
       <path d="M544.5 352.5q52.5 0 90 37.5t37.5 90-37.5 90-90 37.5H480V672l-96-96 96-96v64.5h72q25.5 0 45-19.5t19.5-45-19.5-45-45-19.5H127.5v-63h417zm96-192v63h-513v-63h513zm-513 447v-63h192v63h-192z"/>
     </svg>`,
 
@@ -47,77 +48,50 @@
     }
   }
 
-  // equivalent to .next("code, pre, .highlight, .diff-table");
-  function findNext(el) {
-    const nextSib = el.nextElementSibling;
-    if (
-      /code|pre/i.test(nextSib.nodeName) ||
-      nextSib && (
-        nextSib.classList.contains("highlight") ||
-        nextSib.classList.contains("diff-table")
-      )
-    ) {
-      return nextSib;
+  function findSibling(node, selector) {
+    node = node.parentNode.firstElementChild;
+    while ((node = node.nextElementSibling)) {
+      if (node.matches(selector)) {
+        return node;
+      }
     }
-    return el;
+    return null;
   }
 
-  function toggleClasses(icon) {
+  function toggleClasses(button) {
     let css,
-      code = findNext(icon);
-    if ($("code", code)) {
-      code = $("code", code);
-    }
-    if (!code) {
-      console.error("Code wrap icon associated code not found", icon);
+      target = findSibling(button, "code, pre, .highlight, .diff-table");
+    if (!target) {
+      console.error("Code wrap icon associated code not found", button);
       return;
     }
     // code with line numbers
-    if (code.nodeName === "TABLE") {
-      if (code.className.indexOf("wrap-table") < 0) {
+    if (target.nodeName === "TABLE") {
+      if (target.className.indexOf("wrap-table") < 0) {
         css = !globalWrap;
       } else {
-        css = code.classList.contains("ghd-unwrap-table");
+        css = target.classList.contains("ghd-unwrap-table");
       }
-      if (css) {
-        code.classList.add("ghd-wrap-table");
-        code.classList.remove("ghd-unwrap-table");
-        icon.classList.add("wrapped");
-        icon.classList.remove("unwrap");
-      } else {
-        code.classList.remove("ghd-wrap-table");
-        code.classList.add("ghd-unwrap-table");
-        icon.classList.remove("wrapped");
-        icon.classList.add("unwrap");
-      }
+      target.classList.toggle("ghd-wrap-table", css);
+      target.classList.toggle("ghd-unwrap-table", !css);
+      button.classList.toggle("wrapped", css);
+      button.classList.toggle("unwrap", !css);
     } else {
-      css = code.getAttribute("style") || "";
+      css = target.getAttribute("style") || "";
       if (css === "") {
         css = wrapCss[globalWrap ? "unwrap" : "wrapped"];
       } else {
         css = wrapCss[css === wrapCss.wrapped ? "unwrap" : "wrapped"];
       }
-      code.setAttribute("style", css);
-      if (css === wrapCss.wrapped) {
-        icon.classList.add("wrapped");
-        icon.classList.remove("unwrap");
-      } else {
-        icon.classList.add("unwrap");
-        icon.classList.remove("wrapped");
-      }
+      target.setAttribute("style", css);
+      button.classList.toggle("wrapped", css === wrapCss.wrapped);
+      button.classList.toggle("unwrap", css === wrapCss.wrapped);
     }
   }
 
-  function getPrevSib(el, name) {
-    let prev = el.previousSibling;
-    while (prev) {
-      if (prev.nodeType !== 1 || !prev.classList.contains(name)) {
-        prev = prev.previousSibling;
-      } else {
-        return prev;
-      }
-    }
-    return null;
+  function addCodeWrapButton(button, target) {
+    target.insertBefore(button.cloneNode(true), target.childNodes[0]);
+    target.classList.add("ghd-code-wrapper");
   }
 
   // Add code wrap toggle
@@ -126,36 +100,37 @@
       return;
     }
     busy = true;
-    // add wrap code icons
-    let tmp,
-      wrapper = $$(".blob-wrapper"),
-      indx = wrapper ? wrapper.length : 0,
 
-      // <div class="ghd-wrap-toggle tooltipped tooltipped-w"
-      // aria-label="Toggle code wrap">
-      icon = document.createElement("div");
-      icon.className = "ghd-wrap-toggle tooltipped tooltipped-w";
-      icon.setAttribute("aria-label", "Toggle code wrap");
-      icon.innerHTML = wrapIcon;
+    // add wrap code buttons
+    let wrapper = $$(".blob-wrapper"),
+      indx = wrapper ? wrapper.length : 0;
+    const button = document.createElement("button");
+      button.className = "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
+        (globalWrap ? "" : " unwrap");
+      button.setAttribute("aria-label", "Toggle code wrap");
+      button.innerHTML = wrapIcon;
 
-    // $(".blob-wrapper").prepend(wrapIcon);
+    // Code in table with line numbers
     while (indx--) {
       if (!$(".ghd-wrap-toggle", wrapper[indx])) {
-        wrapper[indx].insertBefore(
-          icon.cloneNode(true), wrapper[indx].childNodes[0]
-        );
+        addCodeWrapButton(button, wrapper[indx]);
       }
     }
 
-    // $(".markdown-body pre").before(wrapIcon);
-    wrapper = $$(".markdown-body pre");
+    // Code in markdown comments & wiki pages
+    wrapper = $$(`
+      .markdown-body pre:not(.ghd-code-wrapper),
+      .markdown-format pre:not(.ghd-code-wrapper)`
+    );
     indx = wrapper ? wrapper.length : 0;
     while (indx--) {
-      tmp = getPrevSib(wrapper[indx], "ghd-wrap-toggle");
-      if (!tmp) {
-        wrapper[indx].parentNode.insertBefore(
-          icon.cloneNode(true), wrapper[indx]
-        );
+      const pre = wrapper[indx];
+      const code = $("code", pre);
+      const wrap = pre.parentNode;
+      if (code) {
+        addCodeWrapButton(button, pre);
+      } else if (wrap.classList.contains("highlight")) {
+        addCodeWrapButton(button, wrap);
       }
     }
     busy = false;
@@ -163,9 +138,7 @@
 
   function init() {
     document.addEventListener("click", findWrap);
-    if (!globalWrap) {
-      $("body").classList.add("nowrap");
-    }
+    $("body").classList.toggle("nowrap", !globalWrap);
     buildCodeWrap();
   }
 
@@ -174,7 +147,7 @@
   }
 
   function $$(str, el) {
-    return Array.from((el || document).querySelectorAll(str));
+    return [...(el || document).querySelectorAll(str)];
   }
 
   // don't initialize if GitHub Dark Script is active
@@ -182,13 +155,18 @@
     GM_addStyle(`
       /* icons next to a pre */
       .ghd-wrap-toggle {
+        padding: 3px 5px;
         position: absolute;
-        right: 1.4em;
-        margin-top: .2em;
+        right: 3px;
+        top: 3px;
         -moz-user-select: none;
         -webkit-user-select: none;
         cursor: pointer;
         z-index: 20;
+      }
+      .ghd-code-wrapper:not(:hover) .ghd-wrap-toggle {
+        border-color: transparent !important;
+        background: transparent !important;
       }
       /* file & diff code tables */
       .ghd-wrap-table td.blob-code-inner {
@@ -199,12 +177,6 @@
         white-space: pre !important;
         word-break: normal !important;
       }
-      /* icons inside a wrapper immediatly around a pre */
-      .highlight > .ghd-wrap-toggle {
-        right: .5em;
-        top: .5em;
-        margin-top: 0;
-      }
       /* icons for non-syntax highlighted code blocks;
        * see https://github.com/gjtorikian/html-proofer/blob/master/README.md
        */
@@ -212,25 +184,27 @@
         right: 3.4em;
       }
       .ghd-wrap-toggle svg {
-        height: 1.25em;
-        width: 1.25em;
+        height: 14px;
+        width: 14px;
         fill: rgba(110, 110, 110, .4);
         pointer-events: none;
+        vertical-align: text-bottom;
       }
-      .ghd-wrap-toggle.unwrap:hover svg, .ghd-wrap-toggle:hover svg {
+      .ghd-code-wrapper:hover .ghd-wrap-toggle.unwrap svg,
+      .ghd-code-wrapper:hover .ghd-wrap-toggle svg {
         fill: #8b0000; /* wrap disabled (red) */
       }
-      body:not(.nowrap) .ghd-wrap-toggle:not(.unwrap):hover svg,
-      .ghd-wrap-toggle.wrapped:hover svg {
+      body:not(.nowrap) .ghd-code-wrapper:hover .ghd-wrap-toggle:not(.unwrap) svg,
+      .ghd-code-wrapper:hover .ghd-wrap-toggle.wrapped svg {
         fill: #006400; /* wrap enabled (green) */
       }
       .blob-wrapper, .markdown-body pre, .markdown-body .highlight {
-        position:relative;
+        position: relative;
       }
       /* global code wrap */
-      .blob-code-inner,
-      .markdown-body pre > code,
-      .markdown-body .highlight > pre {
+      body:not(.nowrap) .blob-code-inner,
+      body:not(.nowrap) .markdown-body pre > code,
+      body:not(.nowrap) .markdown-body .highlight > pre {
         white-space: pre-wrap !important;
         word-break: break-all !important;
         overflow-wrap: break-word !important;
