@@ -198,7 +198,8 @@
       .ghd-code-wrapper:hover .ghd-wrap-toggle.wrapped svg {
         fill: #006400; /* wrap enabled (green) */
       }
-      .blob-wrapper, .markdown-body pre, .markdown-body .highlight {
+      .blob-wrapper, .markdown-body pre, .markdown-body .highlight,
+      .ghd-code-wrapper {
         position: relative;
       }
       /* global code wrap */

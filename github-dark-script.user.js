@@ -627,7 +627,7 @@
       .ghd-code-wrapper:hover .ghd-wrap-toggle.unwrap svg, .ghd-code-wrapper:hover .ghd-wrap-toggle svg { fill:#8b0000; }
       /* wrap enabled (green) */
       body:not(.nowrap) .ghd-code-wrapper:hover .ghd-wrap-toggle:not(.unwrap) svg, .ghd-code-wrapper:hover .ghd-wrap-toggle.wrapped svg { fill:#006400; }
-      .markdown-body pre, .markdown-body .highlight { position:relative; }
+      .markdown-body pre, .markdown-body .highlight, .ghd-code-wrapper { position:relative; }
       /* monospace font toggle */
       .ghd-monospace-font { font-family:"${data.font}", Menlo, Inconsolata, "Droid Mono", monospace !important; font-size:1em !important; }
       /* file collapsed icon */
