@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.4.4
+// @version     2.4.5
 // @description GitHub Dark in userscript form, with a settings panel
 // @license     MIT
 // @author      StylishThemes
