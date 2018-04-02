@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Toggle Code Wrap
-// @version     1.1.5
+// @version     1.1.6
 // @description A userscript that adds a code wrap toggle button
 // @license     MIT
 // @author      StylishThemes
@@ -169,11 +169,11 @@
         background: transparent !important;
       }
       /* file & diff code tables */
-      .ghd-wrap-table td.blob-code-inner {
+      body .ghd-wrap-table td.blob-code-inner {
         white-space: pre-wrap !important;
         word-break: break-all !important;
       }
-      .ghd-unwrap-table td.blob-code-inner {
+      body .ghd-unwrap-table td.blob-code-inner {
         white-space: pre !important;
         word-break: normal !important;
       }
