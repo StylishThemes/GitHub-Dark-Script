@@ -5,7 +5,7 @@
 // @license     MIT
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
-// @include     /^https?://((gist|guides|help|raw|status|developer)\.)?github\.com/((?!generated_pages\/preview).)*$/
+// @include     /^https?://((gist|guides|help|raw|status|developer|blog)\.)?github\.com/((?!generated_pages\/preview).)*$/
 // @include     /^https://*.githubusercontent.com/*$/
 // @include     /^https://*graphql-explorer.githubapp.com/*$/
 // @run-at      document-start
