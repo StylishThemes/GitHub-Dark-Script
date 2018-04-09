@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Toggle Code Wrap
-// @version     1.1.6
+// @version     1.1.7
 // @description A userscript that adds a code wrap toggle button
 // @license     MIT
 // @author      StylishThemes
@@ -12,7 +12,7 @@
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
-// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=189706
+// @require     https://greasyfork.org/scripts/28721-mutations/code/mutations.js?version=264157
 // @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-code-wrap.user.js
