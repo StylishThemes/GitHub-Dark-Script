@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Diff File Toggle
-// @version     1.2.3
+// @version     1.2.4
 // @description A userscript that adds a toggle to show or hide diff files
 // @license     MIT
 // @author      StylishThemes
@@ -57,8 +57,7 @@
   }
 
   function toggleSibs(target, state) {
-    // oddly, when a "Details--on" class is applied, the content is hidden
-    const isCollapsed = state || target.classList.contains("Details--on"),
+    const isCollapsed = state,
       toggles = $$(".file");
     let el,
       indx = toggles.length;
@@ -77,12 +76,12 @@
       if (!init) {
         el.classList.toggle("Details--on");
       }
-      toggleSibs(el, true);
+      toggleSibs(el, false);
     } else if (el) {
       el.classList.toggle("Details--on");
       // shift+click toggle all files!
       if (event.shiftKey) {
-        toggleSibs(el);
+        toggleSibs(el, el.classList.contains("Details--on"));
       }
     }
     document.activeElement.blur();
