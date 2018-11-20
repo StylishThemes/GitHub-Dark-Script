@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.4.9
+// @version     2.4.10
 // @description GitHub Dark in userscript form, with a settings panel
 // @license     MIT
 // @author      StylishThemes
@@ -1277,7 +1277,7 @@
   }
 
   function $$(str, el) {
-    return Array.from((el || document).querySelectorAll(str));
+    return [...(el || document).querySelectorAll(str)];
   }
 
   function next(el, selector) {
