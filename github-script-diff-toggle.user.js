@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Diff File Toggle
-// @version     1.2.5
+// @version     1.2.6
 // @description A userscript that adds a toggle to show or hide diff files
 // @license     MIT
 // @author      StylishThemes
@@ -34,6 +34,7 @@
   function addFileToggle() {
     const files = $$("#files .file-actions");
     let button = document.createElement("button");
+    let updated = false;
     button.type = "button";
     button.className = "ghd-file-toggle btn btn-sm tooltipped tooltipped-n";
     button.setAttribute("aria-label", "Click to Expand or Collapse file");
@@ -44,10 +45,11 @@
         // hide GitHub toggle view button
         el.querySelector(".js-details-target").style.display = "none";
         el.appendChild(button.cloneNode(true));
+        updated = true;
       }
     });
     // start with all but first entry collapsed
-    if (files.length) {
+    if (updated && files.length) {
       if (/^t/.test(GM_getValue("accordion"))) {
         toggleFile({
           target: $(".ghd-file-toggle")
@@ -71,7 +73,7 @@
 
   function toggleFile(event, init) {
     const accordion = GM_getValue("accordion"),
-      el = closest(".file", event.target);
+      el = event.target.closest(".file");
     if (el && accordion) {
       if (!init) {
         el.classList.toggle("Details--on");
@@ -86,7 +88,7 @@
     }
     document.activeElement.blur();
     // move current open panel to the top
-    if (!el.classList.contains("Details--on")) {
+    if (el.classList.contains("Details--on")) {
       location.hash = el.id;
     }
   }
@@ -106,17 +108,7 @@
   }
 
   function $$(str, el) {
-    return Array.from((el || document).querySelectorAll(str));
-  }
-
-  function closest(selector, el) {
-    while (el && el.nodeType === 1) {
-      if (el.matches(selector)) {
-        return el;
-      }
-      el = el.parentNode;
-    }
-    return null;
+    return [...(el || document).querySelectorAll(str)];
   }
 
   // Don't initialize if GitHub Dark Script is active
