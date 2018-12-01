@@ -30,8 +30,14 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
 
 # [Installation](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install)
 
-- Make sure to install a userscript engine like [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/), [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) or [compatible](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install).
-- Install the script:
+- First, you need a userscript manager. Options include:
+  - [Violentmonkey for Firefox](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/)
+  - [Violentmonkey for Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
+  - [Greasemonkey for Firefox](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
+  - [Tampermonkey for Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+  - [other Browsers](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install)
+
+- Then install the script via any of these methods:
   - [GitHub](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js)
   - [GreasyFork](https://greasyfork.org/en/scripts/15562-github-dark-script)
   - [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Dark_Script)

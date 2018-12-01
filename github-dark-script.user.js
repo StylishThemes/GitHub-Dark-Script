@@ -9,6 +9,7 @@
 // @include     /^https://*.githubusercontent.com/*$/
 // @include     /^https://*graphql-explorer.githubapp.com/*$/
 // @run-at      document-start
+// @inject-into content
 // @grant       GM.addStyle
 // @grant       GM_addStyle
 // @grant       GM.getValue
