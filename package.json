@@ -5,13 +5,13 @@
   "license": "MIT",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
-    "eslint": "^5.7.0",
+    "eslint": "^5.9.0",
     "ver": "^3.0.1"
   },
   "scripts": {
-    "lint": "eslint *.js || true",
-    "patch": "npx ver patch github-dark-script.user.js",
-    "minor": "npx ver minor github-dark-script.user.js",
-    "major": "npx ver major github-dark-script.user.js"
+    "lint": "npx eslint *.js",
+    "patch": "npm run lint && npx ver patch github-dark-script.user.js",
+    "minor": "npm run lint && npx ver minor github-dark-script.user.js",
+    "major": "npm run lint && npx ver major github-dark-script.user.js"
   }
 }
