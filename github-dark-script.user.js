@@ -667,13 +667,13 @@
                 </p>
                 <p>
                   <label>Color:</label>
-                  <input class="ghd-color ghd-right" type="text" value="#4183C4">
+                  <input class="ghd-color ghd-right form-control" type="text" value="#4183C4">
                   <span id="ghd-swatch" class="ghd-right"></span>
                 </p>
                 <h4>Background</h4>
                 <p>
                   <label>Image:</label>
-                  <input class="ghd-image ghd-right" type="text">
+                  <input class="ghd-image ghd-right form-control" type="text">
                   <a href="https://github.com/StylishThemes/GitHub-Dark/wiki/Image" class="tooltipped tooltipped-e" aria-label="Click to learn about GitHub's Content Security&#10;Policy and how to add a custom image">${icon}</a>
                 </p>
                 <p>
@@ -695,7 +695,7 @@
                 <p><label>CodeMirror Theme:</label> <select class="ghd-themecm ghd-right form-select">${optscm}</select></p>
                 <p><label>Jupyter Theme:</label> <select class="ghd-themejp ghd-right form-select">${optsjp}</select></p>
                 <p>
-                  <label>Font Name:</label> <input class="ghd-font ghd-right" type="text">
+                  <label>Font Name:</label> <input class="ghd-font ghd-right form-control" type="text">
                   <a href="http://www.cssfontstack.com/" class="tooltipped tooltipped-e" aria-label="Add a system installed (monospaced) font name;&#10;this script will not load external fonts!">${icon}</a>
                 </p>
                 <p>
