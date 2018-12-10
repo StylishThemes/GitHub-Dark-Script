@@ -477,13 +477,6 @@
       // remove default syntax
       .replace(/\s+\/\* grunt build - remove to end of file(.*(\n|\r))+\}$/m, "");
 
-    // see https://github.com/StylishThemes/GitHub-Dark/issues/275
-    if (/firefox/i.test(navigator.userAgent)) {
-      processed = processed
-        // line in github-dark.css = "select, input:not(.btn-link), textarea"
-        .replace("select, input:not(.btn-link)", "input { color:#eee !important; } select")
-        .replace(/input\[type="checkbox"\][\s\S]+?}/gm, "");
-    }
     data.processedCss = processed;
     fetchAndApplyTheme(data.theme, "github");
     fetchAndApplyTheme(data.themeCm, "codemirror");
