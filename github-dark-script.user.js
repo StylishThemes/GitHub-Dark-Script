@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.4.13
+// @version     2.4.14
 // @description GitHub Dark in userscript form, with a settings panel
 // @license     MIT
 // @author      StylishThemes
@@ -189,7 +189,7 @@
     // https://github.com/StylishThemes/GitHub-code-wrap/blob/master/github-code-wrap.css
     wrapCodeCss = `
       /* GitHub: Enable wrapping of long code lines */
-      .blob-code-inner,
+      .blob-code-inner:not(.blob-code-hunk),
       .markdown-body pre > code,
       .markdown-body .highlight > pre { ${wrapCss.wrapped} }
       td.blob-code-inner {
