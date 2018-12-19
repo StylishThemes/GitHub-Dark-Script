@@ -203,7 +203,7 @@
         position: relative;
       }
       /* global code wrap */
-      body:not(.nowrap) .blob-code-inner,
+      body:not(.nowrap) .blob-code-inner:not(.blob-code-hunk),
       body:not(.nowrap) .markdown-body pre > code,
       body:not(.nowrap) .markdown-body .highlight > pre {
         white-space: pre-wrap !important;
