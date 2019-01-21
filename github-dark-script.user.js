@@ -6,8 +6,8 @@
 // @author      StylishThemes
 // @namespace   https://github.com/StylishThemes
 // @include     /^https?://((blog|gist|guides|help|raw|status|developer)\.)?github\.com/((?!generated_pages\/preview).)*$/
-// @include     /^https://*.githubusercontent.com/*$/
-// @include     /^https://*graphql-explorer.githubapp.com/*$/
+// @include     https://*.githubusercontent.com/*
+// @include     https://*graphql-explorer.githubapp.com/*
 // @run-at      document-start
 // @inject-into content
 // @grant       GM.addStyle
