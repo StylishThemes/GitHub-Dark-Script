@@ -38,9 +38,9 @@ This script loads and applies the [GitHub Dark](https://github.com/StylishThemes
   - [other Browsers](https://github.com/StylishThemes/GitHub-Dark-Script/wiki/Install)
 
 - Then install the script via any of these methods:
-  - [GitHub](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js)
-  - [GreasyFork](https://greasyfork.org/en/scripts/15562-github-dark-script)
-  - [OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Dark_Script)
+  - [Install from GitHub](https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js)
+  - [Install from GreasyFork](https://greasyfork.org/en/scripts/15562-github-dark-script)
+  - [Install from OpenUserJS](https://openuserjs.org/scripts/StylishThemes/GitHub_Dark_Script)
 
 # Screenshot
 
