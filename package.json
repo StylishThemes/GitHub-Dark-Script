@@ -5,8 +5,8 @@
   "license": "MIT",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
-    "eslint": "^5.12.1",
-    "ver": "^3.0.1"
+    "eslint": "^5.14.1",
+    "ver": "^4.0.1"
   },
   "scripts": {
     "lint": "npx eslint *.js",
