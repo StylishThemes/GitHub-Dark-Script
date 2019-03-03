@@ -21,7 +21,7 @@ module.exports = {
     "greasemonkey": true
   },
   "parserOptions": {
-    "ecmaVersion": 2017
+    "ecmaVersion": 2019
   },
   "extends": "eslint:recommended"
 };
