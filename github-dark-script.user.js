@@ -478,7 +478,7 @@
       // code wrap css
       .replace("/*[[code-wrap]]*/", data.wrap ? wrapCodeCss : "")
       // remove default syntax
-      .replace(/\s+\/\* grunt build - remove start \*\/.*\s+\/\* grunt build - remove end \*\/$/sm, "");
+      .replace(/\s+\/\* grunt build - remove start[\s\S]+grunt build - remove end \*\/$/m, "");
 
     data.processedCss = processed;
     fetchAndApplyTheme(data.theme, "github");
