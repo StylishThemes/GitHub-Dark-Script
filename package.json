@@ -12,8 +12,8 @@
   "scripts": {
     "lint": "npx eslint *.js",
     "update": "npx updates -cu && rm -rf node_modules && npm i",
-    "patch": "npm run lint && npx ver patch github-dark-script.user.js",
-    "minor": "npm run lint && npx ver minor github-dark-script.user.js",
-    "major": "npm run lint && npx ver major github-dark-script.user.js"
+    "patch": "npm run lint && npx ver -p patch github-dark-script.user.js",
+    "minor": "npm run lint && npx ver -p minor github-dark-script.user.js",
+    "major": "npm run lint && npx ver -p major github-dark-script.user.js"
   }
 }
