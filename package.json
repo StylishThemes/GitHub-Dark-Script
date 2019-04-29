@@ -6,10 +6,12 @@
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
     "eslint": "^5.16.0",
-    "ver": "^4.1.0"
+    "updates": "8.0.2",
+    "ver": "^4.2.0"
   },
   "scripts": {
     "lint": "npx eslint *.js",
+    "update": "npx updates -cu && rm -rf node_modules && npm i",
     "patch": "npm run lint && npx ver patch github-dark-script.user.js",
     "minor": "npm run lint && npx ver minor github-dark-script.user.js",
     "major": "npm run lint && npx ver major github-dark-script.user.js"
