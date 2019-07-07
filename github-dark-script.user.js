@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.5.4
+// @version     2.5.5
 // @description GitHub Dark in userscript form, with a settings panel
 // @license     MIT
 // @author      StylishThemes
@@ -152,8 +152,8 @@
         "Monokai Spacegray Eighties": "monokai-spacegray-eighties",
         "Obsidian": "obsidian",
         "Pastel on Dark": "pastel-on-dark",
-        "Solarized Dark": "solarized-dark",
         "Railscasts": "railscasts",
+        "Solarized Dark": "solarized-dark",
         "Tomorrow Night": "tomorrow-night",
         "Tomorrow Night Blue": "tomorrow-night-blue",
         "Tomorrow Night Bright": "tomorrow-night-bright",
@@ -613,9 +613,10 @@
       icons next to a pre */
       .ghd-wrap-toggle { padding: 3px 5px; position:absolute; right:3px; top:3px; -moz-user-select:none; -webkit-user-select:none; cursor:pointer; z-index:20; }
       .ghd-code-wrapper:not(:hover) .ghd-wrap-toggle { border-color:transparent !important; background:transparent !important; }
+      .ghd-menu { margin-top:45px; }
       /* file & diff code tables */
-      .ghd-wrap-table .blob-code-inner { white-space:pre-wrap !important; word-break:break-all !important; }
-      .ghd-unwrap-table .blob-code-inner { white-space:pre !important; word-break:normal !important; }
+      .ghd-wrap-table .blob-code-inner:not(.blob-code-hunk) { white-space:pre-wrap !important; word-break:break-all !important; }
+      .ghd-unwrap-table .blob-code-inner:not(.blob-code-hunk) { white-space:pre !important; word-break:normal !important; }
       .ghd-wrap-toggle > *, .ghd-monospace > *, .ghd-file-toggle > * { pointer-events:none; vertical-align:middle !important; }
       /* icons for non-syntax highlighted code blocks; see https://github.com/gjtorikian/html-proofer/blob/master/README.md */
       .markdown-body:not(.comment-body) .ghd-wrap-toggle:not(:first-child) { right:3.4em; }
@@ -759,6 +760,14 @@
     target.classList.add("ghd-code-wrapper");
   }
 
+  function moveMenu(codeWrap) {
+    const menu = $("details", codeWrap);
+    if (menu) {
+      menu.classList.add("ghd-menu");
+      codeWrap.parentNode.appendChild(menu);
+    }
+  }
+
   // Add code wrap toggle
   function buildCodeWrap() {
     // mutation events happen quick, so we still add an update flag
@@ -773,6 +782,7 @@
     $$(".blob-wrapper").forEach(el => {
       if (el && !$(".ghd-wrap-toggle", el)) {
         addCodeWrapButton(icon, el);
+        moveMenu(el); // Fixes #66
       }
     });
     $$(`

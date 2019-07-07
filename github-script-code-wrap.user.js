@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Toggle Code Wrap
-// @version     1.1.9
+// @version     1.1.10
 // @description A userscript that adds a code wrap toggle button
 // @license     MIT
 // @author      StylishThemes
@@ -94,6 +94,14 @@
     target.classList.add("ghd-code-wrapper");
   }
 
+  function moveMenu(codeWrap) {
+    const menu = $("details", codeWrap);
+    if (menu) {
+      menu.classList.add("ghd-menu");
+      codeWrap.parentNode.appendChild(menu);
+    }
+  }
+
   // Add code wrap toggle
   function buildCodeWrap() {
     if (busy) {
@@ -114,6 +122,7 @@
     while (indx--) {
       if (!$(".ghd-wrap-toggle", wrapper[indx])) {
         addCodeWrapButton(button, wrapper[indx]);
+        moveMenu(wrapper[indx]); // Fixes #66
       }
     }
 
@@ -168,12 +177,15 @@
         border-color: transparent !important;
         background: transparent !important;
       }
+      .ghd-menu {
+        margin-top: 45px;
+      }
       /* file & diff code tables */
-      body .ghd-wrap-table td.blob-code-inner {
+      body .ghd-wrap-table td.blob-code-inner:not(.blob-code-hunk) {
         white-space: pre-wrap !important;
         word-break: break-all !important;
       }
-      body .ghd-unwrap-table td.blob-code-inner {
+      body .ghd-unwrap-table td.blob-code-inner:not(.blob-code-hunk) {
         white-space: pre !important;
         word-break: normal !important;
       }
