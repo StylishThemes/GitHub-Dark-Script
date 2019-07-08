@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Make Tooltips
-// @version     1.0.4
+// @version     1.0.5
 // @description A userscript converts title tooltips into Github Tooltips
 // @license     MIT
 // @author      StylishThemes
@@ -19,18 +19,17 @@
   GM_addStyle(".news .alert, .news .alert .body { overflow: visible !important; }");
 
   function init() {
-
-    let indx = 0,
-      els = document.querySelector("body").querySelectorAll("[title]"),
-      regex = /(link|time-ago|relative-time)/gi,
-      len = els.length;
+    let indx = 0;
+    const els = document.querySelector("body").querySelectorAll("[title]");
+    const regex = /(link|time-ago|relative-time)/gi;
+    const len = els.length;
 
     // loop with delay to allow user interaction
     function loop() {
       let el, txt, direction,
         // max number of DOM modifications per loop
         max = 0;
-      while ( max < 20 && indx < len ) {
+      while (max < 20 && indx < len) {
         if (indx >= len) {
           return;
         }
@@ -52,7 +51,7 @@
         indx++;
       }
       if (indx < len) {
-        setTimeout(function(){
+        setTimeout(() => {
           loop();
         }, 200);
       }
@@ -62,5 +61,4 @@
 
   init();
   document.addEventListener("pjax:end", init);
-
 })();

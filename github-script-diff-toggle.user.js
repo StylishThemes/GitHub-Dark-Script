@@ -19,12 +19,10 @@
 /* jshint esnext:true, unused:true */
 (() => {
   "use strict";
-  /*
-  This code is also part of the GitHub-Dark Script
-  (https://github.com/StylishThemes/GitHub-Dark-Script)
-  Extracted out into a separate userscript in case users only want to add this
-  functionality
-  */
+  // This code is also part of the GitHub-Dark Script
+  // (https://github.com/StylishThemes/GitHub-Dark-Script)
+  // Extracted out into a separate userscript in case users only want to add this
+  // functionality
   const icon =
     `<svg class="octicon" xmlns="http://www.w3.org/2000/svg" width="10" height="6.5" viewBox="0 0 10 6.5">
       <path d="M0 1.5L1.5 0l3.5 3.7L8.5.0 10 1.5 5 6.5 0 1.5z"/>
@@ -33,7 +31,7 @@
   // Add file diffs toggle
   function addFileToggle() {
     const files = $$("#files .file-actions");
-    let button = document.createElement("button");
+    const button = document.createElement("button");
     let updated = false;
     button.type = "button";
     button.className = "ghd-file-toggle btn btn-sm tooltipped tooltipped-n";
@@ -139,5 +137,4 @@
     addBindings();
     addFileToggle();
   }
-
 })();

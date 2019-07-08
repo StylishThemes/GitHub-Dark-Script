@@ -1,13 +1,14 @@
 {
   "name": "github-dark-script",
-  "version": "2.5.5",
+  "version": "2.5.6",
   "description": "GitHub Dark in userscript form, with an options panel",
   "license": "MIT",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
-    "eslint": "^6.0.1",
+    "eslint": "6.0.1",
+    "eslint-config-silverwind": "4.0.2",
     "updates": "8.2.1",
-    "ver": "^5.0.2"
+    "ver": "5.0.2"
   },
   "scripts": {
     "test": "npx eslint *.js",

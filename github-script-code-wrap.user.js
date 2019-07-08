@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Toggle Code Wrap
-// @version     1.1.10
+// @version     1.1.11
 // @description A userscript that adds a code wrap toggle button
 // @license     MIT
 // @author      StylishThemes
@@ -20,12 +20,10 @@
 /* jshint esnext:true, unused:true */
 (() => {
   "use strict";
-  /*
-  This code is also part of the GitHub-Dark Script
-  (https://github.com/StylishThemes/GitHub-Dark-Script)
-  Extracted out into a separate userscript in case users only want
-  to add this functionality
-  */
+  // This code is also part of the GitHub-Dark Script
+  // (https://github.com/StylishThemes/GitHub-Dark-Script)
+  // Extracted out into a separate userscript in case users only want
+  // to add this functionality
   // set by GM popup menu
   let globalWrap = GM_getValue("github-global-code-wrap", true),
     busy = false;
@@ -59,8 +57,9 @@
   }
 
   function toggleClasses(button) {
-    let css,
-      target = findSibling(button, "code, pre, .highlight, .diff-table");
+    let css;
+    const target = findSibling(button, "code, pre, .highlight, .diff-table");
+
     if (!target) {
       console.error("Code wrap icon associated code not found", button);
       return;
@@ -113,10 +112,10 @@
     let wrapper = $$(".blob-wrapper"),
       indx = wrapper ? wrapper.length : 0;
     const button = document.createElement("button");
-      button.className = "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
+    button.className = "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
         (globalWrap ? "" : " unwrap");
-      button.setAttribute("aria-label", "Toggle code wrap");
-      button.innerHTML = wrapIcon;
+    button.setAttribute("aria-label", "Toggle code wrap");
+    button.innerHTML = wrapIcon;
 
     // Code in table with line numbers
     while (indx--) {
@@ -242,5 +241,4 @@
 
     init();
   }
-
 })();

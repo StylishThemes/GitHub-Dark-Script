@@ -1,0 +1,5 @@
+root: true
+extends: silverwind
+
+rules:
+  prefer-arrow-callback: [0]

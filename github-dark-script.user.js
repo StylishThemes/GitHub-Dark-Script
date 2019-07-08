@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        GitHub Dark Script
-// @version     2.5.5
+// @version     2.5.6
 // @description GitHub Dark in userscript form, with a settings panel
 // @license     MIT
 // @author      StylishThemes
@@ -31,7 +31,7 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
-/* global GM, jscolor */
+/* global jscolor */
 /* jshint esnext:true, unused:true */
 (async () => {
   "use strict";
@@ -223,24 +223,23 @@
       cl4ss: "ghd-style"
     });
 
-  let timer, picker, // jscolor picker
-    isInitialized = "pending",
-    // prevent mutationObserver from going nuts
-    isUpdating = false,
-    // set when css code to test is pasted into the settings panel
-    testing = false,
-    //
-    debug = true,
-    data = {};
+  let timer, picker; // jscolor picker
+  let isInitialized = "pending";
+  // prevent mutationObserver from going nuts
+  let isUpdating = false;
+  // set when css code to test is pasted into the settings panel
+  let testing = false;
+  const debug = true;
+  let data = {};
 
   function updatePanel() {
     if (!isInitialized || !$("#ghd-settings-inner")) { return; }
     // prevent multiple change events from processing
     isUpdating = true;
 
-    let temp, el,
-      body = $("body"),
-      panel = $("#ghd-settings-inner");
+    let temp;
+    const body = $("body");
+    const panel = $("#ghd-settings-inner");
 
     $(".ghd-attach", panel).value = data.attach || defaults.attach;
     $(".ghd-font", panel).value = data.font || defaults.font;
@@ -257,7 +256,7 @@
     $(".ghd-codewrap-checkbox", panel).checked = isBool("enableCodeWrap");
     $(".ghd-monospace-checkbox", panel).checked = isBool("enableMonospace");
 
-    el = $(".ghd-diff-select", panel);
+    const el = $(".ghd-diff-select", panel);
     temp = "" + (data.modeDiffToggle || defaults.modeDiffToggle);
     el.value = temp;
     toggleClass(el, "enabled", temp !== "0");
@@ -281,7 +280,6 @@
     if (data.enableCodeWrap !== data.lastCW ||
       data.enableMonospace !== data.lastMS ||
       data.modeDiffToggle !== data.lastDT) {
-
       data.lastCW = data.enableCodeWrap;
       data.lastMS = data.enableMonospace;
       data.lastDT = data.modeDiffToggle;
@@ -298,7 +296,7 @@
       if (!Object.keys(data).length || ({}).toString.call(data) !== "[object Object]") {
         throw new Error();
       }
-    } catch(err) { // compat
+    } catch (err) { // compat
       data = await GM.getValue("data", defaults);
     }
     if (debug) {
@@ -320,7 +318,7 @@
 
   // modified from http://stackoverflow.com/a/5624139/145346
   function hexToRgb(hex) {
-    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? [
       parseInt(result[1], 16),
       parseInt(result[2], 16),
@@ -330,10 +328,11 @@
 
   // convert version "1.2.3" into "001002003" for easier comparison
   function convertVersion(val) {
-    let index,
-      parts = val ? val.split(".") : "",
-      str = "",
-      len = parts.length;
+    let index;
+    const parts = val ? val.split(".") : "";
+    let str = "";
+    const len = parts.length;
+
     for (index = 0; index < len; index++) {
       str += ("000" + parts[index]).slice(-3);
     }
@@ -351,12 +350,12 @@
       method: "GET",
       url: root + "package.json",
       onload: response => {
-        let pkg = JSON.parse(response.responseText);
+        const pkg = JSON.parse(response.responseText);
 
         // save last loaded date, so package.json is only loaded once a day
         data.date = new Date().getTime();
 
-        let ver = convertVersion(pkg.version);
+        const ver = convertVersion(pkg.version);
         // if new available, load it & parse
         if (ver > data.version) {
           if (data.version !== 0 && debug) {
@@ -398,7 +397,7 @@
     if (data["last" + group] === name && data["css" + group] !== "") {
       return applyTheme(name, group);
     }
-    let themeUrl = `${root}${themesXref[group].folder}${themes[group][name]}.min.css`;
+    const themeUrl = `${root}${themesXref[group].folder}${themes[group][name]}.min.css`;
     if (debug) {
       console.log(`Fetching ${group} ${name} theme`, themeUrl);
     }
@@ -420,7 +419,7 @@
     });
   }
 
-  async function applyTheme(name, group) {
+  async function applyTheme(_name, group) {
     let theme, css;
     if (debug) {
       theme = (data["css" + group] || "").match(regex);
@@ -437,16 +436,16 @@
   }
 
   function setTabSize() {
-    return data.tab > 0
-      ? `pre, .highlight, .diff-table, .tab-size {
+    return data.tab > 0 ?
+      `pre, .highlight, .diff-table, .tab-size {
           tab-size: ${data.tab} !important;
           -moz-tab-size: ${data.tab} !important;
-        }`
-      : "";
+        }` :
+      "";
   }
 
   function processStyle() {
-    let url = /^url/.test(data.image || "") ? data.image :
+    const url = /^url/.test(data.image || "") ? data.image :
       (data.image === "none" ? "none" : "url('" + data.image + "')");
     if (!data.enable) {
       if (debug) {
@@ -458,7 +457,7 @@
       console.log("Processing set styles");
     }
 
-    let processed = (data.rawCss || "")
+    const processed = (data.rawCss || "")
       // remove moz-document wrapper
       .replace(/@-moz-document regexp\((.*)\) \{(\n|\r)+/, "")
       // replace background image; if no "url" at start, then use "none"
@@ -509,7 +508,7 @@
       console.log("Updating user settings");
     }
 
-    let body = $("body"),
+    const body = $("body"),
       panel = $("#ghd-settings-inner");
 
     data.attach = $(".ghd-attach", panel).value;
@@ -525,10 +524,10 @@
     data.type = $(".ghd-type", panel).value;
     data.wrap = $(".ghd-wrap", panel).checked;
 
-    data.enableCodeWrap  = $(".ghd-codewrap-checkbox", panel).checked;
+    data.enableCodeWrap = $(".ghd-codewrap-checkbox", panel).checked;
     data.enableMonospace = $(".ghd-monospace-checkbox", panel).checked;
 
-    data.modeDiffToggle  = $(".ghd-diff-select", panel).value;
+    data.modeDiffToggle = $(".ghd-diff-select", panel).value;
 
     $style.disabled = !data.enable;
 
@@ -562,13 +561,14 @@
   }
 
   function getVersionTooltip() {
-    let indx,
-      ver = [],
-      // convert stored css version from "001014049" into "1.14.49" for tooltip
-      parts = String(data.version).match(/\d{3}/g),
-      len = parts && parts.length || 0;
+    let indx;
+    const ver = [];
+    // convert stored css version from "001014049" into "1.14.49" for tooltip
+    const parts = String(data.version).match(/\d{3}/g);
+    const len = parts && parts.length || 0;
+
     for (indx = 0; indx < len; indx++) {
-      ver.push(parseInt(parts[indx], 10));
+      ver.push(parseInt(parts[indx]));
     }
     return `Script v${version}\nCSS ${(ver.length ? "v" + ver.join(".") : "unknown")}`;
   }
@@ -632,14 +632,13 @@
       .Details--on .ghd-file-toggle svg { -webkit-transform:rotate(90deg); transform:rotate(90deg); }
     `);
 
-    let icon,
-      opts = buildOptions("github"),
-      optscm = buildOptions("codemirror"),
-      optsjp = buildOptions("jupyter"),
-      ver = getVersionTooltip();
+    const opts = buildOptions("github");
+    const optscm = buildOptions("codemirror");
+    const optsjp = buildOptions("jupyter");
+    const ver = getVersionTooltip();
 
     // circle-question-mark icon
-    icon = `
+    const icon = `
       <svg class="octicon" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 16 14">
         <path d="M6 10h2v2H6V10z m4-3.5c0 2.14-2 2.5-2 2.5H6c0-0.55 0.45-1 1-1h0.5c0.28 0 0.5-0.22 0.5-0.5v-1c0-0.28-0.22-0.5-0.5-0.5h-1c-0.28 0-0.5 0.22-0.5 0.5v0.5H4c0-1.5 1.5-3 3-3s3 1 3 2.5zM7 2.3c3.14 0 5.7 2.56 5.7 5.7S10.14 13.7 7 13.7 1.3 11.14 1.3 8s2.56-5.7 5.7-5.7m0-1.3C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7S10.86 1 7 1z" />
       </svg>
@@ -649,7 +648,7 @@
     make({
       el: "div",
       appendTo: "body",
-      attr: { id: "ghd-settings" },
+      attr: {id: "ghd-settings"},
       html: `
         <div id="ghd-settings-inner" class="boxed-group">
           <h3>GitHub-Dark Settings
@@ -772,11 +771,11 @@
   function buildCodeWrap() {
     // mutation events happen quick, so we still add an update flag
     isUpdating = true;
-    let icon = make({
+    const icon = make({
       el: "button",
       cl4ss: "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
         (data.wrap ? "" : " unwrap"),
-      attr: { "aria-label": "Toggle code wrap" },
+      attr: {"aria-label": "Toggle code wrap"},
       html: wrapIcon
     });
     $$(".blob-wrapper").forEach(el => {
@@ -803,7 +802,7 @@
   // Add monospace font toggle
   function addMonospaceToggle() {
     isUpdating = true;
-    let button = make({
+    const button = make({
       el: "button",
       cl4ss: "ghd-monospace toolbar-item tooltipped tooltipped-n",
       attr: {
@@ -825,17 +824,18 @@
   // Add file diffs toggle
   function addFileToggle() {
     isUpdating = true;
-    let firstButton,
-      button = make({
-        el: "button",
-        cl4ss: "ghd-file-toggle btn btn-sm tooltipped tooltipped-n",
-        attr: {
-          "type": "button",
-          "aria-label": "Click to Expand or Collapse file",
-          "tabindex": "-1"
-        },
-        html: fileIcon
-      });
+
+    const button = make({
+      el: "button",
+      cl4ss: "ghd-file-toggle btn btn-sm tooltipped tooltipped-n",
+      attr: {
+        "type": "button",
+        "aria-label": "Click to Expand or Collapse file",
+        "tabindex": "-1"
+      },
+      html: fileIcon
+    });
+
     $$("#files .file-actions").forEach(el => {
       if (el && !$(".ghd-file-toggle", el)) {
         // hide GitHub toggle view button
@@ -843,7 +843,8 @@
         el.appendChild(button.cloneNode(true));
       }
     });
-    firstButton = $(".ghd-file-toggle");
+
+    const firstButton = $(".ghd-file-toggle");
     // accordion mode = start with all but first entry collapsed
     if (firstButton && data.modeDiffToggle === "2") {
       toggleFile({
@@ -891,8 +892,9 @@
 
   // add keyboard shortcut to help menu (press "?")
   function buildShortcut() {
-    let row,
-      el = $(".keyboard-mappings tbody");
+    let row;
+    const el = $(".keyboard-mappings tbody");
+
     if (el && !$(".ghd-shortcut")) {
       row = makeRow(keyboardOpen.split("+"), "GitHub-Dark: open settings");
       el.appendChild(row);
@@ -912,9 +914,10 @@
   }
 
   function toggleCodeWrap(el) {
-    let css,
-      overallWrap = data.wrap,
-      target = findSibling(el, ".highlight, .diff-table, code, pre");
+    let css;
+    const overallWrap = data.wrap;
+    const target = findSibling(el, ".highlight, .diff-table, code, pre");
+
     if (!target) {
       if (debug) {
         console.log("Code wrap icon associated code not found", el);
@@ -946,9 +949,11 @@
   }
 
   function toggleMonospace(el) {
-    let tmp = el.closest(".previewable-comment-form"),
-      // single comment
-      textarea = $(".comment-form-textarea", tmp);
+    let tmp = el.closest(".previewable-comment-form");
+
+    // single comment
+    const textarea = $(".comment-form-textarea", tmp);
+
     if (textarea) {
       toggleClass(textarea, "ghd-monospace-font");
       textarea.focus();
@@ -973,7 +978,7 @@
 
   function toggleFile(event, init) {
     isUpdating = true;
-    let el = event.target.closest(".file");
+    const el = event.target.closest(".file");
     if (el && data.modeDiffToggle === "2") {
       if (!init) {
         el.classList.toggle("Details--on");
@@ -995,20 +1000,21 @@
   }
 
   function bindEvents() {
-    let el, menu, lastKey,
-      panel = $("#ghd-settings-inner"),
-      swatch = $("#ghd-swatch", panel);
+    let el, lastKey;
+
+    const panel = $("#ghd-settings-inner");
+    const swatch = $("#ghd-swatch", panel);
 
     // finish initialization
     $("#ghd-settings-inner .ghd-enable").checked = data.enable;
     toggleClass($("body"), "ghd-disabled", !data.enable);
 
     // Create our menu entry
-    menu = make({
+    const menu = make({
       el: "a",
       cl4ss: "dropdown-item",
       html: "GitHub Dark Settings",
-      attr: { id: "ghd-menu" }
+      attr: {id: "ghd-menu"}
     });
 
     // .header changed to .Header 22 Aug 2017
@@ -1021,6 +1027,7 @@
     // get last found item - gists only have the "go to profile" item;
     // GitHub has both
     el = el[el.length - 1];
+
     if (el) {
       // insert after
       el.parentNode.insertBefore(menu, el.nextSibling);
@@ -1032,7 +1039,7 @@
     on(document, "keypress keydown", event => {
       clearTimeout(timer);
       // use "g+o" to open up ghd options panel
-      let openKeys = keyboardOpen.split("+"),
+      const openKeys = keyboardOpen.split("+"),
         toggleKeys = keyboardToggle.split("+"),
         key = event.key.toLowerCase(),
         panelVisible = $("#ghd-settings").classList.contains("in");
@@ -1132,7 +1139,7 @@
     });
 
     on($(".ghd-paste-area-content", panel), "paste", async event => {
-      let toggle = $(".ghd-textarea-toggle", panel),
+      const toggle = $(".ghd-textarea-toggle", panel),
         textarea = event.target;
       setTimeout(async () => {
         textarea.parentNode.style.display = "none";
@@ -1144,7 +1151,7 @@
 
     // Toggles
     on($("body"), "click", event => {
-      let target = event.target;
+      const target = event.target;
       if (data.enableCodeWrap && target.classList.contains("ghd-wrap-toggle")) {
         // **** CODE WRAP TOGGLE ****
         event.stopPropagation();
@@ -1197,7 +1204,7 @@
   }
 
   function toggleStyle() {
-    let isEnabled = !data.enable;
+    const isEnabled = !data.enable;
     data.enable = isEnabled;
     $("#ghd-settings-inner .ghd-enable").checked = isEnabled;
     // add processedCss back into style (emptied when disabled)
@@ -1267,15 +1274,15 @@
     isInitialized = true;
   }
 
-	if (document.readyState === "loading") {
-		on(document, "DOMContentLoaded", buildOnLoad);
-	} else {
-		buildOnLoad();
-	}
+  if (document.readyState === "loading") {
+    on(document, "DOMContentLoaded", buildOnLoad);
+  } else {
+    buildOnLoad();
+  }
 
   /* utility functions */
   function isBool(name) {
-    let val = data[name];
+    const val = data[name];
     return typeof val === "boolean" ? val : defaults[name];
   }
 
@@ -1297,15 +1304,14 @@
   }
 
   function make(obj) {
-    let key,
-      el = document.createElement(obj.el);
+    let key;
+    const el = document.createElement(obj.el);
+
     if (obj.cl4ss) { el.className = obj.cl4ss; }
     if (obj.html) { el.innerHTML = obj.html; }
     if (obj.attr) {
-      for (key in obj.attr) {
-        if (obj.attr.hasOwnProperty(key)) {
-          el.setAttribute(key, obj.attr[key]);
-        }
+      for (key of obj.attr) {
+        el.setAttribute(key, obj.attr[key]);
       }
     }
     if (obj.appendTo) {
@@ -1324,7 +1330,7 @@
 
   function on(els, name, callback) {
     els = Array.isArray(els) ? els : [els];
-    let events = name.split(/\s+/);
+    const events = name.split(/\s+/);
     els.forEach(el => {
       events.forEach(ev => {
         el.addEventListener(ev, callback);
@@ -1355,5 +1361,4 @@
   //     await GM.setValue("debug", debug);
   //   }
   // });
-
 })();
