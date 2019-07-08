@@ -1309,7 +1309,7 @@
     if (obj.cl4ss) { el.className = obj.cl4ss; }
     if (obj.html) { el.innerHTML = obj.html; }
     if (obj.attr) {
-      for (key of obj.attr) {
+      for (key of Object.keys(obj.attr)) {
         el.setAttribute(key, obj.attr[key]);
       }
     }
