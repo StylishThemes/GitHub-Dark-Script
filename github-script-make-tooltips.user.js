@@ -12,7 +12,6 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-make-tooltips.user.js
 // ==/UserScript==
-/* jshint esnext:true, unused:true */
 (() => {
   "use strict";
 

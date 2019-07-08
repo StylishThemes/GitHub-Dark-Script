@@ -13,7 +13,6 @@
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-monospace-toggle.user.js
 // ==/UserScript==
-/* jshint esnext:true, unused:true */
 (() => {
   "use strict";
   // This code is also part of the GitHub-Dark Script

@@ -32,7 +32,6 @@
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-dark-script.user.js
 // ==/UserScript==
 /* global jscolor */
-/* jshint esnext:true, unused:true */
 (async () => {
   "use strict";
 
