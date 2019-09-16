@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="githubdark-script-logo" src="https://rawgit.com/StylishThemes/logos/master/github.dark/githubdark-script-mini.svg" width="580">
+  <img alt="githubdark-script-logo" src="https://cdn.jsdelivr.net/gh/StylishThemes/logos@master/github.dark/githubdark-script-mini.svg" width="580">
   <br>
   <a href="https://github.com/StylishThemes/GitHub-Dark-Script/tags">
     <img src="https://img.shields.io/github/tag/StylishThemes/GitHub-Dark-Script.svg?label=tagged%20at" alt="Tag">
