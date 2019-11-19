@@ -5,10 +5,10 @@
   "license": "MIT",
   "repository": "StylishThemes/GitHub-Dark-Script",
   "devDependencies": {
-    "eslint": "6.0.1",
-    "eslint-config-silverwind": "4.0.2",
-    "updates": "8.2.1",
-    "versions": "7.0.1"
+    "eslint": "6.6.0",
+    "eslint-config-silverwind": "5.0.0",
+    "updates": "9.0.1",
+    "versions": "7.0.2"
   },
   "scripts": {
     "test": "npx eslint *.js",

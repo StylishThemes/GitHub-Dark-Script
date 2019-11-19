@@ -50,32 +50,32 @@
     root = "https://raw.githubusercontent.com/StylishThemes/GitHub-Dark/master/",
 
     defaults = {
-      attach : "scroll",
-      color  : "#4183C4",
-      enable : true,
-      font   : "Menlo",
-      image  : "url('data:image/png;base64,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')",
-      tab    : 0, // 0 is disabled
-      theme  : "Twilight", // GitHub
+      attach: "scroll",
+      color: "#4183C4",
+      enable: true,
+      font: "Menlo",
+      image: "url('data:image/png;base64,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')",
+      tab: 0, // 0 is disabled
+      theme: "Twilight", // GitHub
       themeCm: "Twilight", // CodeMirror
       themeJp: "Twilight", // Jupyter
-      type   : "tiled",
-      wrap   : false,
+      type: "tiled",
+      wrap: false,
 
       // toggle buttons
-      enableCodeWrap  : true,
-      enableMonospace : true,
+      enableCodeWrap: true,
+      enableMonospace: true,
       // diff toggle + accordion mode
-      modeDiffToggle  : "1",
+      modeDiffToggle: "1",
 
       // internal variables
-      date         : 0,
-      version      : 0,
-      rawCss       : "",
-      cssgithub    : "",
+      date: 0,
+      version: 0,
+      rawCss: "",
+      cssgithub: "",
       csscodemirror: "",
-      cssjupyter   : "",
-      processedCss : ""
+      cssjupyter: "",
+      processedCss: ""
     },
 
     // extract style & theme name
@@ -232,7 +232,7 @@
   let data = {};
 
   function updatePanel() {
-    if (!isInitialized || !$("#ghd-settings-inner")) { return; }
+    if (!isInitialized || !$("#ghd-settings-inner")) { return }
     // prevent multiple change events from processing
     isUpdating = true;
 
@@ -300,9 +300,9 @@
     }
     if (debug) {
       if (init) {
-        console.log("GitHub-Dark Script initializing!");
+        console.info("GitHub-Dark Script initializing!");
       }
-      console.log("Retrieved stored values", data);
+      console.info("Retrieved stored values", data);
     }
   }
 
@@ -311,7 +311,7 @@
     await GM.setValue("data", JSON.stringify(reset ? defaults : data));
     updatePanel();
     if (debug) {
-      console.log((reset ? "Resetting" : "Saving") + " current values", data);
+      console.info((reset ? "Resetting" : "Saving") + " current values", data);
     }
   }
 
@@ -336,14 +336,14 @@
       str += ("000" + parts[index]).slice(-3);
     }
     if (debug) {
-      console.log(`Converted version "${val}" to "${str}" for easy comparison`);
+      console.info(`Converted version "${val}" to "${str}" for easy comparison`);
     }
     return val ? str : val;
   }
 
   function checkVersion() {
     if (debug) {
-      console.log("Fetching package.json");
+      console.info("Fetching package.json");
     }
     GM.xmlHttpRequest({
       method: "GET",
@@ -358,7 +358,7 @@
         // if new available, load it & parse
         if (ver > data.version) {
           if (data.version !== 0 && debug) {
-            console.log(`Updating from ${data.version} to ${ver}`);
+            console.info(`Updating from ${data.version} to ${ver}`);
           }
           data.version = ver;
           fetchAndApplyStyle();
@@ -373,7 +373,7 @@
 
   function fetchAndApplyStyle() {
     if (debug) {
-      console.log(`Fetching ${root}github-dark.css`);
+      console.info(`Fetching ${root}github-dark.css`);
     }
     GM.xmlHttpRequest({
       method: "GET",
@@ -389,7 +389,7 @@
   function fetchAndApplyTheme(name, group) {
     if (!data.enable) {
       if (debug) {
-        console.log("Disabled: stop theme processing");
+        console.info("Disabled: stop theme processing");
       }
       return;
     }
@@ -398,7 +398,7 @@
     }
     const themeUrl = `${root}${themesXref[group].folder}${themes[group][name]}.min.css`;
     if (debug) {
-      console.log(`Fetching ${group} ${name} theme`, themeUrl);
+      console.info(`Fetching ${group} ${name} theme`, themeUrl);
     }
     GM.xmlHttpRequest({
       method: "GET",
@@ -412,7 +412,7 @@
         } else {
           theme = data["css" + group];
           console.error(`Failed to load ${group} theme file: "${name}"`);
-          console.log(`Falling back to previous ${group} theme of ${theme.substring(0, theme.indexOf("*/") + 2)}`);
+          console.info(`Falling back to previous ${group} theme of ${theme.substring(0, theme.indexOf("*/") + 2)}`);
         }
       }
     });
@@ -422,7 +422,7 @@
     let theme, css;
     if (debug) {
       theme = (data["css" + group] || "").match(regex);
-      console.log(`Adding syntax ${group} theme "${theme}" to css`);
+      console.info(`Adding syntax ${group} theme "${theme}" to css`);
     }
     css = data.processedCss || "";
     css = css.replace(
@@ -448,12 +448,12 @@
       (data.image === "none" ? "none" : "url('" + data.image + "')");
     if (!data.enable) {
       if (debug) {
-        console.log("Disabled: stop processing");
+        console.info("Disabled: stop processing");
       }
       return;
     }
     if (debug) {
-      console.log("Processing set styles");
+      console.info("Processing set styles");
     }
 
     const processed = (data.rawCss || "")
@@ -486,14 +486,14 @@
 
   function applyStyle(css) {
     if (debug) {
-      console.log("Applying style", `"${(css || "").match(regex)}"`);
+      console.info("Applying style", `"${(css || "").match(regex)}"`);
     }
     $style.textContent = css || "";
   }
 
   function addSavedStyle() {
     if (debug) {
-      console.log("Adding previously saved style");
+      console.info("Adding previously saved style");
     }
 
     // apply already processed css to prevent FOUC
@@ -504,7 +504,7 @@
     isUpdating = true;
 
     if (debug) {
-      console.log("Updating user settings");
+      console.info("Updating user settings");
     }
 
     const body = $("body"),
@@ -582,7 +582,7 @@
 
   async function buildSettings() {
     if (debug) {
-      console.log("Adding settings panel & GitHub Dark link to profile dropdown");
+      console.info("Adding settings panel & GitHub Dark link to profile dropdown");
     }
     // Script-specific CSS
     GM.addStyle(`
@@ -919,7 +919,7 @@
 
     if (!target) {
       if (debug) {
-        console.log("Code wrap icon associated code not found", el);
+        console.info("Code wrap icon associated code not found", el);
       }
       return;
     }
@@ -1306,8 +1306,8 @@
     let key;
     const el = document.createElement(obj.el);
 
-    if (obj.cl4ss) { el.className = obj.cl4ss; }
-    if (obj.html) { el.innerHTML = obj.html; }
+    if (obj.cl4ss) { el.className = obj.cl4ss }
+    if (obj.html) { el.innerHTML = obj.html }
     if (obj.attr) {
       for (key of Object.keys(obj.attr)) {
         el.setAttribute(key, obj.attr[key]);
