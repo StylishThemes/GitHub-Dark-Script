@@ -11,10 +11,10 @@
     "versions": "7.0.3"
   },
   "scripts": {
-    "test": "npx eslint *.js",
-    "update": "npx updates -cu && rm -rf node_modules && npm i",
-    "patch": "npm run test && npx versions -p patch github-dark-script.user.js",
-    "minor": "npm run test && npx versions -p minor github-dark-script.user.js",
-    "major": "npm run test && npx versions -p major github-dark-script.user.js"
+    "test": "eslint *.js",
+    "patch": "versions -C -p patch github-dark-script.user.js",
+    "minor": "versions -C -p minor github-dark-script.user.js",
+    "major": "versions -C -p major github-dark-script.user.js",
+    "update": "updates -cu && npm i"
   }
 }
