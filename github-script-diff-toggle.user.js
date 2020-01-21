@@ -15,6 +15,7 @@
 // @icon        https://avatars3.githubusercontent.com/u/6145677?v=3&s=200
 // @updateURL   https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
 // @downloadURL https://raw.githubusercontent.com/StylishThemes/GitHub-Dark-Script/master/github-script-diff-toggle.user.js
+// @homepageURL https://github.com/StylishThemes/GitHub-Dark-Script
 // ==/UserScript==
 (() => {
   "use strict";
