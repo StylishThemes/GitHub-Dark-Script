@@ -257,7 +257,7 @@
     $(".ghd-monospace-checkbox", panel).checked = isBool("enableMonospace");
 
     const el = $(".ghd-diff-select", panel);
-    temp = "" + (data.modeDiffToggle || defaults.modeDiffToggle);
+    temp = `${data.modeDiffToggle || defaults.modeDiffToggle}`;
     el.value = temp;
     toggleClass(el, "enabled", temp !== "0");
 
@@ -312,7 +312,7 @@
     await GM.setValue("data", JSON.stringify(reset ? defaults : data));
     updatePanel();
     if (debug) {
-      console.info((reset ? "Resetting" : "Saving") + " current values", data);
+      console.info(`${reset ? "Resetting" : "Saving"} current values`, data);
     }
   }
 
@@ -334,7 +334,7 @@
     const len = parts.length;
 
     for (index = 0; index < len; index++) {
-      str += ("000" + parts[index]).slice(-3);
+      str += (`000${parts[index]}`).slice(-3);
     }
     if (debug) {
       console.info(`Converted version "${val}" to "${str}" for easy comparison`);
@@ -348,7 +348,7 @@
     }
     GM.xmlHttpRequest({
       method: "GET",
-      url: root + "package.json",
+      url: `${root}package.json`,
       onload: response => {
         const pkg = JSON.parse(response.responseText);
 
@@ -378,7 +378,7 @@
     }
     GM.xmlHttpRequest({
       method: "GET",
-      url: root + "github-dark.css",
+      url: `${root}github-dark.css`,
       onload: response => {
         data.rawCss = response.responseText;
         processStyle();
@@ -394,7 +394,7 @@
       }
       return;
     }
-    if (data["last" + group] === name && data["css" + group] !== "") {
+    if (data[`last${group}`] === name && data[`css${group}`] !== "") {
       return applyTheme(name, group);
     }
     const themeUrl = `${root}${themesXref[group].folder}${themes[group][name]}.min.css`;
@@ -407,11 +407,11 @@
       onload: response => {
         let theme = response.responseText;
         if (response.status === 200 && theme) {
-          data["css" + group] = theme;
-          data["last" + group] = name;
+          data[`css${group}`] = theme;
+          data[`last${group}`] = name;
           applyTheme(name, group);
         } else {
-          theme = data["css" + group];
+          theme = data[`css${group}`];
           console.error(`Failed to load ${group} theme file: "${name}"`);
           console.info(`Falling back to previous ${group} theme of ${theme.substring(0, theme.indexOf("*/") + 2)}`);
         }
@@ -422,13 +422,13 @@
   async function applyTheme(_name, group) {
     let theme, css;
     if (debug) {
-      theme = (data["css" + group] || "").match(regex);
+      theme = (data[`css${group}`] || "").match(regex);
       console.info(`Adding syntax ${group} theme "${theme}" to css`);
     }
     css = data.processedCss || "";
     css = css.replace(
       `/*[[${themesXref[group].placeholder}]]*/`,
-      data["css" + group] || ""
+      data[`css${group}`] || ""
     );
     applyStyle(css);
     await setStoredValues();
@@ -446,7 +446,7 @@
 
   function processStyle() {
     const url = /^url/.test(data.image || "") ? data.image :
-      (data.image === "none" ? "none" : "url('" + data.image + "')");
+      (data.image === "none" ? "none" : `url('${data.image}')`);
     if (!data.enable) {
       if (debug) {
         console.info("Disabled: stop processing");
@@ -570,7 +570,7 @@
     for (indx = 0; indx < len; indx++) {
       ver.push(parseInt(parts[indx]));
     }
-    return `Script v${version}\nCSS ${(ver.length ? "v" + ver.join(".") : "unknown")}`;
+    return `Script v${version}\nCSS ${(ver.length ? `v${ver.join(".")}` : "unknown")}`;
   }
 
   function buildOptions(group) {
@@ -773,8 +773,8 @@
     isUpdating = true;
     const icon = make({
       el: "button",
-      cl4ss: "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
-        (data.wrap ? "" : " unwrap"),
+      cl4ss: `ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm${
+        data.wrap ? "" : " unwrap"}`,
       attr: {"aria-label": "Toggle code wrap"},
       html: wrapIcon
     });
@@ -1177,7 +1177,7 @@
     picker.borderWidth = 0;
     picker.borderColor = "#444";
     picker.onFineChange = () => {
-      swatch.style.backgroundColor = "#" + picker;
+      swatch.style.backgroundColor = `#${picker}`;
     };
   }
 

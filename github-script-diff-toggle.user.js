@@ -126,7 +126,7 @@
 
     // Add GM options
     GM_registerMenuCommand("GitHub Diff File Toggle", () => {
-      let result = "" + (GM_getValue("accordion") || false);
+      let result = `${GM_getValue("accordion") || false}`;
       const val = prompt("Accordion Mode? (true/false):", result);
       if (val) {
         result = /^t/.test(val);

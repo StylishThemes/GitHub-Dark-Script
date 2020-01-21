@@ -112,8 +112,8 @@
     let wrapper = $$(".blob-wrapper"),
       indx = wrapper ? wrapper.length : 0;
     const button = document.createElement("button");
-    button.className = "ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm" +
-        (globalWrap ? "" : " unwrap");
+    button.className = `ghd-wrap-toggle tooltipped tooltipped-sw btn btn-sm${
+      globalWrap ? "" : " unwrap"}`;
     button.setAttribute("aria-label", "Toggle code wrap");
     button.innerHTML = wrapIcon;
 
@@ -233,7 +233,7 @@
     // Add GM options
     GM_registerMenuCommand("Set Global Code Wrap Option", () => {
       const body = $("body"),
-        val = prompt("Global Code Wrap (true/false):", "" + globalWrap);
+        val = prompt("Global Code Wrap (true/false):", `${globalWrap}`);
       globalWrap = /^t/.test(val);
       GM_setValue("github-global-code-wrap", globalWrap);
       body.classList.toggle("nowrap", !globalWrap);
