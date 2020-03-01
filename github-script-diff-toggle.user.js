@@ -48,7 +48,7 @@
     });
     // start with all but first entry collapsed
     if (updated && files.length) {
-      if (/^t/.test(GM_getValue("accordion"))) {
+      if ((GM_getValue("accordion") || "").startsWith("t")) {
         toggleFile({
           target: $(".ghd-file-toggle")
         }, "init");
@@ -129,7 +129,7 @@
       let result = `${GM_getValue("accordion") || false}`;
       const val = prompt("Accordion Mode? (true/false):", result);
       if (val) {
-        result = /^t/.test(val);
+        result = val.startsWith("t");
         GM_setValue("accordion", result);
       }
     });

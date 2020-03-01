@@ -445,8 +445,7 @@
   }
 
   function processStyle() {
-    const url = /^url/.test(data.image || "") ? data.image :
-      (data.image === "none" ? "none" : `url('${data.image}')`);
+    const url = (data.image || "").startsWith("url") ? data.image : (data.image === "none" ? "none" : `url('${data.image}')`);
     if (!data.enable) {
       if (debug) {
         console.info("Disabled: stop processing");
@@ -926,7 +925,7 @@
     }
     // code with line numbers
     if (target.nodeName === "TABLE") {
-      if (target.className.indexOf("wrap-table") < 0) {
+      if (!target.className.includes("wrap-table")) {
         css = !overallWrap;
       } else {
         css = target.classList.contains("ghd-unwrap-table");
@@ -1260,7 +1259,7 @@
     }
     // add panel even if you're not logged in - open panel using keyboard
     // shortcut just not on githubusercontent pages (no settings panel needed)
-    if (window.location.host.indexOf("githubusercontent.com") < 0) {
+    if (!window.location.host.includes("githubusercontent.com")) {
       buildSettings();
       // add event binding on document ready
       bindEvents();

@@ -66,7 +66,7 @@
     }
     // code with line numbers
     if (target.nodeName === "TABLE") {
-      if (target.className.indexOf("wrap-table") < 0) {
+      if (!target.className.includes("wrap-table")) {
         css = !globalWrap;
       } else {
         css = target.classList.contains("ghd-unwrap-table");
@@ -232,9 +232,9 @@
 
     // Add GM options
     GM_registerMenuCommand("Set Global Code Wrap Option", () => {
-      const body = $("body"),
-        val = prompt("Global Code Wrap (true/false):", `${globalWrap}`);
-      globalWrap = /^t/.test(val);
+      const body = $("body");
+      const val = prompt("Global Code Wrap (true/false):", `${globalWrap}`);
+      globalWrap = val.startsWith("t");
       GM_setValue("github-global-code-wrap", globalWrap);
       body.classList.toggle("nowrap", !globalWrap);
     });
